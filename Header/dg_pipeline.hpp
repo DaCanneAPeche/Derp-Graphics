@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vulkan/vulkan.hpp"
+#include "dg_device.hpp"
 
 namespace dg
 {
@@ -25,15 +26,25 @@ namespace dg
 	class Pipeline
 	{
 
-		public:
-			Pipeline();
-			~Pipeline();
+	public:
+		Pipeline(Device& device);
+		~Pipeline();
 
-			Pipeline(const Pipeline &) = delete;
-			Pipeline& operator=(const Pipeline &) = delete;
+		Pipeline(const Pipeline &) = delete;
+		Pipeline& operator=(const Pipeline &) = delete;
 
+	private:
 
-		private:
+		void createGraphicsPipeline(const std::string& vertShaderPath,
+				const std::string& fragShaderPath,
+				const PipelineConfigInfo& configInfo);
+
+		vk::ShaderModule createShaderModule(const std::vector<char>& code);
+		
+		Device& m_device;
+		VkPipeline m_graphicsPipeline;
+		vk::ShaderModule m_vertShaderModule;
+		vk::ShaderModule m_fragShaderModule;
 
 	};
 	
