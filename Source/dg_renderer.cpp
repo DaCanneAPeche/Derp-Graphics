@@ -26,6 +26,9 @@ namespace dg
     {
         Logger::msgLn("Creating vk instance");
 
+        if (m_enableValidationLayers && !areValidationLayersSupported())
+            throw std::runtime_error("Validation layers are requested but not available");
+
         vk::ApplicationInfo appInfo(
                 applicationInfo.name.c_str(),
                 VK_MAKE_VERSION(applicationInfo.version[0], 
@@ -40,10 +43,18 @@ namespace dg
         const char** glfwExtensions;
         glfwExtensions = glfwGetRequiredInstanceExtensions(&extensionsCount);
         
+        uint32_t layerCount = 0;
+        const char** ppEnabledLayers = nullptr;
+       
+        if (m_enableValidationLayers) {
+            layerCount = static_cast<uint32_t>(m_validationLayers.size());
+            ppEnabledLayers = m_validationLayers.data();
+        } 
+
         vk::InstanceCreateInfo createInfo(
                 vk::InstanceCreateFlags(),
                 &appInfo,
-                0, nullptr,
+                layerCount, ppEnabledLayers,
                 extensionsCount,
                 glfwExtensions
                 );
@@ -98,6 +109,29 @@ namespace dg
     void Renderer::draw()
     {
 
+    }
+		
+    bool Renderer::areValidationLayersSupported()
+    {
+        std::vector<vk::LayerProperties> availableLayers = vk::enumerateInstanceLayerProperties();
+
+        for (const char* layerName : m_validationLayers)
+        {
+            bool layerFound = true;
+
+            for (const auto& layerProperties : availableLayers)
+            {
+                if (strcmp(layerName, layerProperties.layerName) == 0)
+                {
+                    layerFound = true;
+                    break;
+                }
+            }
+
+            if (!layerFound) return false;
+        }
+
+        return true;
     }
     
 } /* dg */ 

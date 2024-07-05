@@ -44,6 +44,15 @@ namespace dg
 		std::vector<const char*> m_requestedExtensions = {vk::KHRSwapchainExtensionName};
 		Device m_device { instance, m_requestedExtensions};
 		vk::PipelineLayout m_pipelineLayout;
+
+		// Validation layers
+		std::vector<const  char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};
+#ifdef NDEBUG
+		const bool m_enableValidationLayers = false;
+#else
+		const bool m_enableValidationLayers = true;
+#endif
+		bool areValidationLayersSupported();
 	};
 	
 } /* dg */ 
