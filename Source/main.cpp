@@ -2,7 +2,7 @@
 #include "dg_renderer.hpp"
 #include "dg_logger.hpp"
 
-int main(void)
+void run()
 {
     dg::Logger::isEnabled = true;
 
@@ -13,5 +13,15 @@ int main(void)
     while (!renderer.shouldWindowClose())
     {
         renderer.pollEvents();
+    }
+}
+
+int main(void)
+{
+    try {
+        run();
+    } catch(const std::exception &error) {
+        std::cerr << error.what() << std::endl;
+        return 1;
     }
 }

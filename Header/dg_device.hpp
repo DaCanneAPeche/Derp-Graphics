@@ -1,26 +1,44 @@
 #include "vulkan/vulkan.hpp"
 
 #include <span>
+#include <array>
 
 namespace dg
 {
 
-	namespace device
+	class Device
 	{
 
-		bool isSupporting(
-				const vk::PhysicalDevice& physicalDevice,
-				const std::span<char *>& requestedExtensions
-				);
+		public:
+			Device(vk::Instance& instance, const std::vector<const char*>& extensions);
+			~Device();
 
-		bool isSuitable(const vk::PhysicalDevice physicalDevice);
+			Device(const Device&) = delete;
+			Device& operator=(const Device&) = delete;
 
-		vk::PhysicalDevice choosePhysicalDevice(const vk::Instance instance);
+			vk::PhysicalDevice physical;
+			vk::Device device;
 
-		uint32_t findQueueFamilyIndex(vk::PhysicalDevice physicalDevice, vk::QueueFlags queueType);
+			void init()
+			{
+				pickPhysicalDevice();
+				createLogicalDevice();
+			}
 
-		vk::Device createLogicalDevice(vk::PhysicalDevice physicalDevice);
+			void clean()
+			{
+				device.destroy();
+			}
+
+		private:
+			void pickPhysicalDevice();
+			void createLogicalDevice();
+			bool areExtensionsSupportedBy(const vk::PhysicalDevice& physicalDevice);
+			uint32_t findQueueFamilyIndex(vk::QueueFlags queueType);
+
+			const std::vector<const char*>& m_extensions;
+			vk::Instance& m_instance;
 		
-	} /* device */ 
+	};
 	
 } /* dg */ 

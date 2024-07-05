@@ -34,7 +34,6 @@ namespace dg
 	private:
 
 		void createInstance();
-		void chooseDevices();
 		void createPipelineLayout();
 		void createPipeline();
 		void createCommandBuffers();
@@ -42,7 +41,9 @@ namespace dg
 		void recreateSwapChain();
 		void recordCommandBuffer(int imageIndex);
 
-		vk::PhysicalDevice m_physicalDevice;
+		std::vector<const char*> m_requestedExtensions = {vk::KHRSwapchainExtensionName};
+		Device m_device { instance, m_requestedExtensions};
+		vk::PipelineLayout m_pipelineLayout;
 	};
 	
 } /* dg */ 

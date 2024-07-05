@@ -1,6 +1,7 @@
 #include "dg_renderer.hpp"
 #include "vulkan/vulkan.hpp"
 #include "dg_logger.hpp"
+#include "dg_memory_allocator.hpp"
 
 namespace dg
 {
@@ -9,11 +10,15 @@ namespace dg
         : window(windowInfo), applicationInfo {appInfo}
     {
         createInstance();    
-        chooseDevices();
+        m_device.init();
+        Logger::logPhysicalDevice(m_device.physical);
+        MemoryAllocator::init(m_device.physical, m_device.device, instance);
+        createPipelineLayout();
     }
 
     Renderer::~Renderer()
     {
+        m_device.clean();
         instance.destroy(nullptr);
     }
 
@@ -55,24 +60,14 @@ namespace dg
         Logger::msgLn("Vk instance created");
     }
 		
-    void Renderer::chooseDevices()
-    {
-        m_physicalDevice = device::choosePhysicalDevice(instance);
-        Logger::logPhysicalDevice(m_physicalDevice);
-    }
-
     void Renderer::createPipelineLayout()
     {
         Logger::msgLn("Creating pipeline layout");
 
-        vk::PipelineLayoutCreateInfo pipelineLayoutInfo {};
-        pipelineLayoutInfo.sType = vk::StructureType::ePipelineLayoutCreateInfo;
-        pipelineLayoutInfo.setLayoutCount = 0;
-        pipelineLayoutInfo.pSetLayouts = nullptr;
-        pipelineLayoutInfo.pushConstantRangeCount = 0;
-        pipelineLayoutInfo.pPushConstantRanges = nullptr;
+        vk::PipelineLayoutCreateInfo pipelineInfo
+            (vk::PipelineLayoutCreateFlags(), 0,  nullptr, 0, nullptr);
 
-        // createPipelineLayout -> need the device
+        m_pipelineLayout = m_device.device.createPipelineLayoutUnique(pipelineInfo).get();
     }
 
     void Renderer::createPipeline()

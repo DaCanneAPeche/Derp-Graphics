@@ -2,6 +2,8 @@
 
 #define VMA_IMPLEMENTATION
 #define VA_VULKAN_VERSION 1003000
+#define VMA_STATIC_VULKAN_FUNCTIONS 0
+#define VMA_DYNAMIC_VULKAN_FUNCTIONS 1
 #include "vk_mem_alloc.h"
 #include "vulkan/vulkan.hpp"
 
@@ -27,11 +29,12 @@ namespace dg
 			get().iInit(physicalDevice, device, instance);
 		}
 
-		static VmaAllocator& getAllocator() { return m_allocator; }
+		static VmaAllocator& getAllocator() { return get().m_allocator; }
 
 	private:
-		MemoryAllocator () {}
-		~MemoryAllocator ()
+		MemoryAllocator() {}
+
+		~MemoryAllocator()
 		{
 			vmaDestroyAllocator(m_allocator);
 		}
@@ -45,7 +48,7 @@ namespace dg
 
 			VmaAllocatorCreateInfo allocatorCreateInfo = {};
 			allocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
-			allocatorCreateInfo.vulkanApiVersion = VK_API_VERSION_1_0;
+			allocatorCreateInfo.vulkanApiVersion = VK_API_VERSION_1_3;
 			allocatorCreateInfo.physicalDevice = physicalDevice;
 			allocatorCreateInfo.device = device;
 			allocatorCreateInfo.instance = instance;
@@ -54,7 +57,7 @@ namespace dg
 			vmaCreateAllocator(&allocatorCreateInfo, &m_allocator);
 		}
 
-		static VmaAllocator m_allocator;
+		VmaAllocator m_allocator;
 
 	};
 
