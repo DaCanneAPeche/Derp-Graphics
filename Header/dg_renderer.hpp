@@ -2,7 +2,9 @@
 
 #include "dg_window.hpp"
 #include "dg_device.hpp"
+#include "dg_pipeline.hpp"
 
+// std
 #include <memory>
 #include <array>
 
