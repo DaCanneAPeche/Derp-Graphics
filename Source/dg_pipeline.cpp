@@ -8,6 +8,76 @@ namespace dg
 	{
 
 	}
+		
+	void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
+	{
+		configInfo.inputAssemblyInfo = vk::PipelineInputAssemblyStateCreateInfo(
+				{},
+				vk::PrimitiveTopology::eTriangleList,
+				vk::False
+				);
+
+		configInfo.viewportInfo = vk::PipelineViewportStateCreateInfo(
+				{}, 1, {}, 1, {}
+				);
+
+		configInfo.rasterizationInfo = vk::PipelineRasterizationStateCreateInfo(
+				{},
+				vk::False,
+				vk::False,
+				vk::PolygonMode::eFill,
+				vk::CullModeFlagBits::eNone,
+				vk::FrontFace::eClockwise,
+				vk::False,
+				0.0f,
+				0.0f,
+				0.0f,
+				1.0f
+				);
+
+		configInfo.multisampleInfo = vk::PipelineMultisampleStateCreateInfo(
+				{},
+				vk::SampleCountFlagBits::e1,
+				vk::False
+				);
+
+		configInfo.colorBlendAttachment = vk::PipelineColorBlendAttachmentState(
+				vk::False,
+				vk::BlendFactor::eOne,
+				vk::BlendFactor::eZero,
+				vk::BlendOp::eAdd,
+				vk::BlendFactor::eOne,
+				vk::BlendFactor::eZero,
+				vk::BlendOp::eAdd,
+				vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG |
+					vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA
+				);
+
+		configInfo.colorBlendInfo = vk::PipelineColorBlendStateCreateInfo(
+				{},
+				vk::False,
+				vk::LogicOp::eCopy,
+				configInfo.colorBlendAttachment,
+				{0.0f, 0.0f, 0.0f, 0.0f}
+				);
+
+		configInfo.depthStencilInfo = vk::PipelineDepthStencilStateCreateInfo(
+				{},
+				vk::True,
+				vk::True,
+				vk::CompareOp::eLess,
+				vk::False,
+				vk::False,
+				{}, {}, 0.0f, 1.0f
+				);
+
+		configInfo.dynamicStateEnables = { vk::DynamicState::eViewport, vk::DynamicState::eScissor };
+
+		configInfo.dynamicStateInfo = vk::PipelineDynamicStateCreateInfo(
+				{},
+				configInfo.dynamicStateEnables
+				);
+	}
 
 	Pipeline::~Pipeline()
 	{

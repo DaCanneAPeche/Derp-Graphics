@@ -15,7 +15,7 @@ namespace dg
 		vk::PipelineColorBlendAttachmentState colorBlendAttachment;
 		vk::PipelineColorBlendStateCreateInfo colorBlendInfo;
 		vk::PipelineDepthStencilStateCreateInfo depthStencilInfo;
-		std::vector<VkDynamicState> dynamicStateEnables;
+		std::vector<vk::DynamicState> dynamicStateEnables;
 		vk::PipelineDynamicStateCreateInfo dynamicStateInfo;
 		vk::PipelineLayout pipelineLayout = nullptr;
 		vk::RenderPass renderPass = nullptr;
@@ -32,6 +32,8 @@ namespace dg
 
 		Pipeline(const Pipeline &) = delete;
 		Pipeline& operator=(const Pipeline &) = delete;
+
+		static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
 	private:
 
