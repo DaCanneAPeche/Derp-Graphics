@@ -44,8 +44,9 @@ namespace dg
 		void recordCommandBuffer(int imageIndex);
 
 		std::vector<const char*> m_requestedExtensions = {vk::KHRSwapchainExtensionName};
-		Device m_device { instance, m_requestedExtensions};
+		Device m_device { instance, m_requestedExtensions, window};
 		vk::PipelineLayout m_pipelineLayout;
+		std::unique_ptr<Pipeline> m_pipeline;
 
 		// Validation layers
 		std::vector<const  char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};

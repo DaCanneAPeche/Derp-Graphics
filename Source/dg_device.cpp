@@ -8,22 +8,30 @@
 namespace dg
 {
 
-	Device::Device(vk::Instance& instance, const std::vector<const char*>& extensions)
-		: m_instance(instance), m_extensions(extensions) {}
+	Device::Device(vk::Instance& instance, const std::vector<const char*>& extensions, Window& window)
+		: m_instance(instance), m_extensions(extensions), m_window(window)
+	{
+	}
 
 	Device::~Device()
 	{
 		// device.destroy(nullptr);
 	}
 	
+	void Device::init()
+	{
+		createWindowSurface();
+		pickPhysicalDevice();
+		createLogicalDevice();
+	}
+
 	void Device::pickPhysicalDevice()
 	{
-
 		std::vector<vk::PhysicalDevice> availableDevices = m_instance.enumeratePhysicalDevices();
 
 		for (const auto& device : availableDevices)
 		{
-			if (areExtensionsSupportedBy(device))
+			if (isDeviceSuitable(device))
 			{
 				physical = device;
 				Logger::msgLn("Physical device was correctly choosen");
@@ -36,41 +44,71 @@ namespace dg
 	
 	void Device::createLogicalDevice()
 	{
-		uint32_t graphicsQueueFamilyIndex = findQueueFamilyIndex(vk::QueueFlagBits::eGraphics);
+		QueueFamilyIndices queueFamilyIndices = findQueueFamilyIndices(physical);
+
+		std::set<uint32_t> uniqueQueueFamilies = {
+			queueFamilyIndices.graphicsFamily.value(), queueFamilyIndices.presentFamily.value()
+		};
+		std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos(uniqueQueueFamilies.size());
 
 		float queuePriority = 1.0f;
-		vk::DeviceQueueCreateInfo queueCreateInfo(
-				vk::DeviceQueueCreateFlags(), graphicsQueueFamilyIndex, 1, &queuePriority
-				);
+		for (uint32_t queueFamily : uniqueQueueFamilies)
+		{
+			vk::DeviceQueueCreateInfo queueCreateInfo(
+					vk::DeviceQueueCreateFlags(), queueFamily, 1, &queuePriority
+					);
+			queueCreateInfos.push_back(queueCreateInfo);
+		}
 
 		vk::PhysicalDeviceFeatures deviceFeatures;
 
 		vk::DeviceCreateInfo deviceInfo(
 				vk::DeviceCreateFlags(),
-				1, &queueCreateInfo,
-				0, nullptr, // enabledLayers count & names, deprecated and ignored (see doc)
-				m_extensions.size(), m_extensions.data(),
+				queueCreateInfos,
+				{}, // enabledLayers, deprecated and ignored (see doc)
+				m_extensions,
 				&deviceFeatures
 				);
 
 		device = physical.createDevice(deviceInfo);
 		Logger::msgLn("Logical device created");
+
+		graphicsQueue = device.getQueue(queueFamilyIndices.graphicsFamily.value(), 0);
+		presentQueue = device.getQueue(queueFamilyIndices.presentFamily.value(), 0);
 	}
 
-	bool Device::areExtensionsSupportedBy(const vk::PhysicalDevice& physicalDevice)
+	bool Device::isDeviceSuitable(vk::PhysicalDevice physicalDevice)
 	{
-			std::vector<vk::ExtensionProperties> availableExtensions =
-				physicalDevice.enumerateDeviceExtensionProperties();
+		QueueFamilyIndices indices = findQueueFamilyIndices(physicalDevice);
+		bool extensionsSupported = areExtensionsSupportedBy(physicalDevice);
 
-			std::cout << m_extensions[0] << std::endl;
-			std::set<std::string> requiredExtensions(m_extensions.begin(), m_extensions.end());
-			std::cout << requiredExtensions.size() << std::endl;
+		bool swapChainAdequate = false;
+		if (extensionsSupported) {
+			SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
+			swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+		}
 
-			for (const auto &extension : availableExtensions) {
-				requiredExtensions.erase(extension.extensionName);
-			}
+		vk::PhysicalDeviceFeatures supportedFeatures = physicalDevice.getFeatures();
 
-			return requiredExtensions.empty();
+		return indices.isComplete() && extensionsSupported && swapChainAdequate &&
+					 supportedFeatures.samplerAnisotropy;
+
+	}
+
+	bool Device::areExtensionsSupportedBy(vk::PhysicalDevice physicalDevice)
+	{
+		std::vector<vk::ExtensionProperties> availableExtensions =
+			physicalDevice.enumerateDeviceExtensionProperties();
+
+		std::cout << m_extensions[0] << std::endl;
+		std::set<std::string> requiredExtensions(m_extensions.begin(), m_extensions.end());
+		std::cout << requiredExtensions.size() << std::endl;
+
+		for (const auto &extension : availableExtensions) {
+			requiredExtensions.erase(extension.extensionName);
+		}
+
+		return requiredExtensions.empty();
 	}
 
 	uint32_t Device::findQueueFamilyIndex(vk::QueueFlags queueType)
@@ -86,5 +124,66 @@ namespace dg
 		throw std::runtime_error("Could't find a suitable queue family");
 	}
 	
-		
+	QueueFamilyIndices Device::findQueueFamilyIndices(vk::PhysicalDevice physicalDevice)
+	{
+		QueueFamilyIndices indices;
+
+		std::vector<vk::QueueFamilyProperties> queueFamilies = physicalDevice.getQueueFamilyProperties();
+
+		int i = 0;
+		for (const auto &queueFamily : queueFamilies) {
+			if (queueFamily.queueCount > 0 && queueFamily.queueFlags & vk::QueueFlagBits::eGraphics) 
+				indices.graphicsFamily = i;
+
+			vk::Bool32 presentSupport = physicalDevice.getSurfaceSupportKHR(i, m_surface);
+			if (queueFamily.queueCount > 0 && presentSupport) {
+				indices.presentFamily = i;
+			}
+			if (indices.isComplete()) {
+				break;
+			}
+
+			i++;
+		}
+
+		return indices;
+
+	}
+	
+	SwapChainSupportDetails Device::querySwapChainSupport(vk::PhysicalDevice physicalDevice)
+	{
+		return {
+			physicalDevice.getSurfaceCapabilitiesKHR(m_surface),
+			physicalDevice.getSurfaceFormatsKHR(m_surface),
+			physicalDevice.getSurfacePresentModesKHR(m_surface)
+		};
+	}
+	
+	vk::Format Device::findSupportedFormat(
+		const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features)
+	{
+		for (vk::Format format : candidates) {
+			vk::FormatProperties props;
+			props = physical.getFormatProperties(format);
+
+			if (tiling == vk::ImageTiling::eLinear && (props.linearTilingFeatures & features) == features)
+			{
+				return format;
+			} else if (
+					tiling == vk::ImageTiling::eLinear && (props.optimalTilingFeatures & features) == features)
+			{
+				return format;
+			}
+		}
+		throw std::runtime_error("failed to find supported format!");
+	}
+	
+	void Device::createWindowSurface()
+	{
+		// GLFW takes a C surface, which is then casted to a C++ surface
+		VkSurfaceKHR cSurface;
+		m_window.createWindowSurface(m_instance, &cSurface);
+		m_surface = static_cast<vk::SurfaceKHR>(cSurface);
+	}
+	
 } /* dg */ 

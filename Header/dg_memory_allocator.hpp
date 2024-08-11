@@ -1,15 +1,14 @@
 #pragma once
 
-#define VMA_IMPLEMENTATION
-#define VA_VULKAN_VERSION 1003000
-#define VMA_STATIC_VULKAN_FUNCTIONS 0
-#define VMA_DYNAMIC_VULKAN_FUNCTIONS 1
-#include "vk_mem_alloc.h"
 #include "vulkan/vulkan.hpp"
+#include "vk_mem_alloc.hpp"
+
+// std
+#include <vector>
+#include <assert.h>
 
 namespace dg
 {
-
 	// Singleton 
 	class MemoryAllocator
 	{
@@ -29,36 +28,45 @@ namespace dg
 			get().iInit(physicalDevice, device, instance);
 		}
 
-		static VmaAllocator& getAllocator() { return get().m_allocator; }
+		static vma::Allocator& getAllocator() { return get().m_allocator; }
+		static std::pair<vk::Image, vma::Allocation> createImage(const vk::ImageCreateInfo& createInfo,
+				const vma::AllocationCreateInfo& allocInfo)
+		{
+			return get().iCreateImage(createInfo, allocInfo);
+		}
+		
+		static std::pair<vk::Buffer, vma::Allocation> createBuffer(const vk::BufferCreateInfo& createInfo,
+				const vma::AllocationCreateInfo& allocInfo)
+		{
+			return get().iCreateBuffer(createInfo, allocInfo);
+		}
+		
+		static void destroyImage(vk::Image& image, vma::Allocation& allocation)
+		{
+			get().destroyImage(image, allocation);
+		}
+		static void destroyBuffer(vk::Buffer& buffer, vma::Allocation& allocation)
+		{
+			get().destroyBuffer(buffer, allocation);
+		}
 
 	private:
-		MemoryAllocator() {}
-
+		MemoryAllocator() {} 
 		~MemoryAllocator()
 		{
-			vmaDestroyAllocator(m_allocator);
+			m_allocator.destroy();
 		}
 
 		void iInit(const vk::PhysicalDevice& physicalDevice, const vk::Device& device,
-				const vk::Instance& instance)
-		{
-			VmaVulkanFunctions vulkanFunctions = {};
-			vulkanFunctions.vkGetInstanceProcAddr = &vkGetInstanceProcAddr;
-			vulkanFunctions.vkGetDeviceProcAddr = &vkGetDeviceProcAddr;
+				const vk::Instance& instance);
+		std::pair<vk::Image, vma::Allocation> iCreateImage(const vk::ImageCreateInfo& createInfo,
+				const vma::AllocationCreateInfo& allocInfo);
+		std::pair<vk::Buffer, vma::Allocation> iCreateBuffer(const vk::BufferCreateInfo& createInfo,
+				const vma::AllocationCreateInfo& allocInfo);
+		void iDestroyImage(vk::Image& image, vma::Allocation& allocation);
+		void iDestroyBuffer(vk::Buffer& buffer, vma::Allocation& allocation);
 
-			VmaAllocatorCreateInfo allocatorCreateInfo = {};
-			allocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
-			allocatorCreateInfo.vulkanApiVersion = VK_API_VERSION_1_3;
-			allocatorCreateInfo.physicalDevice = physicalDevice;
-			allocatorCreateInfo.device = device;
-			allocatorCreateInfo.instance = instance;
-			allocatorCreateInfo.pVulkanFunctions = &vulkanFunctions;
-
-			vmaCreateAllocator(&allocatorCreateInfo, &m_allocator);
-		}
-
-		VmaAllocator m_allocator;
-
+		vma::Allocator m_allocator;
 	};
 
 } /* dg */ 

@@ -1,6 +1,8 @@
 #include "dg_renderer.hpp"
 #include "vulkan/vulkan.hpp"
 #include "dg_logger.hpp"
+
+#define VMA_IMPLEMENTATION
 #include "dg_memory_allocator.hpp"
 
 namespace dg
@@ -19,7 +21,7 @@ namespace dg
     Renderer::~Renderer()
     {
         m_device.clean();
-        instance.destroy(nullptr);
+        instance.destroy();
     }
 
     void Renderer::createInstance()
@@ -66,7 +68,7 @@ namespace dg
         Logger::msg("Required GLFW extensions : ");
         Logger::msgCStringArray(glfwExtensions, extensionsCount);
 
-        instance = vk::createInstance(createInfo, nullptr);
+        instance = vk::createInstance(createInfo);
 
         Logger::msgLn("Vk instance created");
     }
@@ -83,7 +85,7 @@ namespace dg
 
     void Renderer::createPipeline()
     {
-
+        
     }
 
     void Renderer::recreateSwapChain()
