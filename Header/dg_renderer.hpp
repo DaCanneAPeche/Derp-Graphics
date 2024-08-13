@@ -3,6 +3,7 @@
 #include "dg_window.hpp"
 #include "dg_device.hpp"
 #include "dg_pipeline.hpp"
+#include "dg_swapchain.hpp"
 
 // std
 #include <memory>
@@ -47,6 +48,7 @@ namespace dg
 		Device m_device { instance, m_requestedExtensions, window};
 		vk::PipelineLayout m_pipelineLayout;
 		std::unique_ptr<Pipeline> m_pipeline;
+		std::unique_ptr<SwapChain> m_swapChain;
 
 		// Validation layers
 		std::vector<const  char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};

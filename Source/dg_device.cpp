@@ -14,11 +14,6 @@ namespace dg
 	{
 	}
 
-	Device::~Device()
-	{
-		// device.destroy(nullptr);
-	}
-	
 	void Device::init()
 	{
 		createWindowSurface();
@@ -176,7 +171,7 @@ namespace dg
 			{
 				return format;
 			} else if (
-					tiling == vk::ImageTiling::eLinear && (props.optimalTilingFeatures & features) == features)
+					tiling == vk::ImageTiling::eOptimal && (props.optimalTilingFeatures & features) == features)
 			{
 				return format;
 			}

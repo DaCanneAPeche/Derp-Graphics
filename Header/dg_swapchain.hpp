@@ -19,7 +19,7 @@ namespace dg
 
 		SwapChain(Device &deviceRef, vk::Extent2D windowExtent);
 		SwapChain(Device &deviceRef, vk::Extent2D windowExtent, std::shared_ptr<SwapChain> previous);
-		~SwapChain();
+		void clean();
 
 		SwapChain(const SwapChain &) = delete;
 		SwapChain& operator=(const SwapChain &) = delete;

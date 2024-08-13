@@ -32,7 +32,6 @@ namespace dg
 
 		public:
 			Device(vk::Instance& instance, const std::vector<const char*>& extensions, Window& window);
-			~Device();
 
 			Device(const Device&) = delete;
 			Device& operator=(const Device&) = delete;

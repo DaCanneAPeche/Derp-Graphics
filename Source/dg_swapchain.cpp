@@ -3,7 +3,6 @@
 
 // std
 #include <array>
-#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <limits>
@@ -37,7 +36,7 @@ namespace dg
 		createSyncObjects();
 	}
 
-	SwapChain::~SwapChain()
+	void SwapChain::clean()
 	{
 		for (auto& imageView : m_swapChainImageViews)
 			m_device.device.destroyImageView(imageView);

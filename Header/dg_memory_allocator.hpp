@@ -5,7 +5,6 @@
 
 // std
 #include <vector>
-#include <assert.h>
 
 namespace dg
 {

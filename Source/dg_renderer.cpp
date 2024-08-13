@@ -30,10 +30,13 @@ namespace dg
         Logger::logPhysicalDevice(m_device.physical);
         MemoryAllocator::init(m_device.physical, m_device.device, instance);
         createPipelineLayout();
+        recreateSwapChain();
     }
 
     Renderer::~Renderer()
     {
+        m_swapChain->clean();
+
         executeFunctionStack<vk::Device&>(g::deviceCleaning, m_device.device);
         executeFunctionStack<vk::Instance&>(g::instanceCleaning, instance);
     }
@@ -105,12 +108,50 @@ namespace dg
 
     void Renderer::createPipeline()
     {
-        
+        Logger::msgLn("Creating pipeline");
+
+        assert(m_swapChain != nullptr && "Cannot create pipeline before swapchain");
+        assert(m_pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+
+        PipelineConfigInfo pipelineConfig {};
+        Pipeline::defaultPipelineConfigInfo(pipelineConfig);
+        pipelineConfig.renderPass = m_swapChain->getRenderPass();
+        pipelineConfig.pipelineLayout = m_pipelineLayout;
+        m_pipeline = std::make_unique<Pipeline>(m_device);
     }
 
     void Renderer::recreateSwapChain()
     {
+        Logger::msg("Swapchain ");
 
+        vk::Extent2D extent = window.getVkExtent();
+        while (extent.width == 0 || extent.height == 0)
+        {
+            Logger::msgLn("waiting for correct dimensions");
+            extent = window.getVkExtent();
+            glfwWaitEvents();
+        }
+
+        m_device.device.waitIdle();
+
+        if (m_swapChain == nullptr)
+        {
+            Logger::msgLn("creating");
+            m_swapChain = std::make_unique<SwapChain>(m_device, extent);
+        }
+        else
+        {
+            Logger::msgLn("recreating");
+            m_swapChain = std::make_unique<SwapChain>(m_device, extent, std::move(m_swapChain));
+            /*if (m_swapChain->imageCount() != m_commandBuffers.size())
+            {
+                freeCommandBuffers();
+                createCommandBuffers();
+            }*/
+        }
+
+        // TODO: Don't recreate the pipeline if compatible with the new swapChain & renderPass
+        createPipeline();
     }
 
     void Renderer::createCommandBuffers()
