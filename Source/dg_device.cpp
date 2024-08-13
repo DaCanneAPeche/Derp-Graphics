@@ -1,5 +1,6 @@
 #include "dg_logger.hpp"
 #include "dg_device.hpp"
+#include "dg_globals.hpp"
 
 // std
 #include <stdexcept>
@@ -35,6 +36,11 @@ namespace dg
 			{
 				physical = device;
 				Logger::msgLn("Physical device was correctly choosen");
+				g::deviceCleaning.push(
+						[](vk::Device& device)
+						{
+							device.destroy();
+						});
 				return;
 			}
 		}

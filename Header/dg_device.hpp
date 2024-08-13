@@ -39,11 +39,6 @@ namespace dg
 
 			void init();
 
-			void clean()
-			{
-				device.destroy();
-			}
-
 			[[nodiscard]] SwapChainSupportDetails getSwapChainSupport()
 			{ 
 				return querySwapChainSupport(physical);

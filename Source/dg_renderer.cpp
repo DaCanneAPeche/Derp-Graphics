@@ -1,9 +1,23 @@
 #include "dg_renderer.hpp"
-#include "vulkan/vulkan.hpp"
 #include "dg_logger.hpp"
+#include "dg_globals.hpp"
 
+// vulkan
 #define VMA_IMPLEMENTATION
 #include "dg_memory_allocator.hpp"
+#include "vulkan/vulkan.hpp"
+
+// std
+
+template <class T>
+void executeFunctionStack(std::stack<std::function<void(T)>>& stack, T parameter)
+{
+    while (stack.size() > 0)
+    {
+        stack.top()(parameter);
+        stack.pop();
+    }
+}
 
 namespace dg
 {
@@ -20,8 +34,8 @@ namespace dg
 
     Renderer::~Renderer()
     {
-        m_device.clean();
-        instance.destroy();
+        executeFunctionStack<vk::Device&>(g::deviceCleaning, m_device.device);
+        executeFunctionStack<vk::Instance&>(g::instanceCleaning, instance);
     }
 
     void Renderer::createInstance()
@@ -71,6 +85,12 @@ namespace dg
         instance = vk::createInstance(createInfo);
 
         Logger::msgLn("Vk instance created");
+
+        g::instanceCleaning.push(
+                [](vk::Instance& instance)
+                {
+                    instance.destroy();
+                });
     }
 		
     void Renderer::createPipelineLayout()
@@ -80,7 +100,7 @@ namespace dg
         vk::PipelineLayoutCreateInfo pipelineInfo
             (vk::PipelineLayoutCreateFlags(), 0,  nullptr, 0, nullptr);
 
-        m_pipelineLayout = m_device.device.createPipelineLayoutUnique(pipelineInfo).get();
+        m_pipelineLayout = m_device.device.createPipelineLayout(pipelineInfo);
     }
 
     void Renderer::createPipeline()
