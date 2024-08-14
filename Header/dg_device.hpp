@@ -56,11 +56,13 @@ namespace dg
 			vk::Device device;
 			vk::Queue graphicsQueue;
 			vk::Queue presentQueue;
+			vk::CommandPool commandPool;
 
 		private:
 			void pickPhysicalDevice();
 			void createLogicalDevice();
 			void createWindowSurface();
+			void createCommandPool();
 			[[nodiscard]] bool isDeviceSuitable(vk::PhysicalDevice physicalDevice);
 			[[nodiscard]] bool areExtensionsSupportedBy(vk::PhysicalDevice physicalDevice);
 			[[nodiscard]] uint32_t findQueueFamilyIndex(vk::QueueFlags queueType);

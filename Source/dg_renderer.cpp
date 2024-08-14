@@ -31,20 +31,21 @@ namespace dg
 
         MemoryAllocator::init(m_device.physical, m_device.device, instance);
         g::deviceCleaning.push(
-                [](vk::Device&)
+                [](dg::Device&)
                 {
                     MemoryAllocator::clean();
                 });
 
         createPipelineLayout();
         recreateSwapChain();
+        createCommandBuffers();
     }
 
     Renderer::~Renderer()
     {
         m_swapChain->clean();
         
-        executeFunctionStack<vk::Device&>(g::deviceCleaning, m_device.device);
+        executeFunctionStack<dg::Device&>(g::deviceCleaning, m_device);
         executeFunctionStack<vk::Instance&>(g::instanceCleaning, instance);
     }
 
@@ -150,11 +151,11 @@ namespace dg
         {
             Logger::msgLn("recreating");
             m_swapChain = std::make_unique<SwapChain>(m_device, extent, std::move(m_swapChain));
-            /*if (m_swapChain->imageCount() != m_commandBuffers.size())
+            if (m_swapChain->imageCount() != m_commandBuffers.size())
             {
                 freeCommandBuffers();
                 createCommandBuffers();
-            }*/
+            }
         }
 
         // TODO: Don't recreate the pipeline if compatible with the new swapChain & renderPass
@@ -163,12 +164,24 @@ namespace dg
 
     void Renderer::createCommandBuffers()
     {
+        assert(m_swapChain != nullptr && "Renderer::createCommandBuffers : swapchain shall not be null");
+        Logger::msgLn("Creating command buffers");
 
+        vk::CommandBufferAllocateInfo allocateInfo(
+                m_device.commandPool,
+                vk::CommandBufferLevel::ePrimary,
+                m_commandBuffers.size()
+                );
+
+        m_commandBuffers = m_device.device.allocateCommandBuffers(allocateInfo);
     }
 
     void Renderer::freeCommandBuffers()
     {
+        Logger::msgLn("Freeing command buffers");
 
+        m_device.device.freeCommandBuffers(m_device.commandPool, m_commandBuffers);
+        m_commandBuffers.clear();
     }
 
     void Renderer::recordCommandBuffer(int imageIndex)

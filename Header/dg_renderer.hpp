@@ -49,6 +49,7 @@ namespace dg
 		vk::PipelineLayout m_pipelineLayout;
 		std::unique_ptr<Pipeline> m_pipeline;
 		std::unique_ptr<SwapChain> m_swapChain;
+		std::vector<vk::CommandBuffer> m_commandBuffers;
 
 		// Validation layers
 		std::vector<const  char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};

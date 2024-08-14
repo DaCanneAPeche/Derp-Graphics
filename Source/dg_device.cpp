@@ -19,6 +19,7 @@ namespace dg
 		createWindowSurface();
 		pickPhysicalDevice();
 		createLogicalDevice();
+		createCommandPool();
 	}
 
 	void Device::pickPhysicalDevice()
@@ -32,9 +33,9 @@ namespace dg
 				physical = device;
 				Logger::msgLn("Physical device was correctly choosen");
 				g::deviceCleaning.push(
-						[](vk::Device& device)
+						[](dg::Device& device)
 						{
-							device.destroy();
+							device.device.destroy();
 						});
 				return;
 			}
@@ -185,6 +186,20 @@ namespace dg
 		VkSurfaceKHR cSurface;
 		m_window.createWindowSurface(m_instance, &cSurface);
 		m_surface = static_cast<vk::SurfaceKHR>(cSurface);
+	}
+
+	void Device::createCommandPool()
+	{
+		QueueFamilyIndices queueFamilyIndices = findQueueFamilyIndices(physical);
+		vk::CommandPoolCreateInfo commandPoolInfo({}, queueFamilyIndices.graphicsFamily.value());
+		commandPool = device.createCommandPool(commandPoolInfo);
+
+		g::deviceCleaning.push(
+				[](dg::Device& device)
+				{
+					device.device.destroyCommandPool(device.commandPool);
+				}
+				);
 	}
 	
 } /* dg */ 
