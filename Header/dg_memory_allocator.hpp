@@ -4,7 +4,7 @@
 #include "vk_mem_alloc.hpp"
 
 // std
-#include <vector>
+#include <iostream>
 
 namespace dg
 {
@@ -42,16 +42,18 @@ namespace dg
 		
 		static void destroyImage(vk::Image& image, vma::Allocation& allocation)
 		{
-			get().destroyImage(image, allocation);
+			get().iDestroyImage(image, allocation);
 		}
 		static void destroyBuffer(vk::Buffer& buffer, vma::Allocation& allocation)
 		{
-			get().destroyBuffer(buffer, allocation);
+			get().iDestroyBuffer(buffer, allocation);
 		}
+
+		static void clean() { get().iClean(); }
 
 	private:
 		MemoryAllocator() {} 
-		~MemoryAllocator()
+		void iClean()
 		{
 			m_allocator.destroy();
 		}
@@ -64,6 +66,11 @@ namespace dg
 				const vma::AllocationCreateInfo& allocInfo);
 		void iDestroyImage(vk::Image& image, vma::Allocation& allocation);
 		void iDestroyBuffer(vk::Buffer& buffer, vma::Allocation& allocation);
+
+		void test()
+		{
+			std::cout << "TEST" << std::endl;
+		}
 
 		vma::Allocator m_allocator;
 	};

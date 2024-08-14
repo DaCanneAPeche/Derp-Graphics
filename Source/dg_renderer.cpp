@@ -28,7 +28,14 @@ namespace dg
         createInstance();    
         m_device.init();
         Logger::logPhysicalDevice(m_device.physical);
+
         MemoryAllocator::init(m_device.physical, m_device.device, instance);
+        g::deviceCleaning.push(
+                [](vk::Device&)
+                {
+                    MemoryAllocator::clean();
+                });
+
         createPipelineLayout();
         recreateSwapChain();
     }
@@ -36,7 +43,7 @@ namespace dg
     Renderer::~Renderer()
     {
         m_swapChain->clean();
-
+        
         executeFunctionStack<vk::Device&>(g::deviceCleaning, m_device.device);
         executeFunctionStack<vk::Instance&>(g::instanceCleaning, instance);
     }
