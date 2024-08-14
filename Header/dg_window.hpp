@@ -31,7 +31,7 @@ namespace dg
 		bool shouldClose();
 
 		vk::Extent2D getVkExtent();
-		bool isRezised = false;
+		bool isResized = false;
 		WindowInfo info;
 
 		void createWindowSurface(vk::Instance& instance, VkSurfaceKHR* pSurface);

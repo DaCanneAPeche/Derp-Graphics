@@ -58,7 +58,7 @@ namespace dg
     void Window::frameBufferResizeCallback(GLFWwindow* pGLFWWindow, int width, int height)
     {
         Window* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(pGLFWWindow));
-        window->isRezised = true;
+        window->isResized = true;
         window->info.width = width;
         window->info.height = height;
     }

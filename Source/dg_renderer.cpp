@@ -167,6 +167,7 @@ namespace dg
         assert(m_swapChain != nullptr && "Renderer::createCommandBuffers : swapchain shall not be null");
         Logger::msgLn("Creating command buffers");
 
+        m_commandBuffers.resize(m_swapChain->imageCount());
         vk::CommandBufferAllocateInfo allocateInfo(
                 m_device.commandPool,
                 vk::CommandBufferLevel::ePrimary,
@@ -186,6 +187,8 @@ namespace dg
 
     void Renderer::recordCommandBuffer(int imageIndex)
     {
+        Logger::msgLn("Recording command buffer");
+
         static int frame = 0;
         frame = (frame + 1) % 1000;
         vk::Extent2D swapchainExtent = m_swapChain->getSwapChainExtent();
@@ -221,7 +224,32 @@ namespace dg
 
     void Renderer::draw()
     {
+        Logger::msgLn("Drawing frame");
 
+        uint32_t imageIndex;
+        vk::Result result = m_swapChain->acquireNextImage(imageIndex);
+        if (result == vk::Result::eErrorOutOfDateKHR)
+        {
+            recreateSwapChain();
+            return;
+        }
+
+        if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR)
+            throw std::runtime_error("Failed to acquire swap chain image");
+
+        recordCommandBuffer(imageIndex);
+        result = m_swapChain->submitCommandBuffers(&m_commandBuffers[imageIndex], &imageIndex);
+
+        if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR
+                || window.isResized)
+        {
+            window.isResized = false;
+            recreateSwapChain();
+            return;
+        }
+
+        if (result != vk::Result::eSuccess)
+            throw std::runtime_error("Failed to present swap chain image");
     }
 		
     bool Renderer::areValidationLayersSupported()

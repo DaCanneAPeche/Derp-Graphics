@@ -14,6 +14,7 @@ void run()
     while (!renderer.shouldWindowClose())
     {
         renderer.pollEvents();
+        renderer.draw();
     }
 }
 

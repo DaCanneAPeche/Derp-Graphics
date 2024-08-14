@@ -68,7 +68,7 @@ namespace dg
 		}
 	}
 
-	vk::Result SwapChain::acquireNextImage(uint32_t *imageIndex)
+	vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex)
 	{
 		if (m_device.device.waitForFences(
 				m_inFlightFences[m_currentFrame],
@@ -81,11 +81,14 @@ namespace dg
 			Logger::msgLn("Warning (SwapChain::acquireNextImage) : Timeout while waiting for fences");
 		}
 
-		return m_device.device.acquireNextImageKHR(
+		auto handle = m_device.device.acquireNextImageKHR(
 				m_swapChain,
 				std::numeric_limits<uint64_t>::max(),
 				m_imageAvailableSemaphores[m_currentFrame]
-				).result;
+				);
+
+		imageIndex = handle.value;
+		return handle.result;
 	}
 
 	vk::Result SwapChain::submitCommandBuffers(
