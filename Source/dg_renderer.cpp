@@ -186,7 +186,37 @@ namespace dg
 
     void Renderer::recordCommandBuffer(int imageIndex)
     {
+        static int frame = 0;
+        frame = (frame + 1) % 1000;
+        vk::Extent2D swapchainExtent = m_swapChain->getSwapChainExtent();
 
+        vk::CommandBufferBeginInfo beginInfo;
+        m_commandBuffers[imageIndex].begin(beginInfo);
+
+        std::array<vk::ClearValue, 2> clearValues = {
+            vk::ClearColorValue(0.01f, 0.01f, 0.01f, 0.01f),
+            vk::ClearDepthStencilValue(1.0f, 0)
+        };
+
+        vk::RenderPassBeginInfo renderPassInfo(
+                m_swapChain->getRenderPass(),
+                m_swapChain->getFrameBuffer(imageIndex),
+                vk::Rect2D({0, 0}, swapchainExtent),
+                clearValues
+                );
+
+        m_commandBuffers[imageIndex].beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+
+        vk::Viewport viewport(0.0f, 0.0f, swapchainExtent.width, swapchainExtent.height, 0.0f, 1.0f);
+        vk::Rect2D scissor({0, 0}, swapchainExtent);
+
+        m_commandBuffers[imageIndex].setViewport(0, viewport);
+        m_commandBuffers[imageIndex].setScissor(0, scissor);
+        
+        m_pipeline->bind(m_commandBuffers[imageIndex]); 
+
+        m_commandBuffers[imageIndex].endRenderPass();
+        m_commandBuffers[imageIndex].end();
     }
 
     void Renderer::draw()

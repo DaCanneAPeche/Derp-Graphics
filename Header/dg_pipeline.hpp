@@ -34,6 +34,7 @@ namespace dg
 		Pipeline& operator=(const Pipeline &) = delete;
 
 		static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
+		void bind(vk::CommandBuffer& commandBuffer);
 
 	private:
 

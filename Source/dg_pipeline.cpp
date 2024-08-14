@@ -155,4 +155,8 @@ namespace dg
 		return m_device.device.createShaderModule(createInfo);
 	}
 	
+	void Pipeline::bind(vk::CommandBuffer& commandBuffer)
+	{
+		commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, m_graphicsPipeline);
+	}
 } /* dg */ 
