@@ -43,7 +43,7 @@ namespace dg
 
     Renderer::~Renderer()
     {
-        m_swapChain->clean();
+        m_swapChain = nullptr; // Call destructor
         
         executeFunctionStack<dg::Device&>(g::deviceCleaning, m_device);
         executeFunctionStack<vk::Instance&>(g::instanceCleaning, instance);
@@ -187,8 +187,6 @@ namespace dg
 
     void Renderer::recordCommandBuffer(int imageIndex)
     {
-        Logger::msgLn("Recording command buffer");
-
         static int frame = 0;
         frame = (frame + 1) % 1000;
         vk::Extent2D swapchainExtent = m_swapChain->getSwapChainExtent();
@@ -224,8 +222,6 @@ namespace dg
 
     void Renderer::draw()
     {
-        Logger::msgLn("Drawing frame");
-
         uint32_t imageIndex;
         vk::Result result = m_swapChain->acquireNextImage(imageIndex);
         if (result == vk::Result::eErrorOutOfDateKHR)

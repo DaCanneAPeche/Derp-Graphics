@@ -36,7 +36,7 @@ namespace dg
 		createSyncObjects();
 	}
 
-	void SwapChain::clean()
+	SwapChain::~SwapChain()
 	{
 		for (auto& imageView : m_swapChainImageViews)
 			m_device.device.destroyImageView(imageView);
@@ -360,10 +360,10 @@ namespace dg
 				Logger::msgLn("Present mode: Mailbox");
 				return availablePresentMode;
 			}
-			else if (availablePresentMode == vk::PresentModeKHR::eImmediate) {
+			/*else if (availablePresentMode == vk::PresentModeKHR::eImmediate) {
 				Logger::msgLn("Present mode: Immediate");
 				return availablePresentMode;
-			}
+			}*/
 		}
 
 		Logger::msgLn("Present mode: V-Sync");
