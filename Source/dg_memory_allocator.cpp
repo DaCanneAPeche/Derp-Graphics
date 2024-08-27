@@ -6,9 +6,10 @@ namespace dg
 	void MemoryAllocator::iInit(const vk::PhysicalDevice& physicalDevice, const vk::Device& device,
 			const vk::Instance& instance)
 	{
-		vma::VulkanFunctions vulkanFunctions = {};
-		vulkanFunctions.vkGetInstanceProcAddr = &vkGetInstanceProcAddr;
-		vulkanFunctions.vkGetDeviceProcAddr = &vkGetDeviceProcAddr;
+		vma::VulkanFunctions vulkanFunctions(
+			&vkGetInstanceProcAddr,
+			&vkGetDeviceProcAddr
+		);
 
 		vma::AllocatorCreateInfo allocatorCreateInfo(
 				vma::AllocatorCreateFlagBits::eExtMemoryBudget,

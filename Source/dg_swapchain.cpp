@@ -92,30 +92,31 @@ namespace dg
 	}
 
 	vk::Result SwapChain::submitCommandBuffers(
-			const vk::CommandBuffer *buffers, uint32_t *imageIndex)
+			const vk::CommandBuffer& buffers, uint32_t& imageIndex)
 	{
-		if (m_imagesInFlight[*imageIndex] != VK_NULL_HANDLE)
+		if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
 		{
 			auto _ = m_device.device.waitForFences(
-					m_imagesInFlight[*imageIndex],
+					m_imagesInFlight[imageIndex],
 					vk::True,
 					std::numeric_limits<uint64_t>::max()
 					);
 		}
 
-		m_imagesInFlight[*imageIndex] = m_inFlightFences[m_currentFrame];
+		m_imagesInFlight[imageIndex] = m_inFlightFences[m_currentFrame];
 		
 		vk::Semaphore waitSemaphores[] = {m_imageAvailableSemaphores[m_currentFrame]};
 		vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
 		vk::Semaphore signalSemaphores[] = {m_renderFinishedSemaphores[m_currentFrame]};
 
-		vk::SubmitInfo submitInfo(waitSemaphores, waitStages, *buffers, signalSemaphores);
+		vk::SubmitInfo submitInfo(waitSemaphores, waitStages, buffers, signalSemaphores);
 
 		m_device.device.resetFences(m_inFlightFences[m_currentFrame]);
 		m_device.graphicsQueue.submit(submitInfo, m_inFlightFences[m_currentFrame]);
 
 		vk::SwapchainKHR swapChains[] = {m_swapChain};
-		vk::PresentInfoKHR presentInfo(signalSemaphores, swapChains, *imageIndex);
+
+		vk::PresentInfoKHR presentInfo(signalSemaphores, swapChains, imageIndex);
 
 		auto result = m_device.presentQueue.presentKHR(presentInfo);
 
@@ -180,7 +181,7 @@ namespace dg
 		{
 			vk::ImageViewCreateInfo viewInfo(
 					{},
-					m_swapChainImages[0],
+					m_swapChainImages[i],
 					vk::ImageViewType::e2D,
 					m_swapChainImageFormat,
 					{},
@@ -205,7 +206,7 @@ namespace dg
 				vk::ImageLayout::eDepthStencilAttachmentOptimal
 				);
 
-		vk::AttachmentReference depthAttachmentRef(1, vk::ImageLayout::eDepthAttachmentOptimal);
+		vk::AttachmentReference depthAttachmentRef(1, vk::ImageLayout::eDepthStencilAttachmentOptimal);
 
 		vk::AttachmentDescription colorAttachment(
 				{},
@@ -233,7 +234,7 @@ namespace dg
 
 		vk::SubpassDependency dependency(
 				vk::SubpassExternal,
-				{},
+				0,
 				vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
 				vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
 				{},

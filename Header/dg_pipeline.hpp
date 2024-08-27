@@ -6,6 +6,16 @@
 namespace dg
 {
 
+	// Pipelines, not a enum class to avoid static cast everywhere
+	namespace pl
+	{
+		enum
+		{
+			shapes = 0,
+			Count // As the be the last element, to get the number of elements in the enum		
+		};
+	}
+
 	struct PipelineConfigInfo
 	{
 		vk::PipelineViewportStateCreateInfo viewportInfo;
@@ -22,12 +32,15 @@ namespace dg
 		uint32_t subpass = 0;
 	};
 
-
+	template<class V>
 	class Pipeline
 	{
 
 	public:
-		Pipeline(Device& device);
+		Pipeline(Device& device,
+				const std::string& vertShaderPath,
+				const std::string& fragShaderPath,
+				const PipelineConfigInfo& configInfo);
 		~Pipeline();
 
 		Pipeline(const Pipeline &) = delete;

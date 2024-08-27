@@ -1,15 +1,23 @@
 #include "dg_pipeline.hpp"
 #include "dg_file.hpp"
+#include "dg_logger.hpp"
+#include "dg_shape.hpp"
 
 namespace dg
 {
 
-	Pipeline::Pipeline(Device& device) : m_device(device)
+	template<class V>
+	Pipeline<V>::Pipeline(
+			Device& device,
+			const std::string& vertShaderPath,
+			const std::string& fragShaderPath,
+			const PipelineConfigInfo& configInfo) : m_device(device)
 	{
-
+		createGraphicsPipeline(vertShaderPath, fragShaderPath, configInfo);
 	}
-		
-	void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
+	
+	template<class V>
+	void Pipeline<V>::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 	{
 		configInfo.inputAssemblyInfo = vk::PipelineInputAssemblyStateCreateInfo(
 				{},
@@ -79,12 +87,16 @@ namespace dg
 				);
 	}
 
-	Pipeline::~Pipeline()
+	template<class V>
+	Pipeline<V>::~Pipeline()
 	{
-
+		m_device.device.destroyShaderModule(m_vertShaderModule);
+		m_device.device.destroyShaderModule(m_fragShaderModule);
+		m_device.device.destroyPipeline(m_graphicsPipeline);
 	}
 
-	void Pipeline::createGraphicsPipeline(
+	template<class V>
+	void Pipeline<V>::createGraphicsPipeline(
 			const std::string& vertShaderPath,
 			const std::string& fragShaderPath,
 			const PipelineConfigInfo& configInfo
@@ -102,27 +114,33 @@ namespace dg
 		m_vertShaderModule = createShaderModule(vertCode);
 		m_fragShaderModule = createShaderModule(fragCode);
 
-		vk::PipelineShaderStageCreateInfo shaderStages[2];
+		std::array<vk::PipelineShaderStageCreateInfo, 2> shaderStages 
+		{
+			vk::PipelineShaderStageCreateInfo(
+					vk::PipelineShaderStageCreateFlags(),
+					vk::ShaderStageFlagBits::eVertex,
+					m_vertShaderModule,
+					"main"
+					),
+			vk::PipelineShaderStageCreateInfo(
+					vk::PipelineShaderStageCreateFlags(),
+					vk::ShaderStageFlagBits::eFragment,
+					m_fragShaderModule,
+					"main"
+					)
+		};
 
-		shaderStages[0] = vk::PipelineShaderStageCreateInfo(
-				vk::PipelineShaderStageCreateFlags(),
-				vk::ShaderStageFlagBits::eVertex,
-				m_vertShaderModule,
-				"main"
+		auto bindingDescriptions = V::getBindingDescriptions();
+		auto attributeDescriptions = V::getAttributeDescriptions();
+		vk::PipelineVertexInputStateCreateInfo vertexInputInfo(
+				{},
+				bindingDescriptions,
+				attributeDescriptions
 				);
-		
-		shaderStages[1] = vk::PipelineShaderStageCreateInfo(
-				vk::PipelineShaderStageCreateFlags(),
-				vk::ShaderStageFlagBits::eFragment,
-				m_fragShaderModule,
-				"main"
-				);
-
-		vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
 
 		vk::GraphicsPipelineCreateInfo pipelineInfo(
-				vk::PipelineCreateFlags(),
-				vk::ArrayProxyNoTemporaries<const vk::PipelineShaderStageCreateInfo>(shaderStages),
+				{},
+				shaderStages,
 				&vertexInputInfo,
 				&configInfo.inputAssemblyInfo,
 				nullptr,
@@ -142,21 +160,28 @@ namespace dg
 		m_graphicsPipeline = m_device.device.createGraphicsPipeline(VK_NULL_HANDLE, pipelineInfo).value;
 	}
 
-	vk::ShaderModule Pipeline::createShaderModule(const std::vector<char>& code)
+	template<class V>
+	vk::ShaderModule Pipeline<V>::createShaderModule(const std::vector<char>& code)
 	{
+		// TODO : Fix the vector casting
 		std::vector<uint32_t> iCode(code.begin(), code.end());
-		vk::ArrayProxy<const uint32_t> codeArray(iCode);
+		const uint32_t* c = reinterpret_cast<const uint32_t*>(code.data());
 
 		vk::ShaderModuleCreateInfo createInfo(
 				vk::ShaderModuleCreateFlags(),
-				codeArray
+				static_cast<uint32_t>(code.size()),
+				c
 				);
 
 		return m_device.device.createShaderModule(createInfo);
 	}
 	
-	void Pipeline::bind(vk::CommandBuffer& commandBuffer)
+	template<class V>
+	void Pipeline<V>::bind(vk::CommandBuffer& commandBuffer)
 	{
 		commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, m_graphicsPipeline);
 	}
+
+	template class Pipeline<ShapeVertex>;
 } /* dg */ 
+

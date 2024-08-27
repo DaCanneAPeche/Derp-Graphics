@@ -1,6 +1,7 @@
 #include "dg_renderer.hpp"
 #include "dg_logger.hpp"
 #include "dg_globals.hpp"
+#include "dg_file.hpp"
 
 // vulkan
 #define VMA_IMPLEMENTATION
@@ -8,34 +9,38 @@
 #include "vulkan/vulkan.hpp"
 
 // std
-
-template <class T>
-void executeFunctionStack(std::stack<std::function<void(T)>>& stack, T parameter)
-{
-    while (stack.size() > 0)
-    {
-        stack.top()(parameter);
-        stack.pop();
-    }
-}
+#include <cstring>
 
 namespace dg
 {
+    template <class T>
+    void executeFunctionStack(std::stack<std::function<void(T)>>& stack, T parameter)
+    {
+        while (stack.size() > 0)
+        {
+            stack.top()(parameter);
+            stack.pop();
+        }
+    }
 
     Renderer::Renderer(const WindowInfo& windowInfo, const ApplicationInfo& appInfo)
         : window(windowInfo), applicationInfo {appInfo}
     {
-        createInstance();    
+        createInstance();   
+        m_dispatchLoader = vk::DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
+        m_debugMessenger = Logger::createDebugMessenger(instance, m_dispatchLoader);
+
         m_device.init();
         Logger::logPhysicalDevice(m_device.physical);
 
         MemoryAllocator::init(m_device.physical, m_device.device, instance);
-        g::deviceCleaning.push(
-                [](dg::Device&)
+        g::instanceCleaning.push(
+                [](vk::Instance&)
                 {
                     MemoryAllocator::clean();
                 });
 
+        loadModels();
         createPipelineLayout();
         recreateSwapChain();
         createCommandBuffers();
@@ -43,10 +48,22 @@ namespace dg
 
     Renderer::~Renderer()
     {
-        m_swapChain = nullptr; // Call destructor
-        
         executeFunctionStack<dg::Device&>(g::deviceCleaning, m_device);
         executeFunctionStack<vk::Instance&>(g::instanceCleaning, instance);
+    }
+
+    void Renderer::loadModels()
+    {
+        Logger::msgLn("Loading models");
+
+        std::vector<ShapeVertex> vertices 
+        {
+            ShapeVertex(0.0f, -0.5f),
+            ShapeVertex(0.5f, 0.5f),
+            ShapeVertex(-0.5f, 0.5f),
+        };
+
+        m_shape = std::make_unique<Shape>(m_device, vertices);
     }
 
     void Renderer::createInstance()
@@ -66,32 +83,16 @@ namespace dg
                 );
 
 
-        uint32_t extensionsCount = 0;
-        const char** glfwExtensions;
-        glfwExtensions = glfwGetRequiredInstanceExtensions(&extensionsCount);
-        
-        uint32_t layerCount = 0;
-        const char** ppEnabledLayers = nullptr;
-       
-        if (m_enableValidationLayers) {
-            layerCount = static_cast<uint32_t>(m_validationLayers.size());
-            ppEnabledLayers = m_validationLayers.data();
-        } 
-
+        auto requestedExtensions = getRequestedExtensions();       
         vk::InstanceCreateInfo createInfo(
                 vk::InstanceCreateFlags(),
                 &appInfo,
-                layerCount, ppEnabledLayers,
-                extensionsCount,
-                glfwExtensions
+                m_validationLayers,
+                requestedExtensions
                 );
-        createInfo.pApplicationInfo = &appInfo;
-        createInfo.enabledExtensionCount = extensionsCount;
-        createInfo.ppEnabledExtensionNames = glfwExtensions;
-        createInfo.enabledLayerCount = 0;
 
-        Logger::msg("Required GLFW extensions : ");
-        Logger::msgCStringArray(glfwExtensions, extensionsCount);
+        // Logger::msg("Required GLFW extensions : ");
+        // Logger::msgCStringArray(glfwExtensions, extensionsCount);
 
         instance = vk::createInstance(createInfo);
 
@@ -103,7 +104,22 @@ namespace dg
                     instance.destroy();
                 });
     }
-		
+
+    std::vector<const char*> Renderer::getRequestedExtensions()
+    {
+          uint32_t glfwExtensionCount = 0;
+          const char **glfwExtensions;
+          glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+          std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+
+          if (m_enableValidationLayers) {
+            extensions.push_back(vk::EXTDebugUtilsExtensionName);
+          }
+
+          return extensions;
+    }
+
     void Renderer::createPipelineLayout()
     {
         Logger::msgLn("Creating pipeline layout");
@@ -114,18 +130,28 @@ namespace dg
         m_pipelineLayout = m_device.device.createPipelineLayout(pipelineInfo);
     }
 
-    void Renderer::createPipeline()
+    template<class V>
+    std::unique_ptr<Pipeline<V>> Renderer::createPipeline(const std::string& vertShaderPath, const std::string& fragShaderPath)
     {
-        Logger::msgLn("Creating pipeline");
-
-        assert(m_swapChain != nullptr && "Cannot create pipeline before swapchain");
-        assert(m_pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
-
         PipelineConfigInfo pipelineConfig {};
-        Pipeline::defaultPipelineConfigInfo(pipelineConfig);
+        Pipeline<V>::defaultPipelineConfigInfo(pipelineConfig);
         pipelineConfig.renderPass = m_swapChain->getRenderPass();
         pipelineConfig.pipelineLayout = m_pipelineLayout;
-        m_pipeline = std::make_unique<Pipeline>(m_device);
+
+        return std::make_unique<Pipeline<V>>(m_device, vertShaderPath, fragShaderPath, pipelineConfig);
+    }
+
+    void Renderer::createPipelines()
+    {
+        Logger::msgLn("Creating pipelines");
+
+        assert(m_swapChain != nullptr && "Cannot create pipelines before swapchain");
+        assert(m_pipelineLayout != nullptr && "Cannot create pipelines before pipeline layout");
+
+        m_pipelines[pl::shapes] = createPipeline<ShapeVertex>(
+                "./assets/compiled_shaders/shape.vert.spv",
+                "./assets/compiled_shaders/shape.frag.spv"
+                );
     }
 
     void Renderer::recreateSwapChain()
@@ -146,6 +172,10 @@ namespace dg
         {
             Logger::msgLn("creating");
             m_swapChain = std::make_unique<SwapChain>(m_device, extent);
+            g::deviceCleaning.push([this](dg::Device&)
+                    {
+                        m_swapChain = nullptr; // Call destructor
+                    });
         }
         else
         {
@@ -159,7 +189,7 @@ namespace dg
         }
 
         // TODO: Don't recreate the pipeline if compatible with the new swapChain & renderPass
-        createPipeline();
+        createPipelines();
     }
 
     void Renderer::createCommandBuffers()
@@ -214,7 +244,9 @@ namespace dg
         m_commandBuffers[imageIndex].setViewport(0, viewport);
         m_commandBuffers[imageIndex].setScissor(0, scissor);
         
-        m_pipeline->bind(m_commandBuffers[imageIndex]); 
+        m_pipelines[pl::shapes]->bind(m_commandBuffers[imageIndex]); 
+        m_shape->bind(m_commandBuffers[imageIndex]);
+        m_shape->draw(m_commandBuffers[imageIndex]);
 
         m_commandBuffers[imageIndex].endRenderPass();
         m_commandBuffers[imageIndex].end();
@@ -234,7 +266,7 @@ namespace dg
             throw std::runtime_error("Failed to acquire swap chain image");
 
         recordCommandBuffer(imageIndex);
-        result = m_swapChain->submitCommandBuffers(&m_commandBuffers[imageIndex], &imageIndex);
+        result = m_swapChain->submitCommandBuffers(m_commandBuffers[imageIndex], imageIndex);
 
         if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR
                 || window.isResized)

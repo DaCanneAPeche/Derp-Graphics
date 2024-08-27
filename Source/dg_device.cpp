@@ -51,13 +51,18 @@ namespace dg
 		std::set<uint32_t> uniqueQueueFamilies = {
 			queueFamilyIndices.graphicsFamily.value(), queueFamilyIndices.presentFamily.value()
 		};
-		std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos(uniqueQueueFamilies.size());
+		std::cout << uniqueQueueFamilies.size() << std::endl;
+		std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos(0);
 
 		float queuePriority = 1.0f;
 		for (uint32_t queueFamily : uniqueQueueFamilies)
 		{
 			vk::DeviceQueueCreateInfo queueCreateInfo(
-					vk::DeviceQueueCreateFlags(), queueFamily, 1, &queuePriority
+					{},
+					queueFamily,
+					1,
+					&queuePriority,
+					nullptr
 					);
 			queueCreateInfos.push_back(queueCreateInfo);
 		}
@@ -135,12 +140,15 @@ namespace dg
 		int i = 0;
 		for (const auto &queueFamily : queueFamilies) {
 			if (queueFamily.queueCount > 0 && queueFamily.queueFlags & vk::QueueFlagBits::eGraphics) 
+			{
 				indices.graphicsFamily = i;
+			}
 
 			vk::Bool32 presentSupport = physicalDevice.getSurfaceSupportKHR(i, m_surface);
 			if (queueFamily.queueCount > 0 && presentSupport) {
 				indices.presentFamily = i;
 			}
+			
 			if (indices.isComplete()) {
 				break;
 			}
@@ -191,7 +199,9 @@ namespace dg
 	void Device::createCommandPool()
 	{
 		QueueFamilyIndices queueFamilyIndices = findQueueFamilyIndices(physical);
-		vk::CommandPoolCreateInfo commandPoolInfo({}, queueFamilyIndices.graphicsFamily.value());
+		vk::CommandPoolCreateInfo commandPoolInfo({
+				vk::CommandPoolCreateFlagBits::eTransient | vk::CommandPoolCreateFlagBits::eResetCommandBuffer
+				}, queueFamilyIndices.graphicsFamily.value());
 		commandPool = device.createCommandPool(commandPoolInfo);
 
 		g::deviceCleaning.push(

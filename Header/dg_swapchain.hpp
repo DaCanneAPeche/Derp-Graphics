@@ -39,7 +39,7 @@ namespace dg
 		vk::Format findDepthFormat();
 
 		vk::Result acquireNextImage(uint32_t& imageIndex);
-		vk::Result submitCommandBuffers(const vk::CommandBuffer *buffers, uint32_t *imageIndex);
+		vk::Result submitCommandBuffers(const vk::CommandBuffer& buffers, uint32_t& imageIndex);
 
 	private:
 		void init();

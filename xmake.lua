@@ -11,12 +11,14 @@ target("Derp_Graphics")
     add_packages("glm", "glfw", "vulkan-memory-allocator-hpp", "vulkan-hpp", "vulkan-memory-allocator")
     set_languages("c++23")
 
-    -- after_build(function (target)
-        
-        -- for _, file in ipairs(os.files("$(projectdir)/shaders/*")) do
-        --     os.run("glslc " .. file .. " -o compiled_shaders/" .. file:match("^.+/(.+)$") .. ".spv")
-        -- end
+    after_build(function (target)
+       
+        -- Compile shaders
+        for _, file in ipairs(os.files("$(projectdir)/assets/shaders/*")) do
+            cmd = "glslc " .. file ..  " --target-spv=spv1.6 --target-env=vulkan1.3 -o assets/compiled_shaders/" .. file:match("^.+/(.+)$") .. ".spv"
+            print(cmd)
+            os.run(cmd)
+        end
 
-        -- os.ln("$(projectdir)/compiled_shaders", "$(buildir)/$(host)/$(arch)/debug/compiled_shaders")
-    -- end)
+    end)
 

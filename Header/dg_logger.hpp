@@ -31,12 +31,20 @@ namespace dg
 				const std::string& separator = ", ", const std::string& end = "\n");
 
 		static void logPhysicalDevice(const vk::PhysicalDevice& device);
+
+		static vk::DebugUtilsMessengerEXT createDebugMessenger(vk::Instance& instance,
+				vk::DispatchLoaderDynamic& dispatchLoader)
+		{
+			return get().iCreateDebugMessenger(instance, dispatchLoader);
+		}
 		
 		inline static bool isEnabled = false;
 
 	private:
 
 		void iMsg(std::string message);
+		vk::DebugUtilsMessengerEXT iCreateDebugMessenger(vk::Instance& instance,
+				vk::DispatchLoaderDynamic& dispatchLoader);
 
 	};
 	

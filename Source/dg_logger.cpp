@@ -1,10 +1,28 @@
 #include "dg_logger.hpp"
+#include "dg_globals.hpp"
 
 // std
 #include <span>
 
 namespace dg
 {
+
+	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+					VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+					VkDebugUtilsMessageTypeFlagsEXT messageType,
+					const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+					void* pUserDate
+					)
+	{
+		if (messageSeverity < VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) return VK_TRUE;
+
+		char errorMessage[3000] = "Validation layer : ";
+		strcat(errorMessage, pCallbackData->pMessage);
+		std::cerr << "Validation layer : " << pCallbackData->pMessage << std::endl << std::endl;
+		// throw std::runtime_error(errorMessage);
+
+		return VK_FALSE;
+	}
 
 	Logger::Logger() {};
 
@@ -106,5 +124,36 @@ namespace dg
 		}
 		get().iMsg("\n");
 	}
+    
+	vk::DebugUtilsMessengerEXT Logger::iCreateDebugMessenger(vk::Instance& instance,
+			vk::DispatchLoaderDynamic& dispatchLoader)
+    {
+        vk::DebugUtilsMessengerCreateInfoEXT messengerInfo(
+                {},
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eError |
+                    vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+                    vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
+                    vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose,
+                vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+                    vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
+                    vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
+                    vk::DebugUtilsMessageTypeFlagBitsEXT::eDeviceAddressBinding,
+                debugCallback
+                );
+
+				vk::DebugUtilsMessengerEXT debugMessenger = instance.createDebugUtilsMessengerEXT(
+						messengerInfo,
+						nullptr,
+						dispatchLoader);
+
+				g::instanceCleaning.push(
+						[debugMessenger, dispatchLoader](vk::Instance& instance)
+						{
+							instance.destroyDebugUtilsMessengerEXT(debugMessenger, nullptr, dispatchLoader);
+						});
+
+				return debugMessenger;
+    }
+		
 		
 }
