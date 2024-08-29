@@ -1,0 +1,23 @@
+#include <glm/glm.hpp>
+
+namespace dg
+{
+
+	struct Transform2d
+	{
+		glm::vec2 translation = {0.0f, 0.0f};
+		glm::vec2 scaling = {1.0f, 1.0f};
+		float rotation;
+
+		[[nodiscard]] glm::mat2 getMatrix()
+		{
+			const float sin = glm::sin(rotation);
+			const float cos = glm::cos(rotation);
+			glm::mat2 rotationMatrix {{cos, sin}, {-sin, cos}};
+
+			glm::mat2 scaleMatrix = {{scaling.x, 0.0f}, {0.0f, scaling.y}};
+			return rotationMatrix * scaleMatrix;
+		}
+	};
+	
+} /* dg */ 

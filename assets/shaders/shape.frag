@@ -4,14 +4,15 @@
 
 layout (location = 0) out vec4 outColor;
 
-/*layout(push_constant) uniform Push
+layout(push_constant) uniform Push
 {
+	mat2 transform;
 	vec2 offset;
 	vec3 color;
-} push;*/
+} push;
 
 void main()
 {
-	outColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	outColor = vec4(push.color, 1.0f);
 }
 

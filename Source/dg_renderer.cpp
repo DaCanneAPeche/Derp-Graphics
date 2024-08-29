@@ -2,10 +2,14 @@
 #include "dg_logger.hpp"
 #include "dg_globals.hpp"
 #include "dg_file.hpp"
+#include "dg_push_constant.hpp"
+#include "dg_transform2d.hpp"
 
 // vulkan
 #define VMA_IMPLEMENTATION
 #include "vulkan/vulkan.hpp"
+
+#include "glm/gtc/constants.hpp"
 
 // std
 #include <cstring>
@@ -146,10 +150,14 @@ namespace dg
     {
         Logger::msgLn("Creating pipeline layout");
 
-        vk::PipelineLayoutCreateInfo pipelineInfo
-            (vk::PipelineLayoutCreateFlags(), 0,  nullptr, 0, nullptr);
+        vk::PushConstantRange pushConstantRange(
+                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+                0, sizeof(PushConstant)
+                );
 
-        m_pipelineLayout = m_device.device.createPipelineLayout(pipelineInfo);
+        vk::PipelineLayoutCreateInfo pipelineLayoutInfo({}, {}, pushConstantRange);
+
+        m_pipelineLayout = m_device.device.createPipelineLayout(pipelineLayoutInfo);
     }
 
     std::unique_ptr<Pipeline> Renderer::createPipeline(
@@ -276,6 +284,17 @@ namespace dg
         
         m_pipelines[pl::shapes]->bind(m_commandBuffers[imageIndex]); 
         m_model->bind(m_commandBuffers[imageIndex]);
+
+        Transform2d transform = {{.25f, .25f}, {2.f, 0.5f}, .25f * glm::two_pi<float>()};
+
+        PushConstant push {
+            .transform = transform.getMatrix(),
+            .offset = transform.translation,
+            .color = {1.0f, 0, 1.0f}};
+        m_commandBuffers[imageIndex].pushConstants(m_pipelineLayout,
+                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+                0, sizeof(PushConstant), &push);
+
         m_model->draw(m_commandBuffers[imageIndex]);
 
         m_commandBuffers[imageIndex].endRenderPass();
