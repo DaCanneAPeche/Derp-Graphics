@@ -1,23 +1,31 @@
 #include "dg_pipeline.hpp"
 #include "dg_file.hpp"
 #include "dg_logger.hpp"
-#include "dg_shape.hpp"
+#include "dg_model.hpp"
 
 namespace dg
 {
 
-	template<class V>
-	Pipeline<V>::Pipeline(
+	Pipeline::Pipeline(
 			Device& device,
 			const std::string& vertShaderPath,
 			const std::string& fragShaderPath,
-			const PipelineConfigInfo& configInfo) : m_device(device)
+			const PipelineConfigInfo& configInfo,
+			const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
+			const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions
+			) : m_device(device), m_bindingDescriptions(bindingDescriptions), m_attributeDescriptions(attributeDescriptions)
 	{
 		createGraphicsPipeline(vertShaderPath, fragShaderPath, configInfo);
 	}
+
+	Pipeline::~Pipeline()
+	{
+		m_device.device.destroyShaderModule(m_vertShaderModule);
+		m_device.device.destroyShaderModule(m_fragShaderModule);
+		m_device.device.destroyPipeline(m_graphicsPipeline);
+	}
 	
-	template<class V>
-	void Pipeline<V>::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
+	void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 	{
 		configInfo.inputAssemblyInfo = vk::PipelineInputAssemblyStateCreateInfo(
 				{},
@@ -87,16 +95,7 @@ namespace dg
 				);
 	}
 
-	template<class V>
-	Pipeline<V>::~Pipeline()
-	{
-		m_device.device.destroyShaderModule(m_vertShaderModule);
-		m_device.device.destroyShaderModule(m_fragShaderModule);
-		m_device.device.destroyPipeline(m_graphicsPipeline);
-	}
-
-	template<class V>
-	void Pipeline<V>::createGraphicsPipeline(
+	void Pipeline::createGraphicsPipeline(
 			const std::string& vertShaderPath,
 			const std::string& fragShaderPath,
 			const PipelineConfigInfo& configInfo
@@ -130,12 +129,10 @@ namespace dg
 					)
 		};
 
-		auto bindingDescriptions = V::getBindingDescriptions();
-		auto attributeDescriptions = V::getAttributeDescriptions();
 		vk::PipelineVertexInputStateCreateInfo vertexInputInfo(
 				{},
-				bindingDescriptions,
-				attributeDescriptions
+				m_bindingDescriptions,
+				m_attributeDescriptions
 				);
 
 		vk::GraphicsPipelineCreateInfo pipelineInfo(
@@ -160,8 +157,7 @@ namespace dg
 		m_graphicsPipeline = m_device.device.createGraphicsPipeline(VK_NULL_HANDLE, pipelineInfo).value;
 	}
 
-	template<class V>
-	vk::ShaderModule Pipeline<V>::createShaderModule(const std::vector<char>& code)
+	vk::ShaderModule Pipeline::createShaderModule(const std::vector<char>& code)
 	{
 		// TODO : Fix the vector casting
 		std::vector<uint32_t> iCode(code.begin(), code.end());
@@ -176,12 +172,9 @@ namespace dg
 		return m_device.device.createShaderModule(createInfo);
 	}
 	
-	template<class V>
-	void Pipeline<V>::bind(vk::CommandBuffer& commandBuffer)
+	void Pipeline::bind(vk::CommandBuffer& commandBuffer)
 	{
 		commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, m_graphicsPipeline);
 	}
-
-	template class Pipeline<ShapeVertex>;
 } /* dg */ 
 

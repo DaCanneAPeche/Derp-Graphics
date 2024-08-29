@@ -5,7 +5,6 @@
 
 // vulkan
 #define VMA_IMPLEMENTATION
-#include "dg_memory_allocator.hpp"
 #include "vulkan/vulkan.hpp"
 
 // std
@@ -33,13 +32,7 @@ namespace dg
         m_device.init();
         Logger::logPhysicalDevice(m_device.physical);
 
-        MemoryAllocator::init(m_device.physical, m_device.device, instance);
-        g::instanceCleaning.push(
-                [](vk::Instance&)
-                {
-                    MemoryAllocator::clean();
-                });
-
+        initMemoryAllocator();
         loadModels();
         createPipelineLayout();
         recreateSwapChain();
@@ -48,22 +41,33 @@ namespace dg
 
     Renderer::~Renderer()
     {
-        executeFunctionStack<dg::Device&>(g::deviceCleaning, m_device);
-        executeFunctionStack<vk::Instance&>(g::instanceCleaning, instance);
+        for (auto& pipeline : m_pipelines)
+            pipeline = nullptr;
+        m_swapChain = nullptr;
+        m_model = nullptr;
+
+        gAllocator.destroy();
+
+        m_device.device.destroyPipelineLayout(m_pipelineLayout);
+        m_device.clean();
+
+        if (m_enableValidationLayers)
+            instance.destroyDebugUtilsMessengerEXT(m_debugMessenger, nullptr, m_dispatchLoader);
+        instance.destroy();
     }
 
     void Renderer::loadModels()
     {
         Logger::msgLn("Loading models");
 
-        std::vector<ShapeVertex> vertices 
+        std::vector<Vertex> vertices 
         {
-            ShapeVertex(0.0f, -0.5f),
-            ShapeVertex(0.5f, 0.5f),
-            ShapeVertex(-0.5f, 0.5f),
+            {{0.0f, -0.5f}},
+            {{0.5f, 0.5f}},
+            {{-0.5f, 0.5f}},
         };
 
-        m_shape = std::make_unique<Shape>(m_device, vertices);
+        m_model = std::make_unique<Model>(m_device, vertices);
     }
 
     void Renderer::createInstance()
@@ -97,12 +101,30 @@ namespace dg
         instance = vk::createInstance(createInfo);
 
         Logger::msgLn("Vk instance created");
+    }
 
-        g::instanceCleaning.push(
-                [](vk::Instance& instance)
-                {
-                    instance.destroy();
-                });
+    void Renderer::initMemoryAllocator()
+    {
+        vma::VulkanFunctions vulkanFunctions(
+          &vkGetInstanceProcAddr,
+          &vkGetDeviceProcAddr
+        );
+
+        vma::AllocatorCreateInfo allocatorCreateInfo(
+            vma::AllocatorCreateFlagBits::eExtMemoryBudget,
+            m_device.physical,
+            m_device.device,
+            {},
+            nullptr,
+            nullptr,
+            {},
+            &vulkanFunctions,
+            instance,
+            vk::ApiVersion13,
+            {}
+            );
+
+        gAllocator = vma::createAllocator(allocatorCreateInfo);
     }
 
     std::vector<const char*> Renderer::getRequestedExtensions()
@@ -130,15 +152,25 @@ namespace dg
         m_pipelineLayout = m_device.device.createPipelineLayout(pipelineInfo);
     }
 
-    template<class V>
-    std::unique_ptr<Pipeline<V>> Renderer::createPipeline(const std::string& vertShaderPath, const std::string& fragShaderPath)
+    std::unique_ptr<Pipeline> Renderer::createPipeline(
+            const std::string& vertShaderPath,
+            const std::string& fragShaderPath,
+            const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
+            const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions
+            )
     {
         PipelineConfigInfo pipelineConfig {};
-        Pipeline<V>::defaultPipelineConfigInfo(pipelineConfig);
+        Pipeline::defaultPipelineConfigInfo(pipelineConfig);
         pipelineConfig.renderPass = m_swapChain->getRenderPass();
         pipelineConfig.pipelineLayout = m_pipelineLayout;
 
-        return std::make_unique<Pipeline<V>>(m_device, vertShaderPath, fragShaderPath, pipelineConfig);
+        return std::make_unique<Pipeline>(m_device,
+                vertShaderPath,
+                fragShaderPath,
+                pipelineConfig,
+                bindingDescriptions,
+                attributeDescriptions
+                );
     }
 
     void Renderer::createPipelines()
@@ -148,9 +180,11 @@ namespace dg
         assert(m_swapChain != nullptr && "Cannot create pipelines before swapchain");
         assert(m_pipelineLayout != nullptr && "Cannot create pipelines before pipeline layout");
 
-        m_pipelines[pl::shapes] = createPipeline<ShapeVertex>(
+        m_pipelines[pl::shapes] = createPipeline(
                 "./assets/compiled_shaders/shape.vert.spv",
-                "./assets/compiled_shaders/shape.frag.spv"
+                "./assets/compiled_shaders/shape.frag.spv",
+                Vertex::getBindingDescriptions(),
+                Vertex::getAttributeDescriptions()
                 );
     }
 
@@ -172,10 +206,6 @@ namespace dg
         {
             Logger::msgLn("creating");
             m_swapChain = std::make_unique<SwapChain>(m_device, extent);
-            g::deviceCleaning.push([this](dg::Device&)
-                    {
-                        m_swapChain = nullptr; // Call destructor
-                    });
         }
         else
         {
@@ -245,8 +275,8 @@ namespace dg
         m_commandBuffers[imageIndex].setScissor(0, scissor);
         
         m_pipelines[pl::shapes]->bind(m_commandBuffers[imageIndex]); 
-        m_shape->bind(m_commandBuffers[imageIndex]);
-        m_shape->draw(m_commandBuffers[imageIndex]);
+        m_model->bind(m_commandBuffers[imageIndex]);
+        m_model->draw(m_commandBuffers[imageIndex]);
 
         m_commandBuffers[imageIndex].endRenderPass();
         m_commandBuffers[imageIndex].end();

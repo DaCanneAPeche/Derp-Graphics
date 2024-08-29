@@ -145,13 +145,7 @@ namespace dg
 						messengerInfo,
 						nullptr,
 						dispatchLoader);
-
-				g::instanceCleaning.push(
-						[debugMessenger, dispatchLoader](vk::Instance& instance)
-						{
-							instance.destroyDebugUtilsMessengerEXT(debugMessenger, nullptr, dispatchLoader);
-						});
-
+				
 				return debugMessenger;
     }
 		

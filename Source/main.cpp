@@ -16,6 +16,7 @@ void run()
         renderer.pollEvents();
         renderer.draw();
     }
+    renderer.waitIdle();
 }
 
 int main(void)

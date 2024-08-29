@@ -6,14 +6,11 @@
 
 // vulkan
 #include <vulkan/vulkan.hpp>
+#include <vk_mem_alloc.hpp>
 
 #include "dg_device.hpp"
 
 namespace dg
 {
-	namespace g
-	{
-		inline std::stack<std::function<void(vk::Instance&)>> instanceCleaning;
-		inline std::stack<std::function<void(dg::Device&)>> deviceCleaning;
-	} /* g */ 
+	inline vma::Allocator gAllocator;
 } /* dg */ 

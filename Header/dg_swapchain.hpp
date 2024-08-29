@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dg_device.hpp"
-#include "dg_memory_allocator.hpp"
+#include "dg_globals.hpp"
 
 // vulkan headers
 #include <vulkan/vulkan.hpp>
@@ -64,7 +64,7 @@ namespace dg
 		vk::RenderPass m_renderPass;
 
 		std::vector<vk::Image> m_depthImages;
-		std::vector<vma::Allocation> m_depthImageMemorys;
+		std::vector<vma::Allocation> m_depthImageAllocations;
 		std::vector<vk::ImageView> m_depthImageViews;
 		std::vector<vk::Image> m_swapChainImages;
 		std::vector<vk::ImageView> m_swapChainImageViews;

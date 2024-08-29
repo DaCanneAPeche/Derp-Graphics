@@ -1,23 +1,19 @@
 #include "dg_model.hpp"
-#include "dg_shape.hpp"
 
 namespace dg
 {
 	
-	template<class V>
-	Model<V>::Model(Device& device, const std::vector<V>& vertices) : m_device(device)
+	Model::Model(Device& device, const std::vector<Vertex>& vertices) : m_device(device)
 	{
 		createVertexBuffer(vertices);
 	}
 
-	template<class V>
-	Model<V>::~Model()
+	Model::~Model()
 	{
-		MemoryAllocator::destroyBuffer(m_vertexBuffer, m_bufferMemory);
+		gAllocator.destroyBuffer(m_vertexBuffer, m_bufferAllocation);
 	}
-
-	template<class V>
-	void Model<V>::createVertexBuffer(const std::vector<V>& vertices)
+	
+	void Model::createVertexBuffer(const std::vector<Vertex>& vertices)
 	{
 		m_vertexCount = static_cast<uint32_t>(vertices.size());
 		assert(m_vertexCount >= 3 && "Model::createVertexBuffer : you need to provide at least 3 vertices");
@@ -27,24 +23,23 @@ namespace dg
 		vk::BufferCreateInfo bufferInfo(
 				{}, bufferSize, vk::BufferUsageFlagBits::eVertexBuffer,
 				vk::SharingMode::eExclusive);
-		vma::AllocationCreateInfo allocInfo({}, vma::MemoryUsage::eAuto);
+		vma::AllocationCreateInfo allocInfo(
+				vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
+				vma::MemoryUsage::eAuto);
 
-		auto handle = MemoryAllocator::createBuffer(bufferInfo, allocInfo);
+		auto handle = gAllocator.createBuffer(bufferInfo, allocInfo);
 		m_vertexBuffer = handle.first;
-		m_bufferMemory = handle.second;
+		m_bufferAllocation = handle.second;
+		gAllocator.copyMemoryToAllocation(vertices.data(), m_bufferAllocation, 0, bufferSize);
 	}
 
-	template<class V>
-	void Model<V>::bind(const vk::CommandBuffer &commandBuffer)
+	void Model::bind(const vk::CommandBuffer &commandBuffer)
 	{
 		commandBuffer.bindVertexBuffers(0, m_vertexBuffer, vk::DeviceSize {0});
 	}
 	
-	template<class V>
-	void Model<V>::draw(const vk::CommandBuffer &commandBuffer)
+	void Model::draw(const vk::CommandBuffer &commandBuffer)
 	{
 		commandBuffer.draw(m_vertexCount, 1, 0, 0);
 	}
-	template class Model<ShapeVertex>;
-
 } /* dg */ 

@@ -37,6 +37,7 @@ namespace dg
 			Device& operator=(const Device&) = delete;
 
 			void init();
+			void clean();
 
 			[[nodiscard]] SwapChainSupportDetails getSwapChainSupport()
 			{ 

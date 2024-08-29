@@ -51,7 +51,7 @@ namespace dg
 		for (size_t i = 0; i < m_depthImages.size(); i++)
 		{
 			m_device.device.destroyImageView(m_depthImageViews[i]);
-			MemoryAllocator::destroyImage(m_depthImages[i], m_depthImageMemorys[i]);
+			gAllocator.destroyImage(m_depthImages[i], m_depthImageAllocations[i]);
 		}
 
 		for (auto framebuffer : m_swapChainFramebuffers)
@@ -280,7 +280,7 @@ namespace dg
 		vk::Extent2D swapChainExtent = getSwapChainExtent();
 
 		m_depthImages.resize(imageCount());
-		m_depthImageMemorys.resize(imageCount());
+		m_depthImageAllocations.resize(imageCount());
 		m_depthImageViews.resize(imageCount());
 
 		for (int i = 0; i < m_depthImages.size(); i++)
@@ -303,9 +303,9 @@ namespace dg
 					{}
 					);
 			
-			auto imageHandle = MemoryAllocator::createImage(imageInfo, {{}, vma::MemoryUsage::eAuto});
+			auto imageHandle = gAllocator.createImage(imageInfo, {{}, vma::MemoryUsage::eAuto});
 			m_depthImages[i] = imageHandle.first; 
-			m_depthImageMemorys[i] = imageHandle.second; 
+			m_depthImageAllocations[i] = imageHandle.second; 
 
 			vk::ImageViewCreateInfo viewInfo(
 					{},

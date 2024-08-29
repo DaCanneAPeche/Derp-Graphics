@@ -22,6 +22,13 @@ namespace dg
 		createCommandPool();
 	}
 
+	void Device::clean()
+	{
+		device.destroyCommandPool(commandPool);
+		device.destroy();
+    m_instance.destroySurfaceKHR(m_surface);
+	}
+
 	void Device::pickPhysicalDevice()
 	{
 		std::vector<vk::PhysicalDevice> availableDevices = m_instance.enumeratePhysicalDevices();
@@ -32,11 +39,6 @@ namespace dg
 			{
 				physical = device;
 				Logger::msgLn("Physical device was correctly choosen");
-				g::deviceCleaning.push(
-						[](dg::Device& device)
-						{
-							device.device.destroy();
-						});
 				return;
 			}
 		}
@@ -203,13 +205,6 @@ namespace dg
 				vk::CommandPoolCreateFlagBits::eTransient | vk::CommandPoolCreateFlagBits::eResetCommandBuffer
 				}, queueFamilyIndices.graphicsFamily.value());
 		commandPool = device.createCommandPool(commandPoolInfo);
-
-		g::deviceCleaning.push(
-				[](dg::Device& device)
-				{
-					device.device.destroyCommandPool(device.commandPool);
-				}
-				);
 	}
 	
 } /* dg */ 

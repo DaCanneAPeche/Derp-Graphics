@@ -32,7 +32,6 @@ namespace dg
 		uint32_t subpass = 0;
 	};
 
-	template<class V>
 	class Pipeline
 	{
 
@@ -40,7 +39,10 @@ namespace dg
 		Pipeline(Device& device,
 				const std::string& vertShaderPath,
 				const std::string& fragShaderPath,
-				const PipelineConfigInfo& configInfo);
+				const PipelineConfigInfo& configInfo,
+				const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
+				const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions
+				);
 		~Pipeline();
 
 		Pipeline(const Pipeline &) = delete;
@@ -61,7 +63,8 @@ namespace dg
 		VkPipeline m_graphicsPipeline;
 		vk::ShaderModule m_vertShaderModule;
 		vk::ShaderModule m_fragShaderModule;
-
+		std::vector<vk::VertexInputBindingDescription> m_bindingDescriptions;
+		std::vector<vk::VertexInputAttributeDescription> m_attributeDescriptions;
 	};
 	
 } /* dg */ 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dg_device.hpp"
-#include "dg_memory_allocator.hpp"
+#include "dg_globals.hpp"
 
 // glm
 #define GLM_FORCE_RADIANS
@@ -14,25 +14,36 @@
 namespace dg
 {
 
-	template<class T>
 	struct Vertex
 	{
-		static std::vector<vk::VertexInputBindingDescription> getBindingDescriptions()
+		glm::vec2 position;
+
+		static constexpr std::vector<vk::VertexInputBindingDescription> getBindingDescriptions()
 		{
-			return T::_getBindingDescriptions();
+			std::vector<vk::VertexInputBindingDescription> bindingDescriptions
+			{
+				vk::VertexInputBindingDescription(0, sizeof(Vertex), vk::VertexInputRate::eVertex)
+			};
+
+			return bindingDescriptions;
 		}
-		static std::vector<vk::VertexInputAttributeDescription> getAttributeDescriptions()
+		
+		static constexpr std::vector<vk::VertexInputAttributeDescription> getAttributeDescriptions()
 		{
-			return T::_getAttributeDescriptions();
+			std::vector<vk::VertexInputAttributeDescription> attributeDescriptions
+			{
+				vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, position))	
+			};
+
+			return attributeDescriptions;
 		}
 	};
 
-	template<class V> // Vertex derived class
 	class Model
 	{
 	public:
 
-		Model(Device& device, const std::vector<V>& vertices);
+		Model(Device& device, const std::vector<Vertex>& vertices);
 		~Model();
 		
 		Model(const Model &) = delete;
@@ -42,11 +53,11 @@ namespace dg
 		void draw(const vk::CommandBuffer& commandBuffer);
 
 	private:
-		void createVertexBuffer(const std::vector<V>& vertices);
+		void createVertexBuffer(const std::vector<Vertex>& vertices);
 
 		Device& m_device;
 		vk::Buffer m_vertexBuffer;
-		vma::Allocation m_bufferMemory;
+		vma::Allocation m_bufferAllocation;
 		uint32_t m_vertexCount;
 	};
 	
