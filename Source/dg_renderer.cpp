@@ -56,12 +56,15 @@ namespace dg
 
         std::vector<Vertex> vertices 
         {
-            {{0.0f, -0.5f}},
+            {{-0.5f, -0.5f}},
+            {{0.5f, -0.5f}},
             {{0.5f, 0.5f}},
-            {{-0.5f, 0.5f}},
+            {{-0.5f, 0.5f}}
         };
 
-        m_model = std::make_unique<Model>(m_device, vertices);
+        std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
+
+        m_model = std::make_unique<Model>(m_device, vertices, indices);
     }
 
     void Renderer::createInstance()
@@ -275,7 +278,8 @@ namespace dg
         m_pipelines[pl::shapes]->bind(m_commandBuffers[imageIndex]); 
         m_model->bind(m_commandBuffers[imageIndex]);
 
-        Transform2d transform = {{.25f, .25f}, {2.f, 0.5f}, .25f * glm::two_pi<float>()};
+        // Transform2d transform = {{.25f, .25f}, {2.f, 0.5f}, .25f * glm::two_pi<float>()};
+        Transform2d transform {};
 
         PushConstant push {
             .transform = transform.getMatrix(),
