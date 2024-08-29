@@ -16,16 +16,6 @@
 
 namespace dg
 {
-    template <class T>
-    void executeFunctionStack(std::stack<std::function<void(T)>>& stack, T parameter)
-    {
-        while (stack.size() > 0)
-        {
-            stack.top()(parameter);
-            stack.pop();
-        }
-    }
-
     Renderer::Renderer(const WindowInfo& windowInfo, const ApplicationInfo& appInfo)
         : window(windowInfo), applicationInfo {appInfo}
     {
