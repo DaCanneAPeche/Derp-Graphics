@@ -15,7 +15,7 @@ const vec3 colors[5] = vec3[5](
 		vec3(0.0f, 1.0f, 0.0f),
 		vec3(0.0f, 0.0f, 1.0f),
 		vec3(1.0f, 1.0f, 1.0f),
-		vec3(0.0f, 0.0f, 0.0f) // Should appear as the hightest index is supposed to be 3
+		vec3(0.0f, 0.0f, 0.0f) // Should'nt appear as the hightest index is supposed to be 3
 		);
 
 void main()

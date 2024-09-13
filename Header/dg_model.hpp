@@ -2,6 +2,7 @@
 
 #include "dg_device.hpp"
 #include "dg_globals.hpp"
+#include "dg_buffer.hpp"
 
 // glm
 #define GLM_FORCE_RADIANS
@@ -10,6 +11,7 @@
 
 // std
 #include <vector>
+#include <memory>
 
 namespace dg
 {
@@ -43,7 +45,7 @@ namespace dg
 	{
 	public:
 
-		Model(Device& device, const std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices = {0, 1, 2});
+		Model(Device& device, const std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices);
 		~Model();
 		
 		Model(const Model &) = delete;
@@ -57,12 +59,11 @@ namespace dg
 		void createIndexBuffer(const std::vector<uint16_t>& indices);
 
 		Device& m_device;
-		vk::Buffer m_vertexBuffer;
-		vma::Allocation m_vertexBufferAllocation;
 		uint32_t m_vertexCount;
-		vk::Buffer m_indexBuffer;
-		vma::Allocation m_indexBufferAllocation;
 		uint32_t m_indicesCount;
+		std::unique_ptr<Buffer> m_vertexBuffer;
+		std::unique_ptr<Buffer> m_indexBuffer;
+		bool m_hasIndices = false;
 	};
 	
 } /* dg */ 

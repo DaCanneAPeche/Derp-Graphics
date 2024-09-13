@@ -21,10 +21,5 @@ void run()
 
 int main(void)
 {
-    try {
-        run();
-    } catch(const std::exception &error) {
-        std::cerr << error.what() << std::endl;
-        return 1;
-    }
+    run();
 }
