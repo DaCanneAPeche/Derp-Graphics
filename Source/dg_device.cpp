@@ -86,7 +86,7 @@ namespace dg
 		presentQueue = device.getQueue(queueFamilyIndices.presentFamily.value(), 0);
 	}
 
-	bool Device::isDeviceSuitable(vk::PhysicalDevice physicalDevice)
+	bool Device::isDeviceSuitable(vk::PhysicalDevice physicalDevice) const
 	{
 		QueueFamilyIndices indices = findQueueFamilyIndices(physicalDevice);
 		bool extensionsSupported = areExtensionsSupportedBy(physicalDevice);
@@ -104,7 +104,7 @@ namespace dg
 
 	}
 
-	bool Device::areExtensionsSupportedBy(vk::PhysicalDevice physicalDevice)
+	bool Device::areExtensionsSupportedBy(vk::PhysicalDevice physicalDevice) const
 	{
 		std::vector<vk::ExtensionProperties> availableExtensions =
 			physicalDevice.enumerateDeviceExtensionProperties();
@@ -120,7 +120,7 @@ namespace dg
 		return requiredExtensions.empty();
 	}
 
-	uint32_t Device::findQueueFamilyIndex(vk::QueueFlags queueType)
+	uint32_t Device::findQueueFamilyIndex(vk::QueueFlags queueType) const
 	{
 		std::vector<vk::QueueFamilyProperties> queueFamilies = physical.getQueueFamilyProperties();
 
@@ -133,7 +133,7 @@ namespace dg
 		throw std::runtime_error("Could't find a suitable queue family");
 	}
 	
-	QueueFamilyIndices Device::findQueueFamilyIndices(vk::PhysicalDevice physicalDevice)
+	QueueFamilyIndices Device::findQueueFamilyIndices(vk::PhysicalDevice physicalDevice) const
 	{
 		QueueFamilyIndices indices;
 
@@ -162,7 +162,7 @@ namespace dg
 
 	}
 	
-	SwapChainSupportDetails Device::querySwapChainSupport(vk::PhysicalDevice physicalDevice)
+	SwapChainSupportDetails Device::querySwapChainSupport(vk::PhysicalDevice physicalDevice) const
 	{
 		return {
 			physicalDevice.getSurfaceCapabilitiesKHR(m_surface),
@@ -171,8 +171,8 @@ namespace dg
 		};
 	}
 	
-	vk::Format Device::findSupportedFormat(
-		const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features)
+	vk::Format Device::findSupportedFormat (
+		const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const
 	{
 		for (vk::Format format : candidates) {
 			vk::FormatProperties props;

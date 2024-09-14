@@ -32,7 +32,7 @@ namespace dg
         Logger::msgLn("Window inited");
     }
 
-    bool Window::shouldClose()
+    bool Window::shouldClose() const
     {
         return glfwWindowShouldClose(m_window);
     }
@@ -47,7 +47,7 @@ namespace dg
         Logger::msgLn("Window surface created");
     }
 
-    vk::Extent2D Window::getVkExtent()
+    vk::Extent2D Window::getVkExtent() const
     {
         return {
             static_cast<uint32_t>(info.width),

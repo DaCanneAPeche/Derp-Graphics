@@ -57,7 +57,7 @@ namespace dg
 				const std::string& fragShaderPath,
 				const PipelineConfigInfo& configInfo);
 
-		vk::ShaderModule createShaderModule(const std::vector<char>& code);
+		[[nodiscard]] vk::ShaderModule createShaderModule(const std::vector<char>& code);
 		
 		Device& m_device;
 		VkPipeline m_graphicsPipeline;

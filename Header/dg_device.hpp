@@ -15,7 +15,7 @@ namespace dg
 	{
 		std::optional<uint32_t> graphicsFamily;
 		std::optional<uint32_t> presentFamily;
-		bool isComplete()
+		bool isComplete() const
 		{
 			return graphicsFamily.has_value() && presentFamily.has_value();
 		}
@@ -39,19 +39,19 @@ namespace dg
 			void init();
 			void clean();
 
-			[[nodiscard]] SwapChainSupportDetails getSwapChainSupport()
+			[[nodiscard]] SwapChainSupportDetails getSwapChainSupport() const
 			{ 
 				return querySwapChainSupport(physical);
 			};
 
 			[[nodiscard]] vk::SurfaceKHR& surface() { return m_surface; }
-			[[nodiscard]] QueueFamilyIndices physicalDeviceQueueFamilyIndices()
+			[[nodiscard]] QueueFamilyIndices physicalDeviceQueueFamilyIndices() const
 			{
 				return findQueueFamilyIndices(physical);
 			}
 
-			vk::Format findSupportedFormat(
-				const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features);
+			[[nodiscard]] vk::Format findSupportedFormat(
+				const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const;
 
 			vk::PhysicalDevice physical;
 			vk::Device device;
@@ -64,11 +64,11 @@ namespace dg
 			void createLogicalDevice();
 			void createWindowSurface();
 			void createCommandPool();
-			[[nodiscard]] bool isDeviceSuitable(vk::PhysicalDevice physicalDevice);
-			[[nodiscard]] bool areExtensionsSupportedBy(vk::PhysicalDevice physicalDevice);
-			[[nodiscard]] uint32_t findQueueFamilyIndex(vk::QueueFlags queueType);
-			[[nodiscard]] QueueFamilyIndices findQueueFamilyIndices(vk::PhysicalDevice physicalDevice);
-			[[nodiscard]] SwapChainSupportDetails querySwapChainSupport(vk::PhysicalDevice physicalDevice);
+			[[nodiscard]] bool isDeviceSuitable(vk::PhysicalDevice physicalDevice) const;
+			[[nodiscard]] bool areExtensionsSupportedBy(vk::PhysicalDevice physicalDevice) const;
+			[[nodiscard]] uint32_t findQueueFamilyIndex(vk::QueueFlags queueType) const;
+			[[nodiscard]] QueueFamilyIndices findQueueFamilyIndices(vk::PhysicalDevice physicalDevice) const;
+			[[nodiscard]] SwapChainSupportDetails querySwapChainSupport(vk::PhysicalDevice physicalDevice) const;
 
 			const std::vector<const char*>& m_extensions;
 			vk::Instance& m_instance;

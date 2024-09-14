@@ -42,7 +42,7 @@ namespace dg
 		gAllocator.copyMemoryToAllocation(data, allocation, offset, size);
 	}
 
-	vk::DescriptorBufferInfo Buffer::descriptorInfo(vk::DeviceSize size, vk::DeviceSize offset)
+	vk::DescriptorBufferInfo Buffer::descriptorInfo(vk::DeviceSize size, vk::DeviceSize offset) const
 	{
 		return vk::DescriptorBufferInfo(buffer, size, offset);
 	}
@@ -52,12 +52,12 @@ namespace dg
 		write(data, m_instanceSize, index * m_alignementSize);
 	}
 
-	vk::DescriptorBufferInfo Buffer::descriptorInfoForIndex(int index)
+	vk::DescriptorBufferInfo Buffer::descriptorInfoForIndex(int index) const
 	{
 		return descriptorInfo(m_alignementSize, m_alignementSize * index);
 	}
 
-	vk::DeviceSize Buffer::getAlignment(vk::DeviceSize instanceSize, vk::DeviceSize minOffsetAlignment)
+	vk::DeviceSize Buffer::getAlignment(vk::DeviceSize instanceSize, vk::DeviceSize minOffsetAlignment) const
 	{
 		if (minOffsetAlignment > 0)
 			return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);

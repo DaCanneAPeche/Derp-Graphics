@@ -45,7 +45,7 @@ namespace dg
 		m_indexBuffer->write((void*)indices.data(), bufferSize);
 	}
 
-	void Model::bind(const vk::CommandBuffer& commandBuffer)
+	void Model::bind(const vk::CommandBuffer& commandBuffer) const
 	{
 		commandBuffer.bindVertexBuffers(0, m_vertexBuffer->buffer, vk::DeviceSize {0});
 
@@ -53,7 +53,7 @@ namespace dg
 			commandBuffer.bindIndexBuffer(m_indexBuffer->buffer, vk::DeviceSize {0}, vk::IndexType::eUint16);
 	}
 	
-	void Model::draw(const vk::CommandBuffer& commandBuffer)
+	void Model::draw(const vk::CommandBuffer& commandBuffer) const
 	{
 		if (m_hasIndices)
 			commandBuffer.drawIndexed(m_indicesCount, 1, 0, 0, 0);

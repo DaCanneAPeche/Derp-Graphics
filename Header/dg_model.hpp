@@ -20,7 +20,7 @@ namespace dg
 	{
 		glm::vec2 position;
 
-		static constexpr std::vector<vk::VertexInputBindingDescription> getBindingDescriptions()
+		[[nodiscard]] static constexpr std::vector<vk::VertexInputBindingDescription> getBindingDescriptions()
 		{
 			std::vector<vk::VertexInputBindingDescription> bindingDescriptions
 			{
@@ -30,7 +30,7 @@ namespace dg
 			return bindingDescriptions;
 		}
 		
-		static constexpr std::vector<vk::VertexInputAttributeDescription> getAttributeDescriptions()
+		[[nodiscard]] static constexpr std::vector<vk::VertexInputAttributeDescription> getAttributeDescriptions()
 		{
 			std::vector<vk::VertexInputAttributeDescription> attributeDescriptions
 			{
@@ -51,8 +51,8 @@ namespace dg
 		Model(const Model &) = delete;
 		Model &operator=(const Model &) = delete;
 
-		void bind(const vk::CommandBuffer& commandBuffer);
-		void draw(const vk::CommandBuffer& commandBuffer);
+		void bind(const vk::CommandBuffer& commandBuffer) const;
+		void draw(const vk::CommandBuffer& commandBuffer) const;
 
 	private:
 		void createVertexBuffer(const std::vector<Vertex>& vertices);

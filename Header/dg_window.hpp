@@ -28,9 +28,9 @@ namespace dg
 		Window(const Window&) = delete;
 		Window &operator=(const Window&) = delete;
 
-		bool shouldClose();
+		[[nodiscard]] bool shouldClose() const;
 
-		vk::Extent2D getVkExtent();
+		[[nodiscard]] vk::Extent2D getVkExtent() const;
 		bool isResized = false;
 		WindowInfo info;
 

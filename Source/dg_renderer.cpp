@@ -9,6 +9,7 @@
 #define VMA_IMPLEMENTATION
 #include "vulkan/vulkan.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
 #include "glm/gtc/constants.hpp"
 
 // std
@@ -100,7 +101,7 @@ namespace dg
         Logger::msgLn("Vk instance created");
     }
 
-    void Renderer::initMemoryAllocator()
+    void Renderer::initMemoryAllocator() const
     {
         vma::VulkanFunctions vulkanFunctions(
           &vkGetInstanceProcAddr,
@@ -124,7 +125,7 @@ namespace dg
         gAllocator = vma::createAllocator(allocatorCreateInfo);
     }
 
-    std::vector<const char*> Renderer::getRequestedExtensions()
+    std::vector<const char*> Renderer::getRequestedExtensions() const
     {
           uint32_t glfwExtensionCount = 0;
           const char **glfwExtensions;
@@ -323,7 +324,7 @@ namespace dg
             throw std::runtime_error("Failed to present swap chain image");
     }
 		
-    bool Renderer::areValidationLayersSupported()
+    bool Renderer::areValidationLayersSupported() const
     {
         std::vector<vk::LayerProperties> availableLayers = vk::enumerateInstanceLayerProperties();
 

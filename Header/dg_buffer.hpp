@@ -24,9 +24,9 @@ namespace dg
 		~Buffer ();
 
 		void write(void* data, vk::DeviceSize size, vk::DeviceSize offset = 0);
-		vk::DescriptorBufferInfo descriptorInfo(vk::DeviceSize size = vk::WholeSize, vk::DeviceSize offset = 0);
+		[[nodiscard]] vk::DescriptorBufferInfo descriptorInfo(vk::DeviceSize size = vk::WholeSize, vk::DeviceSize offset = 0) const;
 		void writeToIndex(void* data, int index);
-		vk::DescriptorBufferInfo descriptorInfoForIndex(int index);
+		[[nodiscard]] vk::DescriptorBufferInfo descriptorInfoForIndex(int index) const;
 
 		vk::Buffer buffer;
 		vma::Allocation allocation;
@@ -42,7 +42,7 @@ namespace dg
 		vk::DeviceSize m_alignementSize;
 
 		void createBuffer();
-		vk::DeviceSize getAlignment(vk::DeviceSize instanceSize, vk::DeviceSize minOffsetAlignement);
+		[[nodiscard]] vk::DeviceSize getAlignment(vk::DeviceSize instanceSize, vk::DeviceSize minOffsetAlignement) const;
 	};
 
 }/* dg */

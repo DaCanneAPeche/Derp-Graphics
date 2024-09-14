@@ -10,7 +10,7 @@ namespace dg
 	namespace file
 	{
 
-		std::vector<char> read(const std::string& filePath);
+		[[nodiscard]] std::vector<char> read(const std::string& filePath);
 		
 	} /* file */ 
 	

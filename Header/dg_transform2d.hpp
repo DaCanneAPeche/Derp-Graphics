@@ -9,7 +9,7 @@ namespace dg
 		glm::vec2 scaling = {1.0f, 1.0f};
 		float rotation;
 
-		[[nodiscard]] glm::mat2 getMatrix()
+		[[nodiscard]] glm::mat2 getMatrix() const
 		{
 			const float sin = glm::sin(rotation);
 			const float cos = glm::cos(rotation);

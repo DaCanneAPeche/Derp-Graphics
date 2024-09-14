@@ -31,9 +31,9 @@ namespace dg
 		Renderer &operator=(const Renderer &) = delete;
 
 		void draw();
-		void pollEvents() { glfwPollEvents(); };
-		bool shouldWindowClose() { return window.shouldClose(); };
-		void waitIdle() { m_device.device.waitIdle(); }
+		void pollEvents() const { glfwPollEvents(); };
+		[[nodiscard]] bool shouldWindowClose() const { return window.shouldClose(); };
+		void waitIdle() const { m_device.device.waitIdle(); }
 		
 		Window window;
 		vk::Instance instance;
@@ -44,7 +44,7 @@ namespace dg
 		void createInstance();
 		void createPipelineLayout();
 		void createPipelines();
-		std::unique_ptr<Pipeline> createPipeline(
+		[[nodiscard]] std::unique_ptr<Pipeline> createPipeline(
 				const std::string& vertShaderPath,
 				const std::string& fragShaderPath,
 				const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
@@ -55,8 +55,8 @@ namespace dg
 		void recreateSwapChain();
 		void recordCommandBuffer(int imageIndex);
 		void loadModels();
-		std::vector<const char*> getRequestedExtensions();
-		void initMemoryAllocator();
+		[[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
+		void initMemoryAllocator() const;
 
 		std::vector<const char*> m_deviceExtensions = {vk::KHRSwapchainExtensionName};
 		Device m_device { instance, m_deviceExtensions, window};
@@ -75,6 +75,6 @@ namespace dg
 #else
 		const bool m_enableValidationLayers = true;
 #endif
-		bool areValidationLayersSupported();
+		[[nodiscard]] bool areValidationLayersSupported() const;
 	};
 } /* dg */ 
