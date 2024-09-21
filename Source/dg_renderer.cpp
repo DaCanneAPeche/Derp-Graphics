@@ -10,6 +10,7 @@
 #include "vulkan/vulkan.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
+#include "dg_texture.hpp"
 #include "glm/gtc/constants.hpp"
 
 // std

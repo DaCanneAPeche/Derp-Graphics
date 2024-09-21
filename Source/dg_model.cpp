@@ -24,8 +24,9 @@ namespace dg
 		vk::DeviceSize bufferSize = vertexSize * m_vertexCount;  
 
 		m_vertexBuffer = std::make_unique<Buffer>(
-				m_device, vertexSize, m_vertexCount, vk::BufferUsageFlagBits::eVertexBuffer,
-				vma::AllocationCreateFlagBits::eHostAccessSequentialWrite, vma::MemoryUsage::eAuto);
+				m_device, vertexSize, m_vertexCount, vk::BufferUsageFlagBits::eVertexBuffer |
+				vk::BufferUsageFlagBits::eTransferDst, vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
+				vma::MemoryUsage::eAuto);
 		m_vertexBuffer->write((void*)vertices.data(), bufferSize);
 	}
 
@@ -40,8 +41,9 @@ namespace dg
 		vk::DeviceSize bufferSize = indexSize * m_indicesCount;
 
 		m_indexBuffer = std::make_unique<Buffer>(
-				m_device, indexSize, m_indicesCount, vk::BufferUsageFlagBits::eIndexBuffer,
-				vma::AllocationCreateFlagBits::eHostAccessSequentialWrite, vma::MemoryUsage::eCpuToGpu);
+				m_device, indexSize, m_indicesCount, vk::BufferUsageFlagBits::eIndexBuffer |
+				vk::BufferUsageFlagBits::eTransferDst, vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
+				vma::MemoryUsage::eCpuToGpu);
 		m_indexBuffer->write((void*)indices.data(), bufferSize);
 	}
 

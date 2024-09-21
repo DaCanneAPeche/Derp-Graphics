@@ -15,8 +15,8 @@ namespace dg
 				Device& device,
 				vk::DeviceSize instanceSize,
 				uint32_t instanceCount,
-				vk::BufferUsageFlagBits bufferUsageFlags,
-				vma::AllocationCreateFlagBits allocFlag,
+				vk::BufferUsageFlags bufferUsageFlags,
+				vma::AllocationCreateFlags allocFlag,
 				vma::MemoryUsage memoryUsage = vma::MemoryUsage::eAuto,
 				vk::DeviceSize minOffsetAlignement = 1,
 				vk::SharingMode sharingMode = vk::SharingMode::eExclusive
