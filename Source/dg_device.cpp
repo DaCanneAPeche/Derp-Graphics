@@ -1,6 +1,7 @@
 #include "dg_logger.hpp"
 #include "dg_device.hpp"
 #include "dg_globals.hpp"
+#include "dg_buffer.hpp"
 
 // std
 #include <stdexcept>
@@ -205,6 +206,25 @@ namespace dg
 				vk::CommandPoolCreateFlagBits::eTransient | vk::CommandPoolCreateFlagBits::eResetCommandBuffer
 				}, queueFamilyIndices.graphicsFamily.value());
 		commandPool = device.createCommandPool(commandPoolInfo);
+	}
+	
+	vk::CommandBuffer Device::beginSingleTimeCommands() const
+	{
+		vk::CommandBufferAllocateInfo allocInfo(commandPool, vk::CommandBufferLevel::ePrimary, 1);
+		vk::CommandBuffer commandBuffer = device.allocateCommandBuffers(allocInfo)[0];
+		vk::CommandBufferBeginInfo beginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+		commandBuffer.begin(beginInfo);
+
+		return commandBuffer;
+	} 
+
+	void Device::endSingleTimeCommands(vk::CommandBuffer commandBuffer) const
+	{
+		commandBuffer.end();
+		vk::SubmitInfo submitInfo({}, {}, commandBuffer);
+		graphicsQueue.submit(submitInfo);
+		graphicsQueue.waitIdle();
+		device.freeCommandBuffers(commandPool, commandBuffer);
 	}
 	
 } /* dg */ 

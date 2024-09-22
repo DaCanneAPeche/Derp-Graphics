@@ -11,23 +11,27 @@ namespace dg
 {
 	class Texture {
 		public:
-			int width = 0;
-			int height = 0;
-			int channels = 0;
-			vk::DeviceSize size;
-			stbi_uc* pixels = nullptr;
-			vk::Image image;
-			vma::Allocation allocation;
 
-			Texture(const std::string& path);
+			Texture(Device& device, const std::string& filepath);
 			~Texture()
 			{
-				gAllocator.destroyImage(image, allocation);
+				gAllocator.destroyImage(m_image, m_allocation);
+				m_device.device.destroySampler(sampler);
+				m_device.device.destroyImageView(imageView);
 			}
 
-			void createImage(Device& device);
+			vk::ImageView imageView;
+			vk::Sampler sampler; 
+			vk::ImageLayout imageLayout;
 
 		private:
-			void load(const std::string& path);
+			void transitionImageLayout(vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
+			void copyBufferToImage(Buffer& buffer, vk::Image& image, uint32_t width, uint32_t height) const;
+
+			Device& m_device;
+			int m_width, m_height, m_mipLevels;
+			vk::Image m_image;
+			vma::Allocation m_allocation;
+			vk::Format m_format;
 	};
 }

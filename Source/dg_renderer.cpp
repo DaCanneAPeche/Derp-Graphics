@@ -6,11 +6,8 @@
 #include "dg_transform2d.hpp"
 
 // vulkan
-#define VMA_IMPLEMENTATION
 #include "vulkan/vulkan.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "dg_texture.hpp"
 #include "glm/gtc/constants.hpp"
 
 // std
@@ -30,6 +27,7 @@ namespace dg
 
         initMemoryAllocator();
         loadModels();
+        m_leclercTexture = std::make_unique<Texture>(m_device, "./assets/textures/leclerc.jpg");
         createPipelineLayout();
         recreateSwapChain();
         createCommandBuffers();
@@ -41,6 +39,7 @@ namespace dg
             pipeline = nullptr;
         m_swapChain = nullptr;
         m_model = nullptr;
+        m_leclercTexture = nullptr;
 
         gAllocator.destroy();
 

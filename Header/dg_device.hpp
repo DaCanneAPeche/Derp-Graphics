@@ -52,6 +52,8 @@ namespace dg
 
 			[[nodiscard]] vk::Format findSupportedFormat(
 				const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const;
+			[[nodiscard]] vk::CommandBuffer beginSingleTimeCommands() const; 
+			void endSingleTimeCommands(vk::CommandBuffer commandBuffer) const;
 
 			vk::PhysicalDevice physical;
 			vk::Device device;

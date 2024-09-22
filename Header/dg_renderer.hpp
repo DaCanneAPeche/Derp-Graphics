@@ -6,6 +6,8 @@
 #include "dg_swapchain.hpp"
 #include "dg_model.hpp"
 
+#include "dg_texture.hpp"
+
 #include <vk_mem_alloc.hpp>
 
 // std
@@ -66,6 +68,7 @@ namespace dg
 		std::vector<vk::CommandBuffer> m_commandBuffers;
 		vk::DispatchLoaderDynamic m_dispatchLoader;
 		std::unique_ptr<Model> m_model;
+		std::unique_ptr<Texture> m_leclercTexture;
 
 		// Validation layers
 		std::vector<const  char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};

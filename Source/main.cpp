@@ -1,4 +1,5 @@
 #define VMA_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
 #include <iostream>
 #include "dg_renderer.hpp"
 #include "dg_logger.hpp"
