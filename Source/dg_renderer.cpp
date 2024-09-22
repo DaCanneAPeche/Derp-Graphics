@@ -27,7 +27,8 @@ namespace dg
 
         initMemoryAllocator();
         loadModels();
-        m_leclercTexture = std::make_unique<Texture>(m_device, "./assets/textures/leclerc.jpg");
+        m_leclercTexture = std::make_unique<Texture>(m_device, "./assets/textures/leclerc.jpg",
+                m_device.physical.getProperties().limits.maxSamplerAnisotropy);
         createPipelineLayout();
         recreateSwapChain();
         createCommandBuffers();

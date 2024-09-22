@@ -2,7 +2,17 @@
 
 namespace dg {
 
-	Texture::Texture(Device& device, const std::string& filepath) : m_device(device)
+	Texture::Texture(Device& device, const std::string& filepath, float maxAnistrophy, vk::Filter minifiedFilter,
+			vk::Filter magnifiedFilter,
+			vk::SamplerAddressMode adressingMode) :
+		m_device(device), c_subresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1)
+	{
+		createImage(filepath);
+		createImageView();
+		createSampler(maxAnistrophy, minifiedFilter, magnifiedFilter, adressingMode);
+	}
+
+	void Texture::createImage(const std::string& filepath)
 	{
 		int channels;
 		int desiredChannels = STBI_rgb_alpha;
@@ -20,9 +30,7 @@ namespace dg {
 		stagingBuffer.write(pixels, desiredChannels * pixelsCount);
 		stbi_image_free(pixels);
 
-		m_format = vk::Format::eR8G8B8A8Srgb;
-
-		vk::ImageCreateInfo imageInfo({}, vk::ImageType::e2D, m_format, vk::Extent3D(m_width, m_height, 1),
+		vk::ImageCreateInfo imageInfo({}, vk::ImageType::e2D, c_format, vk::Extent3D(m_width, m_height, 1),
 				1, 1, vk::SampleCountFlagBits::e1, vk::ImageTiling::eOptimal, vk::ImageUsageFlagBits::eTransferDst |
 				vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferSrc, vk::SharingMode::eExclusive);	
 		
@@ -37,14 +45,31 @@ namespace dg {
 		transitionImageLayout(vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
 	}
 
+	void Texture::createImageView()
+	{
+		vk::ImageViewCreateInfo imageViewInfo({}, m_image, vk::ImageViewType::e2D, c_format,
+				vk::ComponentSwizzle::eIdentity, c_subresourceRange);
+
+		imageView = m_device.device.createImageView(imageViewInfo);
+	}
+
+	void Texture::createSampler(float maxAnistrophy, vk::Filter minifiedFilter, vk::Filter magnifiedFilter,
+			vk::SamplerAddressMode adressingMode)
+	{
+		vk::SamplerCreateInfo samplerInfo({}, magnifiedFilter, minifiedFilter, vk::SamplerMipmapMode::eLinear,
+				adressingMode, adressingMode, adressingMode, .0f, maxAnistrophy > .0f, maxAnistrophy, vk::False,
+				vk::CompareOp::eAlways, .0f, .0f, vk::BorderColor::eIntOpaqueBlack, vk::False);
+
+		sampler = m_device.device.createSampler(samplerInfo);
+	}
+
 	void Texture::transitionImageLayout(vk::ImageLayout oldLayout, vk::ImageLayout newLayout)
 	{
 		vk::CommandBuffer commandBuffer = m_device.beginSingleTimeCommands();
 
-		vk::ImageSubresourceRange subresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1);
 		vk::ImageMemoryBarrier barrier({}, {}, // determined later
 				oldLayout, newLayout, vk::QueueFamilyIgnored, vk::QueueFamilyIgnored,
-				m_image, subresourceRange);
+				m_image, c_subresourceRange);
 
 		vk::PipelineStageFlags sourceStage;
 		vk::PipelineStageFlags destinationStage;
