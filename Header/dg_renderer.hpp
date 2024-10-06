@@ -59,10 +59,16 @@ namespace dg
 		void loadModels();
 		[[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
 		void initMemoryAllocator() const;
+    void createDescriptorSetLayout();
+    void createDescriptorPool();
+    void createDescriptorSets();
 
 		std::vector<const char*> m_deviceExtensions = {vk::KHRSwapchainExtensionName};
 		Device m_device { instance, m_deviceExtensions, window};
 		vk::PipelineLayout m_pipelineLayout;
+    vk::DescriptorSetLayout m_descriptorSetLayout;
+    vk::DescriptorPool m_descriptorPool;
+    std::vector<vk::DescriptorSet> m_descriptorSets;
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;

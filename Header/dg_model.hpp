@@ -19,6 +19,7 @@ namespace dg
 	struct Vertex
 	{
 		glm::vec2 position;
+    glm::vec2 textureCoordinates;
 
 		[[nodiscard]] static constexpr std::vector<vk::VertexInputBindingDescription> getBindingDescriptions()
 		{
@@ -34,7 +35,8 @@ namespace dg
 		{
 			std::vector<vk::VertexInputAttributeDescription> attributeDescriptions
 			{
-				vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, position))	
+				vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, position)),
+				vk::VertexInputAttributeDescription(1, 0, vk::Format::eR32G32Sfloat, offsetof(Vertex, textureCoordinates))
 			};
 
 			return attributeDescriptions;

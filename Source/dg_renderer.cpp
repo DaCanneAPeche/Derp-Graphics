@@ -18,20 +18,25 @@ namespace dg
     Renderer::Renderer(const WindowInfo& windowInfo, const ApplicationInfo& appInfo)
         : window(windowInfo), applicationInfo {appInfo}
     {
-        createInstance();   
-        m_dispatchLoader = vk::DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
-        m_debugMessenger = Logger::createDebugMessenger(instance, m_dispatchLoader);
+      createInstance();   
+      m_dispatchLoader = vk::DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
+      m_debugMessenger = Logger::createDebugMessenger(instance, m_dispatchLoader);
 
-        m_device.init();
-        Logger::logPhysicalDevice(m_device.physical);
+      m_device.init();
+      Logger::logPhysicalDevice(m_device.physical);
 
-        initMemoryAllocator();
-        loadModels();
-        m_leclercTexture = std::make_unique<Texture>(m_device, "./assets/textures/leclerc.jpg",
-                m_device.physical.getProperties().limits.maxSamplerAnisotropy);
-        createPipelineLayout();
-        recreateSwapChain();
-        createCommandBuffers();
+      initMemoryAllocator();
+      loadModels();
+      m_leclercTexture = std::make_unique<Texture>(m_device, "./assets/textures/leclerc.jpg",
+          m_device.physical.getProperties().limits.maxSamplerAnisotropy);
+
+      createDescriptorSetLayout();
+      createDescriptorPool();
+      createDescriptorSets();
+      
+      createPipelineLayout();
+      recreateSwapChain();
+      createCommandBuffers();
     }
 
     Renderer::~Renderer()
@@ -41,6 +46,9 @@ namespace dg
         m_swapChain = nullptr;
         m_model = nullptr;
         m_leclercTexture = nullptr;
+
+        m_device.device.destroyDescriptorPool(m_descriptorPool);
+        m_device.device.destroyDescriptorSetLayout(m_descriptorSetLayout);
 
         gAllocator.destroy();
 
@@ -58,10 +66,10 @@ namespace dg
 
         std::vector<Vertex> vertices 
         {
-            {{-0.5f, -0.5f}},
-            {{0.5f, -0.5f}},
-            {{0.5f, 0.5f}},
-            {{-0.5f, 0.5f}}
+            {{-0.5f, -0.5f}, {0.0f, 0.0f}},
+            {{0.5f, -0.5f}, {1.0f, 0.0f}},
+            {{0.5f, 0.5f}, {1.0f, 1.0f}},
+            {{-0.5f, 0.5f}, {0.0f, 1.0f}}
         };
 
         std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
@@ -150,7 +158,8 @@ namespace dg
                 0, sizeof(PushConstant)
                 );
 
-        vk::PipelineLayoutCreateInfo pipelineLayoutInfo({}, {}, pushConstantRange);
+        vk::PipelineLayoutCreateInfo pipelineLayoutInfo({}, m_descriptorSetLayout,
+            pushConstantRange);
 
         m_pipelineLayout = m_device.device.createPipelineLayout(pipelineLayoutInfo);
     }
@@ -174,6 +183,68 @@ namespace dg
                 bindingDescriptions,
                 attributeDescriptions
                 );
+    }
+    void Renderer::createDescriptorSetLayout()
+    {
+      vk::DescriptorSetLayoutBinding samplerLayoutBinding(
+          0,
+          vk::DescriptorType::eCombinedImageSampler, 1,
+          vk::ShaderStageFlagBits::eFragment
+          );
+
+      std::array<vk::DescriptorSetLayoutBinding, 1> bindings =
+      {
+        samplerLayoutBinding
+      };
+
+      vk::DescriptorSetLayoutCreateInfo layoutInfo({}, bindings);
+      m_descriptorSetLayout = m_device.device.createDescriptorSetLayout(layoutInfo);
+    }
+    
+    void Renderer::createDescriptorPool()
+    {
+      std::array<vk::DescriptorPoolSize, 1> poolSizes = {
+        vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 
+            static_cast<uint32_t>(1))
+      };
+
+      vk::DescriptorPoolCreateInfo poolInfo(
+          {}, static_cast<uint32_t>(1),
+          poolSizes
+          );
+
+      m_descriptorPool = m_device.device.createDescriptorPool(poolInfo);
+    }
+    
+    void Renderer::createDescriptorSets()
+    {
+      std::vector<vk::DescriptorSetLayout> layouts = {
+        m_descriptorSetLayout
+      };
+
+      vk::DescriptorSetAllocateInfo allocInfo(
+          m_descriptorPool,
+          layouts);
+
+      m_descriptorSets.resize(1);
+      m_descriptorSets = m_device.device.allocateDescriptorSets(allocInfo);
+
+      vk::DescriptorImageInfo imageInfo(
+          m_leclercTexture->sampler,
+          m_leclercTexture->imageView,
+          vk::ImageLayout::eShaderReadOnlyOptimal);
+
+      std::array<vk::WriteDescriptorSet, 1> descriptorWrites = {
+        vk::WriteDescriptorSet(
+            m_descriptorSets[0],
+            0,
+            0,
+            vk::DescriptorType::eCombinedImageSampler,
+            imageInfo
+            )
+      };
+
+      m_device.device.updateDescriptorSets(descriptorWrites, {});
     }
 
     void Renderer::createPipelines()
@@ -291,6 +362,11 @@ namespace dg
                 vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
                 0, sizeof(PushConstant), &push);
 
+        m_commandBuffers[imageIndex].bindDescriptorSets(
+            vk::PipelineBindPoint::eGraphics,
+            m_pipelineLayout,
+            0, m_descriptorSets, {}
+            );
         m_model->draw(m_commandBuffers[imageIndex]);
 
         m_commandBuffers[imageIndex].endRenderPass();

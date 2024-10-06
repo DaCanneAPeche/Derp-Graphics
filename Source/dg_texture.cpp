@@ -15,7 +15,7 @@ namespace dg {
 	void Texture::createImage(const std::string& filepath)
 	{
 		int channels;
-		int desiredChannels = STBI_rgb_alpha;
+		int desiredChannels = STBI_rgb;
 
 		stbi_uc* pixels = stbi_load(filepath.c_str(), &m_width, &m_height, &channels, desiredChannels);
 		m_mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(m_width, m_height)))) + 1;
