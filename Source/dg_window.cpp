@@ -23,7 +23,7 @@ namespace dg
 
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         m_window = glfwCreateWindow(info.width, info.height, info.name.c_str(), nullptr, nullptr);
         glfwSetWindowUserPointer(m_window, this);

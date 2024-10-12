@@ -14,7 +14,7 @@ namespace dg
 
 			Texture(Device& device, const std::string& filepath, float maxAnistrophy, vk::Filter minifiedFilter = vk::Filter::eLinear,
 					vk::Filter magnifiedFilter = vk::Filter::eLinear,
-					vk::SamplerAddressMode adressingMode = vk::SamplerAddressMode::eMirroredRepeat);
+					vk::SamplerAddressMode adressingMode = vk::SamplerAddressMode::eClampToEdge);
 			~Texture()
 			{
 				gAllocator.destroyImage(m_image, m_allocation);
