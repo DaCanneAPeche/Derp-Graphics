@@ -2,14 +2,13 @@
 
 namespace dg {
 
-	Texture::Texture(Device& device, const std::string& filepath, float maxAnistrophy, vk::Filter minifiedFilter,
-			vk::Filter magnifiedFilter,
-			vk::SamplerAddressMode adressingMode) :
-		m_device(device), c_subresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1)
+	Texture::Texture(Device& device, const std::string& filepath,
+      const vk::Sampler& _sampler) :
+		m_device(device), c_subresourceRange(vk::ImageAspectFlagBits::eColor,
+        0, 1, 0, 1), sampler(_sampler)
 	{
 		createImage(filepath);
 		createImageView();
-		createSampler(maxAnistrophy, minifiedFilter, magnifiedFilter, adressingMode);
 	}
 
 	void Texture::createImage(const std::string& filepath)
@@ -51,16 +50,6 @@ namespace dg {
 				vk::ComponentSwizzle::eIdentity, c_subresourceRange);
 
 		imageView = m_device.device.createImageView(imageViewInfo);
-	}
-
-	void Texture::createSampler(float maxAnistrophy, vk::Filter minifiedFilter, vk::Filter magnifiedFilter,
-			vk::SamplerAddressMode adressingMode)
-	{
-		vk::SamplerCreateInfo samplerInfo({}, magnifiedFilter, minifiedFilter, vk::SamplerMipmapMode::eLinear,
-				adressingMode, adressingMode, adressingMode, .0f, maxAnistrophy > .0f, maxAnistrophy, vk::False,
-				vk::CompareOp::eAlways, .0f, .0f, vk::BorderColor::eIntOpaqueBlack, vk::False);
-
-		sampler = m_device.device.createSampler(samplerInfo);
 	}
 
 	void Texture::transitionImageLayout(vk::ImageLayout oldLayout, vk::ImageLayout newLayout)

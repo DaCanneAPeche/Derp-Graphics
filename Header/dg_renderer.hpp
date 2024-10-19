@@ -62,6 +62,7 @@ namespace dg
     void createDescriptorSetLayout();
     void createDescriptorPool();
     void createDescriptorSets();
+    void createImageSampler();
 
 		std::vector<const char*> m_deviceExtensions = {vk::KHRSwapchainExtensionName};
 		Device m_device { instance, m_deviceExtensions, window};
@@ -73,9 +74,9 @@ namespace dg
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
 		vk::DispatchLoaderDynamic m_dispatchLoader;
-		// std::unique_ptr<Model> m_model;
     std::unique_ptr<Sprite> m_sprite;
 		std::shared_ptr<Texture> m_texture;
+    vk::Sampler m_imageSampler;
 
 		// Validation layers
 		std::vector<const  char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};

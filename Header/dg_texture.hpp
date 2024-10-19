@@ -12,10 +12,8 @@ namespace dg
 	class Texture {
 		public:
 
-			Texture(Device& device, const std::string& filepath, float maxAnistrophy,
-          vk::Filter minifiedFilter = vk::Filter::eLinear,
-          vk::Filter magnifiedFilter = vk::Filter::eLinear,
-					vk::SamplerAddressMode adressingMode = vk::SamplerAddressMode::eClampToEdge);
+			Texture(Device& device, const std::string& filepath,
+          const vk::Sampler& _sampler);
 			~Texture()
 			{
 				gAllocator.destroyImage(m_image, m_allocation);
@@ -24,7 +22,7 @@ namespace dg
 			}
 
 			vk::ImageView imageView;
-			vk::Sampler sampler; 
+			const vk::Sampler& sampler; 
 			vk::ImageLayout imageLayout;
       int width, height;
 
