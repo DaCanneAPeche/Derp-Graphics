@@ -12,8 +12,9 @@ namespace dg
 	class Texture {
 		public:
 
-			Texture(Device& device, const std::string& filepath, float maxAnistrophy, vk::Filter minifiedFilter = vk::Filter::eLinear,
-					vk::Filter magnifiedFilter = vk::Filter::eLinear,
+			Texture(Device& device, const std::string& filepath, float maxAnistrophy,
+          vk::Filter minifiedFilter = vk::Filter::eLinear,
+          vk::Filter magnifiedFilter = vk::Filter::eLinear,
 					vk::SamplerAddressMode adressingMode = vk::SamplerAddressMode::eClampToEdge);
 			~Texture()
 			{
@@ -25,6 +26,7 @@ namespace dg
 			vk::ImageView imageView;
 			vk::Sampler sampler; 
 			vk::ImageLayout imageLayout;
+      int width, height;
 
 		private:
 			void createImage(const std::string& filepath);
@@ -36,7 +38,7 @@ namespace dg
 			void copyBufferToImage(Buffer& buffer, vk::Image& image, uint32_t width, uint32_t height) const;
 
 			Device& m_device;
-			int m_width, m_height, m_mipLevels;
+			int m_mipLevels;
 			vk::Image m_image;
 			vma::Allocation m_allocation;
 			const vk::Format c_format = vk::Format::eR8G8B8Srgb;

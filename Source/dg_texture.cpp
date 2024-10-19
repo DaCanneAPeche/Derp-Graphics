@@ -17,20 +17,20 @@ namespace dg {
 		int channels;
 		int desiredChannels = STBI_rgb;
 
-		stbi_uc* pixels = stbi_load(filepath.c_str(), &m_width, &m_height, &channels, desiredChannels);
-		m_mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(m_width, m_height)))) + 1;
+		stbi_uc* pixels = stbi_load(filepath.c_str(), &width, &height, &channels, desiredChannels);
+		m_mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(width, height)))) + 1;
 
 		if (!pixels)
 			throw std::runtime_error("Error loading image");
 
-		uint32_t pixelsCount = m_width * m_height;
+		uint32_t pixelsCount = width * height;
 
 		Buffer stagingBuffer(m_device, desiredChannels, pixelsCount,
 				vk::BufferUsageFlagBits::eTransferSrc, vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
 		stagingBuffer.write(pixels, desiredChannels * pixelsCount);
 		stbi_image_free(pixels);
 
-		vk::ImageCreateInfo imageInfo({}, vk::ImageType::e2D, c_format, vk::Extent3D(m_width, m_height, 1),
+		vk::ImageCreateInfo imageInfo({}, vk::ImageType::e2D, c_format, vk::Extent3D(width, height, 1),
 				1, 1, vk::SampleCountFlagBits::e1, vk::ImageTiling::eOptimal, vk::ImageUsageFlagBits::eTransferDst |
 				vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferSrc, vk::SharingMode::eExclusive);	
 		
@@ -41,7 +41,7 @@ namespace dg {
 		m_allocation = handle.second;
 
 		transitionImageLayout(vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
-		copyBufferToImage(stagingBuffer, m_image, static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height));
+		copyBufferToImage(stagingBuffer, m_image, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
 		transitionImageLayout(vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
 	}
 

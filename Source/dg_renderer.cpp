@@ -26,9 +26,9 @@ namespace dg
       Logger::logPhysicalDevice(m_device.physical);
 
       initMemoryAllocator();
-      loadModels();
-      m_leclercTexture = std::make_unique<Texture>(m_device, "./assets/textures/leclerc.jpg",
+      m_texture = std::make_shared<Texture>(m_device, "./assets/textures/nothing_suspicious.jpeg",
           m_device.physical.getProperties().limits.maxSamplerAnisotropy);
+      loadModels();
 
       createDescriptorSetLayout();
       createDescriptorPool();
@@ -44,8 +44,9 @@ namespace dg
         for (auto& pipeline : m_pipelines)
             pipeline = nullptr;
         m_swapChain = nullptr;
-        m_model = nullptr;
-        m_leclercTexture = nullptr;
+        // m_model = nullptr;
+        m_sprite = nullptr;
+        m_texture = nullptr;
 
         m_device.device.destroyDescriptorPool(m_descriptorPool);
         m_device.device.destroyDescriptorSetLayout(m_descriptorSetLayout);
@@ -64,7 +65,7 @@ namespace dg
     {
         Logger::msgLn("Loading models");
 
-        std::vector<Vertex> vertices 
+        /*std::vector<Vertex> vertices 
         {
             {{-0.5f, -0.5f}, {0.0f, 0.0f}},
             {{0.5f, -0.5f}, {1.0f, 0.0f}},
@@ -74,7 +75,8 @@ namespace dg
 
         std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 
-        m_model = std::make_unique<Model>(m_device, vertices, indices);
+        m_model = std::make_unique<Model>(m_device, vertices, indices);*/
+        m_sprite = std::make_unique<Sprite>(m_device, m_texture);
     }
 
     void Renderer::createInstance()
@@ -229,10 +231,11 @@ namespace dg
       m_descriptorSets.resize(1);
       m_descriptorSets = m_device.device.allocateDescriptorSets(allocInfo);
 
-      vk::DescriptorImageInfo imageInfo(
-          m_leclercTexture->sampler,
-          m_leclercTexture->imageView,
-          vk::ImageLayout::eShaderReadOnlyOptimal);
+      /*vk::DescriptorImageInfo imageInfo(
+          m_texture->sampler,
+          m_texture->imageView,
+          vk::ImageLayout::eShaderReadOnlyOptimal);*/
+      vk::DescriptorImageInfo imageInfo = m_sprite->getImageInfo();
 
       std::array<vk::WriteDescriptorSet, 1> descriptorWrites = {
         vk::WriteDescriptorSet(
@@ -321,8 +324,6 @@ namespace dg
 
     void Renderer::recordCommandBuffer(int imageIndex)
     {
-        static int frame = 0;
-        frame = (frame + 1) % 1000;
         vk::Extent2D swapchainExtent = m_swapChain->getSwapChainExtent();
 
         vk::CommandBufferBeginInfo beginInfo;
@@ -349,25 +350,14 @@ namespace dg
         m_commandBuffers[imageIndex].setScissor(0, scissor);
         
         m_pipelines[pl::shapes]->bind(m_commandBuffers[imageIndex]); 
-        m_model->bind(m_commandBuffers[imageIndex]);
-
-        // Transform2d transform = {{.25f, .25f}, {2.f, 0.5f}, .25f * glm::two_pi<float>()};
-        Transform2d transform {};
-
-        PushConstant push {
-            .transform = transform.getMatrix(),
-            .offset = transform.translation,
-            .color = {1.0f, 0, 1.0f}};
-        m_commandBuffers[imageIndex].pushConstants(m_pipelineLayout,
-                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-                0, sizeof(PushConstant), &push);
-
         m_commandBuffers[imageIndex].bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics,
             m_pipelineLayout,
             0, m_descriptorSets, {}
             );
-        m_model->draw(m_commandBuffers[imageIndex]);
+
+        m_sprite->transform.rotation += 0.0001f;
+        m_sprite->draw(m_commandBuffers[imageIndex], m_pipelineLayout);
 
         m_commandBuffers[imageIndex].endRenderPass();
         m_commandBuffers[imageIndex].end();
