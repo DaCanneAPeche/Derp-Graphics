@@ -67,14 +67,14 @@ namespace dg
   {
     vk::SamplerCreateInfo samplerInfo(
         {},
-        vk::Filter::eLinear,
-        vk::Filter::eLinear,
+        vk::Filter::eNearest,
+        vk::Filter::eNearest,
         vk::SamplerMipmapMode::eLinear,
         vk::SamplerAddressMode::eClampToEdge,
         vk::SamplerAddressMode::eClampToEdge,
         vk::SamplerAddressMode::eClampToEdge,
         .0f,
-        vk::True,
+        vk::False,
         m_device.physical.getProperties().limits.maxSamplerAnisotropy,
         vk::False,
         vk::CompareOp::eAlways,
@@ -381,7 +381,6 @@ namespace dg
         0, m_descriptorSets, {}
         );
 
-    m_sprite->transform.rotation += 0.0001f;
     m_sprite->draw(m_commandBuffers[imageIndex], m_pipelineLayout);
 
     m_commandBuffers[imageIndex].endRenderPass();

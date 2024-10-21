@@ -4,7 +4,7 @@ add_requires("glm", "glfw", "vulkan-memory-allocator-hpp", "vulkan-hpp", "vulkan
 
 target("Derp_Graphics")
     set_kind("binary")
-    add_files("Source/*.cpp")
+    add_files("Source/*.cpp", "Source/_vulkan/*.cpp")
     add_includedirs("Header")
 
     set_symbols("debug")

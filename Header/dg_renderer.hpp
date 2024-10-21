@@ -79,7 +79,7 @@ namespace dg
     vk::Sampler m_imageSampler;
 
 		// Validation layers
-		std::vector<const  char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};
+		std::vector<const char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};
 		vk::DebugUtilsMessengerEXT m_debugMessenger;
 #ifdef NDEBUG
 		const bool m_enableValidationLayers = false;
