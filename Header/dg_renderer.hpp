@@ -1,12 +1,12 @@
 #pragma once
 
 #include "dg_window.hpp"
-#include "dg_device.hpp"
 #include "dg_pipeline.hpp"
 #include "dg_swapchain.hpp"
 #include "dg_model.hpp"
 #include "dg_sprite.hpp"
 #include "dg_texture.hpp"
+#include "_vulkan/vulkan_tool_box.hpp"
 
 #include <vk_mem_alloc.hpp>
 
@@ -18,16 +18,11 @@
 namespace dg
 {
 
-  struct ApplicationInfo {
-		const std::string& name;
-		std::array<uint8_t, 3> version;
-  };
-
 	class Renderer
 	{
 	public:
-		Renderer(const WindowInfo& windowInfo, const ApplicationInfo& appInfo);
-		~Renderer ();
+		Renderer(const WindowInfo& windowInfo, VulkanToolBox& vulkanToolBox);
+		~Renderer();
 
 		Renderer(const Renderer &) = delete;
 		Renderer &operator=(const Renderer &) = delete;
@@ -35,15 +30,12 @@ namespace dg
 		void draw();
 		void pollEvents() const { glfwPollEvents(); };
 		[[nodiscard]] bool shouldWindowClose() const { return window.shouldClose(); };
-		void waitIdle() const { m_device.device.waitIdle(); }
+		void waitIdle() const { m_toolBox.device.waitIdle(); }
 		
 		Window window;
-		vk::Instance instance;
-		ApplicationInfo applicationInfo;
 
 	private:
 
-		void createInstance();
 		void createPipelineLayout();
 		void createPipelines();
 		[[nodiscard]] std::unique_ptr<Pipeline> createPipeline(
@@ -64,8 +56,6 @@ namespace dg
     void createDescriptorSets();
     void createImageSampler();
 
-		std::vector<const char*> m_deviceExtensions = {vk::KHRSwapchainExtensionName};
-		Device m_device { instance, m_deviceExtensions, window};
 		vk::PipelineLayout m_pipelineLayout;
     vk::DescriptorSetLayout m_descriptorSetLayout;
     vk::DescriptorPool m_descriptorPool;
@@ -73,19 +63,12 @@ namespace dg
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
-		vk::DispatchLoaderDynamic m_dispatchLoader;
+		// vk::DispatchLoaderDynamic m_dispatchLoader;
     std::unique_ptr<Sprite> m_sprite;
 		std::shared_ptr<Texture> m_texture;
     vk::Sampler m_imageSampler;
+    VulkanToolBox& m_toolBox;
 
-		// Validation layers
-		std::vector<const char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};
 		vk::DebugUtilsMessengerEXT m_debugMessenger;
-#ifdef NDEBUG
-		const bool m_enableValidationLayers = false;
-#else
-		const bool m_enableValidationLayers = true;
-#endif
-		[[nodiscard]] bool areValidationLayersSupported() const;
 	};
 } /* dg */ 

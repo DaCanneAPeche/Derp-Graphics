@@ -1,6 +1,5 @@
 #pragma once
 
-#include "dg_device.hpp"
 #include "dg_globals.hpp"
 #include "dg_buffer.hpp"
 
@@ -47,7 +46,8 @@ namespace dg
 	{
 	public:
 
-		Model(Device& device, const std::vector<Vertex>& vertices, const std::vector<uint16_t>& indices);
+		Model(const std::vector<Vertex>& vertices,
+        const std::vector<uint16_t>& indices);
 		~Model();
 		
 		Model(const Model &) = delete;
@@ -60,7 +60,6 @@ namespace dg
 		void createVertexBuffer(const std::vector<Vertex>& vertices);
 		void createIndexBuffer(const std::vector<uint16_t>& indices);
 
-		Device& m_device;
 		uint32_t m_vertexCount;
 		uint32_t m_indicesCount;
 		std::unique_ptr<Buffer> m_vertexBuffer;

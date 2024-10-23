@@ -4,6 +4,7 @@
 
 #include "dg_window.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
+#include "_vulkan/structs.hpp"
 
 #include <span>
 #include <array>
@@ -12,22 +13,6 @@
 namespace dg
 {
 	
-	struct QueueFamilyIndices
-	{
-		std::optional<uint32_t> graphicsFamily;
-		std::optional<uint32_t> presentFamily;
-		bool isComplete() const
-		{
-			return graphicsFamily.has_value() && presentFamily.has_value();
-		}
-	};
-
-	struct SwapChainSupportDetails {
-		vk::SurfaceCapabilitiesKHR capabilities;
-		std::vector<vk::SurfaceFormatKHR> formats;
-		std::vector<vk::PresentModeKHR> presentModes;
-	};
-
 	class DeviceBuilder
 	{
 
@@ -50,9 +35,6 @@ namespace dg
 			{
 				return findQueueFamilyIndices(physical);
 			}
-
-			[[nodiscard]] vk::Format findSupportedFormat(
-				const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const;
 
 			vk::PhysicalDevice physical;
 			vk::Device device;

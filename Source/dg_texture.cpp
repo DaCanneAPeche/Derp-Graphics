@@ -2,9 +2,9 @@
 
 namespace dg {
 
-	Texture::Texture(Device& device, const std::string& filepath,
+	Texture::Texture(VulkanToolBox& toolBox, const std::string& filepath,
       const vk::Sampler& _sampler) :
-		m_device(device), c_subresourceRange(vk::ImageAspectFlagBits::eColor,
+		m_toolBox(toolBox), c_subresourceRange(vk::ImageAspectFlagBits::eColor,
         0, 1, 0, 1), sampler(_sampler)
 	{
 		createImage(filepath);
@@ -24,7 +24,7 @@ namespace dg {
 
 		uint32_t pixelsCount = width * height;
 
-		Buffer stagingBuffer(m_device, desiredChannels, pixelsCount,
+		Buffer stagingBuffer(desiredChannels, pixelsCount,
 				vk::BufferUsageFlagBits::eTransferSrc, vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
 		stagingBuffer.write(pixels, desiredChannels * pixelsCount);
 		stbi_image_free(pixels);
@@ -49,12 +49,12 @@ namespace dg {
 		vk::ImageViewCreateInfo imageViewInfo({}, m_image, vk::ImageViewType::e2D, c_format,
 				vk::ComponentSwizzle::eIdentity, c_subresourceRange);
 
-		imageView = m_device.device.createImageView(imageViewInfo);
+		imageView = m_toolBox.device.createImageView(imageViewInfo);
 	}
 
 	void Texture::transitionImageLayout(vk::ImageLayout oldLayout, vk::ImageLayout newLayout)
 	{
-		vk::CommandBuffer commandBuffer = m_device.beginSingleTimeCommands();
+		vk::CommandBuffer commandBuffer = m_toolBox.beginSingleTimeCommands();
 
 		vk::ImageMemoryBarrier barrier({}, {}, // determined later
 				oldLayout, newLayout, vk::QueueFamilyIgnored, vk::QueueFamilyIgnored,
@@ -81,18 +81,18 @@ namespace dg {
 
 		commandBuffer.pipelineBarrier(sourceStage, destinationStage, {}, {}, {}, barrier);
 		
-		m_device.endSingleTimeCommands(commandBuffer);
+		m_toolBox.endSingleTimeCommands(commandBuffer);
 	}
 	
 	void Texture::copyBufferToImage(Buffer& buffer, vk::Image& image, uint32_t width, uint32_t height) const
 	{
-		vk::CommandBuffer commandBuffer = m_device.beginSingleTimeCommands();
+		vk::CommandBuffer commandBuffer = m_toolBox.beginSingleTimeCommands();
 
 		vk::ImageSubresourceLayers subresourceLayers(vk::ImageAspectFlagBits::eColor, 0, 0, 1);
 		vk::BufferImageCopy region(0, 0, 0, subresourceLayers, {0, 0, 0}, {width, height, 1});
 		commandBuffer.copyBufferToImage(buffer.buffer, image, vk::ImageLayout::eTransferDstOptimal, region);
 
-		m_device.endSingleTimeCommands(commandBuffer);
+		m_toolBox.endSingleTimeCommands(commandBuffer);
 	}
 	
 

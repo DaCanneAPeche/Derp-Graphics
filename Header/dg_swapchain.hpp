@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dg_device.hpp"
+#include "_vulkan/vulkan_tool_box.hpp"
 #include "dg_globals.hpp"
 
 // vulkan headers
@@ -17,8 +17,8 @@ namespace dg
 	public:
 		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-		SwapChain(Device &deviceRef, vk::Extent2D windowExtent);
-		SwapChain(Device &deviceRef, vk::Extent2D windowExtent, std::shared_ptr<SwapChain> previous);
+		SwapChain(VulkanToolBox& toolBox, vk::Extent2D windowExtent);
+		SwapChain(VulkanToolBox& toolBox, vk::Extent2D windowExtent, std::shared_ptr<SwapChain> previous);
 		~SwapChain();
 
 		SwapChain(const SwapChain &) = delete;
@@ -69,7 +69,7 @@ namespace dg
 		std::vector<vk::Image> m_swapChainImages;
 		std::vector<vk::ImageView> m_swapChainImageViews;
 
-		Device& m_device;
+		VulkanToolBox& m_toolBox;
 		vk::Extent2D m_windowExtent;
 
 		vk::SwapchainKHR m_swapChain;

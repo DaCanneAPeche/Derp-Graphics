@@ -173,25 +173,6 @@ namespace dg
 		};
 	}
 	
-	vk::Format DeviceBuilder::findSupportedFormat (
-		const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) const
-	{
-		for (vk::Format format : candidates) {
-			vk::FormatProperties props;
-			props = physical.getFormatProperties(format);
-
-			if (tiling == vk::ImageTiling::eLinear && (props.linearTilingFeatures & features) == features)
-			{
-				return format;
-			} else if (
-					tiling == vk::ImageTiling::eOptimal && (props.optimalTilingFeatures & features) == features)
-			{
-				return format;
-			}
-		}
-		throw std::runtime_error("failed to find supported format!");
-	}
-	
 	void DeviceBuilder::createWindowSurface()
 	{
 		// GLFW takes a C surface, which is then casted to a C++ surface

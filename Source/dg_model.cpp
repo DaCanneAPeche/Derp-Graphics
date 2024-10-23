@@ -4,8 +4,8 @@
 namespace dg
 {
 	
-	Model::Model(Device& device, const std::vector<Vertex>& vertices,
-			const std::vector<uint16_t>& indices) : m_device(device)
+	Model::Model(const std::vector<Vertex>& vertices,
+			const std::vector<uint16_t>& indices)
 	{
 		createVertexBuffer(vertices);
 		createIndexBuffer(indices);
@@ -23,9 +23,10 @@ namespace dg
 		vk::DeviceSize vertexSize = sizeof(vertices[0]);
 		vk::DeviceSize bufferSize = vertexSize * m_vertexCount;  
 
-		m_vertexBuffer = std::make_unique<Buffer>(
-				m_device, vertexSize, m_vertexCount, vk::BufferUsageFlagBits::eVertexBuffer |
-				vk::BufferUsageFlagBits::eTransferDst, vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
+		m_vertexBuffer = std::make_unique<Buffer>(vertexSize, m_vertexCount,
+        vk::BufferUsageFlagBits::eVertexBuffer |
+				vk::BufferUsageFlagBits::eTransferDst,
+        vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
 				vma::MemoryUsage::eAuto);
 		m_vertexBuffer->write((void*)vertices.data(), bufferSize);
 	}
@@ -40,9 +41,10 @@ namespace dg
 		vk::DeviceSize indexSize = sizeof(indices[0]);
 		vk::DeviceSize bufferSize = indexSize * m_indicesCount;
 
-		m_indexBuffer = std::make_unique<Buffer>(
-				m_device, indexSize, m_indicesCount, vk::BufferUsageFlagBits::eIndexBuffer |
-				vk::BufferUsageFlagBits::eTransferDst, vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
+		m_indexBuffer = std::make_unique<Buffer>(indexSize, m_indicesCount,
+        vk::BufferUsageFlagBits::eIndexBuffer |
+				vk::BufferUsageFlagBits::eTransferDst,
+        vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
 				vma::MemoryUsage::eCpuToGpu);
 		m_indexBuffer->write((void*)indices.data(), bufferSize);
 	}

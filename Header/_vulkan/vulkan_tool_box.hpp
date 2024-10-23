@@ -5,13 +5,14 @@
 
 #include "core/application_info.hpp"
 #include "dg_window.hpp"
+#include "_vulkan/structs.hpp"
 
 namespace dg
 {
   class VulkanToolBox
   {
     public:
-      VulkanToolBox(ApplicationInfo& applicationInfo, Window& window);
+      void init(const ApplicationInfo& applicationInfo, Window& window);
       ~VulkanToolBox() {};
 
       vk::Instance instance;
@@ -21,9 +22,15 @@ namespace dg
 			vk::Queue graphicsQueue;
 			vk::Queue presentQueue;
 			vk::CommandPool commandPool;
+      SwapChainSupportDetails swapChainSupport;
+      QueueFamilyIndices physicalDeviceQueueFamilyIndices;
 
 			[[nodiscard]] vk::CommandBuffer beginSingleTimeCommands() const; 
 			void endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const;
+
+      [[nodiscard]] vk::Format findSupportedFormat(
+				const std::vector<vk::Format>& candidates, vk::ImageTiling tiling,
+        vk::FormatFeatureFlags features) const;
 
     private:
       [[nodiscard]] std::vector<const char*> getRequestedExtensions() const;

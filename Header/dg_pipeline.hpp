@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vulkan/vulkan.hpp"
-#include "dg_device.hpp"
+#include "_vulkan/vulkan_tool_box.hpp"
 
 namespace dg
 {
@@ -36,7 +36,7 @@ namespace dg
 	{
 
 	public:
-		Pipeline(Device& device,
+		Pipeline(VulkanToolBox& toolBox,
 				const std::string& vertShaderPath,
 				const std::string& fragShaderPath,
 				const PipelineConfigInfo& configInfo,
@@ -59,7 +59,7 @@ namespace dg
 
 		[[nodiscard]] vk::ShaderModule createShaderModule(const std::vector<char>& code);
 		
-		Device& m_device;
+		VulkanToolBox& m_toolBox;
 		VkPipeline m_graphicsPipeline;
 		vk::ShaderModule m_vertShaderModule;
 		vk::ShaderModule m_fragShaderModule;

@@ -6,7 +6,6 @@ namespace dg
 {
 
 	Buffer::Buffer(
-			Device& device,
 			vk::DeviceSize instanceSize,
 			uint32_t instanceCount,
 			vk::BufferUsageFlags bufferUsageFlags,
@@ -14,7 +13,7 @@ namespace dg
 			vma::MemoryUsage memoryUsage,
 			vk::DeviceSize minOffsetAlignement,
 			vk::SharingMode sharingMode
-			) : m_device(device), m_bufferUsageFlags(bufferUsageFlags), m_sharingMode(sharingMode),
+			) : m_bufferUsageFlags(bufferUsageFlags), m_sharingMode(sharingMode),
 					m_memoryUsage(memoryUsage), m_instanceSize(instanceSize), m_allocFlag(allocFlag)
 	{
 		m_alignementSize = getAlignment(instanceSize, minOffsetAlignement);

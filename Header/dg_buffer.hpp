@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "dg_device.hpp"
+#include "_vulkan/vulkan_tool_box.hpp"
 #include "dg_globals.hpp"
 
 namespace dg
@@ -12,7 +12,6 @@ namespace dg
 	{
 	public:
 		Buffer(
-				Device& device,
 				vk::DeviceSize instanceSize,
 				uint32_t instanceCount,
 				vk::BufferUsageFlags bufferUsageFlags,
@@ -32,7 +31,6 @@ namespace dg
 		vma::Allocation allocation;
 
 	private:
-		Device& m_device;
 		vk::BufferUsageFlags m_bufferUsageFlags;
 		vma::AllocationCreateFlags m_allocFlag;
 		vk::SharingMode m_sharingMode;

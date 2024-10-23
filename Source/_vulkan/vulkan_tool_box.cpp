@@ -5,7 +5,7 @@
 namespace dg
 {
 
-  VulkanToolBox::VulkanToolBox(ApplicationInfo& applicationInfo,
+  void VulkanToolBox::init(const ApplicationInfo& applicationInfo,
       Window& window)
   {
     vk::ApplicationInfo appInfo(
@@ -28,6 +28,10 @@ namespace dg
     graphicsQueue = deviceBuilder.graphicsQueue;
     presentQueue = deviceBuilder.presentQueue;
     commandPool = deviceBuilder.commandPool;
+
+    swapChainSupport = deviceBuilder.getSwapChainSupport();
+    physicalDeviceQueueFamilyIndices =
+      deviceBuilder.physicalDeviceQueueFamilyIndices();
   }
 
   std::vector<const char*> VulkanToolBox::getRequestedExtensions() const
@@ -63,5 +67,25 @@ namespace dg
 		graphicsQueue.waitIdle();
 		device.freeCommandBuffers(commandPool, commandBuffer);
 	}
+
+  vk::Format VulkanToolBox::findSupportedFormat(
+      const std::vector<vk::Format>& candidates, vk::ImageTiling tiling,
+      vk::FormatFeatureFlags features) const
+  {
+		for (vk::Format format : candidates) {
+			vk::FormatProperties props;
+			props = physicalDevice.getFormatProperties(format);
+
+			if (tiling == vk::ImageTiling::eLinear && (props.linearTilingFeatures & features) == features)
+			{
+				return format;
+			} else if (
+					tiling == vk::ImageTiling::eOptimal && (props.optimalTilingFeatures & features) == features)
+			{
+				return format;
+			}
+		}
+		throw std::runtime_error("failed to find supported format!");
+  }
 
 }

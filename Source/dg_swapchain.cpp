@@ -11,15 +11,15 @@
 
 namespace dg
 {
-	SwapChain::SwapChain(Device& deviceRef, vk::Extent2D extent)
-			: m_device {deviceRef}, m_windowExtent {extent}
+	SwapChain::SwapChain(VulkanToolBox& toolBox, vk::Extent2D extent)
+			: m_toolBox(toolBox), m_windowExtent {extent}
 	{
 		
 		init();
 	}
 
-	SwapChain::SwapChain(Device& deviceRef, vk::Extent2D extent, std::shared_ptr<SwapChain> previous)
-			: m_device {deviceRef}, m_windowExtent {extent}, m_oldSwapChain {previous}
+	SwapChain::SwapChain(VulkanToolBox& toolBox, vk::Extent2D extent, std::shared_ptr<SwapChain> previous)
+			: m_toolBox(toolBox), m_windowExtent {extent}, m_oldSwapChain {previous}
 	{
 		init();
 
@@ -39,38 +39,38 @@ namespace dg
 	SwapChain::~SwapChain()
 	{
 		for (auto& imageView : m_swapChainImageViews)
-			m_device.device.destroyImageView(imageView);
+			m_toolBox.device.destroyImageView(imageView);
 		m_swapChainImageViews.clear();
 
 		if (m_swapChain != nullptr)
 		{
-			m_device.device.destroySwapchainKHR(m_swapChain);
+			m_toolBox.device.destroySwapchainKHR(m_swapChain);
 			m_swapChain = nullptr;
 		}
 
 		for (size_t i = 0; i < m_depthImages.size(); i++)
 		{
-			m_device.device.destroyImageView(m_depthImageViews[i]);
+			m_toolBox.device.destroyImageView(m_depthImageViews[i]);
 			gAllocator.destroyImage(m_depthImages[i], m_depthImageAllocations[i]);
 		}
 
 		for (auto framebuffer : m_swapChainFramebuffers)
-			m_device.device.destroyFramebuffer(framebuffer);
+			m_toolBox.device.destroyFramebuffer(framebuffer);
 
-		m_device.device.destroyRenderPass(m_renderPass);
+		m_toolBox.device.destroyRenderPass(m_renderPass);
 
 		// cleanup synchronization objects
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
-			m_device.device.destroySemaphore(m_renderFinishedSemaphores[i]);
-			m_device.device.destroySemaphore(m_imageAvailableSemaphores[i]);
-			m_device.device.destroyFence(m_inFlightFences[i]);
+			m_toolBox.device.destroySemaphore(m_renderFinishedSemaphores[i]);
+			m_toolBox.device.destroySemaphore(m_imageAvailableSemaphores[i]);
+			m_toolBox.device.destroyFence(m_inFlightFences[i]);
 		}
 	}
 
 	vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex)
 	{
-		if (m_device.device.waitForFences(
+		if (m_toolBox.device.waitForFences(
 				m_inFlightFences[m_currentFrame],
 				vk::True,
 				std::numeric_limits<uint64_t>::max()
@@ -81,7 +81,7 @@ namespace dg
 			Logger::msgLn("Warning (SwapChain::acquireNextImage) : Timeout while waiting for fences");
 		}
 
-		auto handle = m_device.device.acquireNextImageKHR(
+		auto handle = m_toolBox.device.acquireNextImageKHR(
 				m_swapChain,
 				std::numeric_limits<uint64_t>::max(),
 				m_imageAvailableSemaphores[m_currentFrame]
@@ -96,7 +96,7 @@ namespace dg
 	{
 		if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
 		{
-			auto _ = m_device.device.waitForFences(
+			auto _ = m_toolBox.device.waitForFences(
 					m_imagesInFlight[imageIndex],
 					vk::True,
 					std::numeric_limits<uint64_t>::max()
@@ -111,14 +111,14 @@ namespace dg
 
 		vk::SubmitInfo submitInfo(waitSemaphores, waitStages, buffers, signalSemaphores);
 
-		m_device.device.resetFences(m_inFlightFences[m_currentFrame]);
-		m_device.graphicsQueue.submit(submitInfo, m_inFlightFences[m_currentFrame]);
+		m_toolBox.device.resetFences(m_inFlightFences[m_currentFrame]);
+		m_toolBox.graphicsQueue.submit(submitInfo, m_inFlightFences[m_currentFrame]);
 
 		vk::SwapchainKHR swapChains[] = {m_swapChain};
 
 		vk::PresentInfoKHR presentInfo(signalSemaphores, swapChains, imageIndex);
 
-		auto result = m_device.presentQueue.presentKHR(presentInfo);
+		auto result = m_toolBox.presentQueue.presentKHR(presentInfo);
 
 		m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
@@ -126,7 +126,7 @@ namespace dg
 	}
 
 	void SwapChain::createSwapChain() {
-		SwapChainSupportDetails swapChainSupport = m_device.getSwapChainSupport();
+		SwapChainSupportDetails swapChainSupport = m_toolBox.swapChainSupport;
 
 		vk::SurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
 		vk::PresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
@@ -141,7 +141,7 @@ namespace dg
 
 		vk::SwapchainCreateInfoKHR createInfo(
 				{},
-				m_device.surface(),
+				m_toolBox.surface,
 				imageCount,
 				surfaceFormat.format,
 				surfaceFormat.colorSpace,
@@ -157,7 +157,7 @@ namespace dg
 				m_oldSwapChain == nullptr ? VK_NULL_HANDLE : m_oldSwapChain->m_swapChain
 				);
 
-		QueueFamilyIndices indices = m_device.physicalDeviceQueueFamilyIndices();
+		QueueFamilyIndices indices = m_toolBox.physicalDeviceQueueFamilyIndices;
 		uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
 		if (indices.graphicsFamily != indices.presentFamily) {
@@ -167,9 +167,9 @@ namespace dg
 			createInfo.imageSharingMode = vk::SharingMode::eExclusive;
 		}
 
-		m_swapChain =	m_device.device.createSwapchainKHR(createInfo);
+		m_swapChain =	m_toolBox.device.createSwapchainKHR(createInfo);
 
-		m_swapChainImages = m_device.device.getSwapchainImagesKHR(m_swapChain);
+		m_swapChainImages = m_toolBox.device.getSwapchainImagesKHR(m_swapChain);
 		m_swapChainImageFormat = surfaceFormat.format;
 		m_swapChainExtent = extent;
 	}
@@ -188,7 +188,7 @@ namespace dg
 					vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1)
 					);
 
-			m_swapChainImageViews[i] = m_device.device.createImageView(viewInfo);
+			m_swapChainImageViews[i] = m_toolBox.device.createImageView(viewInfo);
 		}
 	}
 
@@ -250,7 +250,7 @@ namespace dg
 				dependency
 				);
 
-		m_renderPass = m_device.device.createRenderPass(renderPassInfo);
+		m_renderPass = m_toolBox.device.createRenderPass(renderPassInfo);
 	}
 
 	void SwapChain::createFramebuffers()
@@ -270,7 +270,7 @@ namespace dg
 					1
 					);
 			
-			m_swapChainFramebuffers[i] = m_device.device.createFramebuffer(framebufferInfo);
+			m_swapChainFramebuffers[i] = m_toolBox.device.createFramebuffer(framebufferInfo);
 		}
 	}
 
@@ -316,7 +316,7 @@ namespace dg
 					{vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1}
 					);
 
-			m_depthImageViews[i] = m_device.device.createImageView(viewInfo);
+			m_depthImageViews[i] = m_toolBox.device.createImageView(viewInfo);
 		}
 	}
 
@@ -333,9 +333,9 @@ namespace dg
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
-			m_imageAvailableSemaphores[i] = m_device.device.createSemaphore(semaphoreInfo);
-			m_renderFinishedSemaphores[i] = m_device.device.createSemaphore(semaphoreInfo);
-			m_inFlightFences[i] = m_device.device.createFence(fenceInfo);
+			m_imageAvailableSemaphores[i] = m_toolBox.device.createSemaphore(semaphoreInfo);
+			m_renderFinishedSemaphores[i] = m_toolBox.device.createSemaphore(semaphoreInfo);
+			m_inFlightFences[i] = m_toolBox.device.createFence(fenceInfo);
 		}
 	}
 
@@ -391,7 +391,7 @@ namespace dg
 	}
 
 	vk::Format SwapChain::findDepthFormat() {
-		return m_device.findSupportedFormat(
+		return m_toolBox.findSupportedFormat(
 				{vk::Format::eD32Sfloat, vk::Format::eD32SfloatS8Uint, vk::Format::eD24UnormS8Uint},
 				vk::ImageTiling::eOptimal,
 				vk::FormatFeatureFlagBits::eDepthStencilAttachment);

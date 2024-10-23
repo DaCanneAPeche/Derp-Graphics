@@ -15,21 +15,18 @@
 
 namespace dg
 {
-  Renderer::Renderer(const WindowInfo& windowInfo, const ApplicationInfo& appInfo)
-    : window(windowInfo), applicationInfo {appInfo}
+  Renderer::Renderer(const WindowInfo& windowInfo, VulkanToolBox& vulkanToolBox)
+    : window(windowInfo), m_toolBox(vulkanToolBox)
   {
-    createInstance();   
-    m_dispatchLoader = vk::DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
-    m_debugMessenger = Logger::createDebugMessenger(instance, m_dispatchLoader);
-
-    m_device.init();
-    Logger::logPhysicalDevice(m_device.physical);
+    // m_dispatchLoader = vk::DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
+    // m_debugMessenger = Logger::createDebugMessenger(instance, m_dispatchLoader);
 
     initMemoryAllocator();
 
     createImageSampler();
-    m_texture = std::make_shared<Texture>(m_device, "./assets/textures/nothing_suspicious.jpeg",
-       m_imageSampler);
+    m_texture = std::make_shared<Texture>(m_toolBox,
+        "./assets/textures/nothing_suspicious.jpeg",
+        m_imageSampler);
     loadModels();
 
     createDescriptorSetLayout();
@@ -50,17 +47,17 @@ namespace dg
     m_sprite = nullptr;
     m_texture = nullptr;
 
-    m_device.device.destroyDescriptorPool(m_descriptorPool);
-    m_device.device.destroyDescriptorSetLayout(m_descriptorSetLayout);
+    // m_device.device.destroyDescriptorPool(m_descriptorPool);
+    // m_device.device.destroyDescriptorSetLayout(m_descriptorSetLayout);
 
     gAllocator.destroy();
 
-    m_device.device.destroyPipelineLayout(m_pipelineLayout);
-    m_device.clean();
+    // m_device.device.destroyPipelineLayout(m_pipelineLayout);
+    // m_device.clean();
 
-    if (m_enableValidationLayers)
+    /*if (m_enableValidationLayers)
       instance.destroyDebugUtilsMessengerEXT(m_debugMessenger, nullptr, m_dispatchLoader);
-    instance.destroy();
+    instance.destroy();*/
   }
 
   void Renderer::createImageSampler()
@@ -75,7 +72,7 @@ namespace dg
         vk::SamplerAddressMode::eClampToEdge,
         .0f,
         vk::False,
-        m_device.physical.getProperties().limits.maxSamplerAnisotropy,
+        m_toolBox.physicalDevice.getProperties().limits.maxSamplerAnisotropy,
         vk::False,
         vk::CompareOp::eAlways,
         .0f,
@@ -83,7 +80,7 @@ namespace dg
         vk::BorderColor::eIntOpaqueBlack,
         vk::False);
 
-    m_imageSampler = m_device.device.createSampler(samplerInfo);
+    m_imageSampler = m_toolBox.device.createSampler(samplerInfo);
   }
 
   void Renderer::loadModels()
@@ -101,40 +98,7 @@ namespace dg
       std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 
       m_model = std::make_unique<Model>(m_device, vertices, indices);*/
-    m_sprite = std::make_unique<Sprite>(m_device, m_texture);
-  }
-
-  void Renderer::createInstance()
-  {
-    Logger::msgLn("Creating vk instance");
-
-    if (m_enableValidationLayers && !areValidationLayersSupported())
-      throw std::runtime_error("Validation layers are requested but not available");
-
-    vk::ApplicationInfo appInfo(
-        applicationInfo.name.c_str(),
-        VK_MAKE_VERSION(applicationInfo.version[0], 
-          applicationInfo.version[1], applicationInfo.version[2]),
-        "Derp Graphics",
-        VK_MAKE_VERSION(1, 0, 0),
-        vk::ApiVersion13
-        );
-
-
-    auto requestedExtensions = getRequestedExtensions();       
-    vk::InstanceCreateInfo createInfo(
-        vk::InstanceCreateFlags(),
-        &appInfo,
-        m_validationLayers,
-        requestedExtensions
-        );
-
-    // Logger::msg("Required GLFW extensions : ");
-    // Logger::msgCStringArray(glfwExtensions, extensionsCount);
-
-    instance = vk::createInstance(createInfo);
-
-    Logger::msgLn("Vk instance created");
+    m_sprite = std::make_unique<Sprite>(m_texture);
   }
 
   void Renderer::initMemoryAllocator() const
@@ -146,34 +110,19 @@ namespace dg
 
     vma::AllocatorCreateInfo allocatorCreateInfo(
         vma::AllocatorCreateFlagBits::eExtMemoryBudget,
-        m_device.physical,
-        m_device.device,
+        m_toolBox.physicalDevice,
+        m_toolBox.device,
         {},
         nullptr,
         nullptr,
         {},
         &vulkanFunctions,
-        instance,
+        m_toolBox.instance,
         vk::ApiVersion13,
         {}
         );
 
     gAllocator = vma::createAllocator(allocatorCreateInfo);
-  }
-
-  std::vector<const char*> Renderer::getRequestedExtensions() const
-  {
-    uint32_t glfwExtensionCount = 0;
-    const char **glfwExtensions;
-    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-    std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-    if (m_enableValidationLayers) {
-      extensions.push_back(vk::EXTDebugUtilsExtensionName);
-    }
-
-    return extensions;
   }
 
   void Renderer::createPipelineLayout()
@@ -188,7 +137,7 @@ namespace dg
     vk::PipelineLayoutCreateInfo pipelineLayoutInfo({}, m_descriptorSetLayout,
         pushConstantRange);
 
-    m_pipelineLayout = m_device.device.createPipelineLayout(pipelineLayoutInfo);
+    m_pipelineLayout = m_toolBox.device.createPipelineLayout(pipelineLayoutInfo);
   }
 
   std::unique_ptr<Pipeline> Renderer::createPipeline(
@@ -203,7 +152,7 @@ namespace dg
     pipelineConfig.renderPass = m_swapChain->getRenderPass();
     pipelineConfig.pipelineLayout = m_pipelineLayout;
 
-    return std::make_unique<Pipeline>(m_device,
+    return std::make_unique<Pipeline>(m_toolBox,
         vertShaderPath,
         fragShaderPath,
         pipelineConfig,
@@ -225,7 +174,7 @@ namespace dg
     };
 
     vk::DescriptorSetLayoutCreateInfo layoutInfo({}, bindings);
-    m_descriptorSetLayout = m_device.device.createDescriptorSetLayout(layoutInfo);
+    m_descriptorSetLayout = m_toolBox.device.createDescriptorSetLayout(layoutInfo);
   }
 
   void Renderer::createDescriptorPool()
@@ -240,7 +189,7 @@ namespace dg
         poolSizes
         );
 
-    m_descriptorPool = m_device.device.createDescriptorPool(poolInfo);
+    m_descriptorPool = m_toolBox.device.createDescriptorPool(poolInfo);
   }
 
   void Renderer::createDescriptorSets()
@@ -254,7 +203,7 @@ namespace dg
         layouts);
 
     m_descriptorSets.resize(1);
-    m_descriptorSets = m_device.device.allocateDescriptorSets(allocInfo);
+    m_descriptorSets = m_toolBox.device.allocateDescriptorSets(allocInfo);
 
     /*vk::DescriptorImageInfo imageInfo(
       m_texture->sampler,
@@ -272,7 +221,7 @@ namespace dg
           )
     };
 
-    m_device.device.updateDescriptorSets(descriptorWrites, {});
+    m_toolBox.device.updateDescriptorSets(descriptorWrites, {});
   }
 
   void Renderer::createPipelines()
@@ -302,17 +251,17 @@ namespace dg
       glfwWaitEvents();
     }
 
-    m_device.device.waitIdle();
+    m_toolBox.device.waitIdle();
 
     if (m_swapChain == nullptr)
     {
       Logger::msgLn("creating");
-      m_swapChain = std::make_unique<SwapChain>(m_device, extent);
+      m_swapChain = std::make_unique<SwapChain>(m_toolBox, extent);
     }
     else
     {
       Logger::msgLn("recreating");
-      m_swapChain = std::make_unique<SwapChain>(m_device, extent, std::move(m_swapChain));
+      m_swapChain = std::make_unique<SwapChain>(m_toolBox, extent, std::move(m_swapChain));
       if (m_swapChain->imageCount() != m_commandBuffers.size())
       {
         freeCommandBuffers();
@@ -331,19 +280,19 @@ namespace dg
 
     m_commandBuffers.resize(m_swapChain->imageCount());
     vk::CommandBufferAllocateInfo allocateInfo(
-        m_device.commandPool,
+        m_toolBox.commandPool,
         vk::CommandBufferLevel::ePrimary,
         m_commandBuffers.size()
         );
 
-    m_commandBuffers = m_device.device.allocateCommandBuffers(allocateInfo);
+    m_commandBuffers = m_toolBox.device.allocateCommandBuffers(allocateInfo);
   }
 
   void Renderer::freeCommandBuffers()
   {
     Logger::msgLn("Freeing command buffers");
 
-    m_device.device.freeCommandBuffers(m_device.commandPool, m_commandBuffers);
+    m_toolBox.device.freeCommandBuffers(m_toolBox.commandPool, m_commandBuffers);
     m_commandBuffers.clear();
   }
 
@@ -413,29 +362,6 @@ namespace dg
 
     if (result != vk::Result::eSuccess)
       throw std::runtime_error("Failed to present swap chain image");
-  }
-
-  bool Renderer::areValidationLayersSupported() const
-  {
-    std::vector<vk::LayerProperties> availableLayers = vk::enumerateInstanceLayerProperties();
-
-    for (const char* layerName : m_validationLayers)
-    {
-      bool layerFound = true;
-
-      for (const auto& layerProperties : availableLayers)
-      {
-        if (strcmp(layerName, layerProperties.layerName) == 0)
-        {
-          layerFound = true;
-          break;
-        }
-      }
-
-      if (!layerFound) return false;
-    }
-
-    return true;
   }
 
 } /* dg */ 

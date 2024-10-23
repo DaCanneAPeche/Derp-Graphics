@@ -7,22 +7,23 @@ namespace dg
 {
 
 	Pipeline::Pipeline(
-			Device& device,
+			VulkanToolBox& toolBox,
 			const std::string& vertShaderPath,
 			const std::string& fragShaderPath,
 			const PipelineConfigInfo& configInfo,
 			const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
 			const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions
-			) : m_device(device), m_bindingDescriptions(bindingDescriptions), m_attributeDescriptions(attributeDescriptions)
+			) : m_toolBox(toolBox), m_bindingDescriptions(bindingDescriptions),
+  m_attributeDescriptions(attributeDescriptions)
 	{
 		createGraphicsPipeline(vertShaderPath, fragShaderPath, configInfo);
 	}
 
 	Pipeline::~Pipeline()
 	{
-		m_device.device.destroyShaderModule(m_vertShaderModule);
-		m_device.device.destroyShaderModule(m_fragShaderModule);
-		m_device.device.destroyPipeline(m_graphicsPipeline);
+		m_toolBox.device.destroyShaderModule(m_vertShaderModule);
+		m_toolBox.device.destroyShaderModule(m_fragShaderModule);
+		m_toolBox.device.destroyPipeline(m_graphicsPipeline);
 	}
 	
 	void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
@@ -154,7 +155,7 @@ namespace dg
 				-1
 				);
 
-		m_graphicsPipeline = m_device.device.createGraphicsPipeline(VK_NULL_HANDLE, pipelineInfo).value;
+		m_graphicsPipeline = m_toolBox.device.createGraphicsPipeline(VK_NULL_HANDLE, pipelineInfo).value;
 	}
 
 	vk::ShaderModule Pipeline::createShaderModule(const std::vector<char>& code)
@@ -169,7 +170,7 @@ namespace dg
 				c
 				);
 
-		return m_device.device.createShaderModule(createInfo);
+		return m_toolBox.device.createShaderModule(createInfo);
 	}
 	
 	void Pipeline::bind(vk::CommandBuffer& commandBuffer)
