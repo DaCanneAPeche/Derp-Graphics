@@ -23,9 +23,6 @@ namespace dg
 			DeviceBuilder(const DeviceBuilder&) = delete;
 			DeviceBuilder& operator=(const DeviceBuilder&) = delete;
 
-			void init();
-			void clean();
-
 			[[nodiscard]] SwapChainSupportDetails getSwapChainSupport() const
 			{ 
 				return querySwapChainSupport(physical);

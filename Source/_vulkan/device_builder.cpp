@@ -13,21 +13,10 @@ namespace dg
       const std::vector<const char*>& extensions, Window& window)
 		: m_toolBox(toolBox), m_extensions(extensions), m_window(window)
 	{
-	}
-
-	void DeviceBuilder::init()
-	{
 		createWindowSurface();
 		pickPhysicalDevice();
 		createLogicalDevice();
 		createCommandPool();
-	}
-
-	void DeviceBuilder::clean()
-	{
-		device.destroyCommandPool(commandPool);
-		device.destroy();
-    m_toolBox.instance.destroySurfaceKHR(surface);
 	}
 
   void DeviceBuilder::pickPhysicalDevice()

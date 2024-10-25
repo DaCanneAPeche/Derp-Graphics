@@ -14,7 +14,9 @@ void run()
 
     dg::VulkanToolBox vulkanToolBox;
     dg::Renderer renderer(windowInfo, vulkanToolBox);
+
     vulkanToolBox.init(appInfo, renderer.window);
+    renderer.init();
 
     while (!renderer.shouldWindowClose())
     {
@@ -22,6 +24,8 @@ void run()
         renderer.draw();
     }
     renderer.waitIdle();
+
+    renderer.clean();
 }
 
 int main(void)

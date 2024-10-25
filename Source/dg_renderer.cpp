@@ -17,12 +17,10 @@ namespace dg
 {
   Renderer::Renderer(const WindowInfo& windowInfo, VulkanToolBox& vulkanToolBox)
     : window(windowInfo), m_toolBox(vulkanToolBox)
+  {}
+
+  void Renderer::init()
   {
-    // m_dispatchLoader = vk::DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
-    // m_debugMessenger = Logger::createDebugMessenger(instance, m_dispatchLoader);
-
-    initMemoryAllocator();
-
     createImageSampler();
     m_texture = std::make_shared<Texture>(m_toolBox,
         "./assets/textures/nothing_suspicious.jpeg",
@@ -38,7 +36,7 @@ namespace dg
     createCommandBuffers();
   }
 
-  Renderer::~Renderer()
+  void Renderer::clean()
   {
     for (auto& pipeline : m_pipelines)
       pipeline = nullptr;
@@ -47,17 +45,9 @@ namespace dg
     m_sprite = nullptr;
     m_texture = nullptr;
 
-    // m_device.device.destroyDescriptorPool(m_descriptorPool);
-    // m_device.device.destroyDescriptorSetLayout(m_descriptorSetLayout);
-
-    gAllocator.destroy();
-
-    // m_device.device.destroyPipelineLayout(m_pipelineLayout);
-    // m_device.clean();
-
-    /*if (m_enableValidationLayers)
-      instance.destroyDebugUtilsMessengerEXT(m_debugMessenger, nullptr, m_dispatchLoader);
-    instance.destroy();*/
+    m_toolBox.device.destroyDescriptorPool(m_descriptorPool);
+    m_toolBox.device.destroyDescriptorSetLayout(m_descriptorSetLayout);
+    m_toolBox.device.destroyPipelineLayout(m_pipelineLayout);
   }
 
   void Renderer::createImageSampler()
@@ -99,30 +89,6 @@ namespace dg
 
       m_model = std::make_unique<Model>(m_device, vertices, indices);*/
     m_sprite = std::make_unique<Sprite>(m_texture);
-  }
-
-  void Renderer::initMemoryAllocator() const
-  {
-    vma::VulkanFunctions vulkanFunctions(
-        &vkGetInstanceProcAddr,
-        &vkGetDeviceProcAddr
-        );
-
-    vma::AllocatorCreateInfo allocatorCreateInfo(
-        vma::AllocatorCreateFlagBits::eExtMemoryBudget,
-        m_toolBox.physicalDevice,
-        m_toolBox.device,
-        {},
-        nullptr,
-        nullptr,
-        {},
-        &vulkanFunctions,
-        m_toolBox.instance,
-        vk::ApiVersion13,
-        {}
-        );
-
-    gAllocator = vma::createAllocator(allocatorCreateInfo);
   }
 
   void Renderer::createPipelineLayout()

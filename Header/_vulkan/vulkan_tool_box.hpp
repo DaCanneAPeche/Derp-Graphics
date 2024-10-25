@@ -7,13 +7,15 @@
 #include "dg_window.hpp"
 #include "_vulkan/structs.hpp"
 
+#include "dg_globals.hpp"
+
 namespace dg
 {
   class VulkanToolBox
   {
     public:
       void init(const ApplicationInfo& applicationInfo, Window& window);
-      ~VulkanToolBox() {};
+      ~VulkanToolBox();
 
       vk::Instance instance;
       vk::PhysicalDevice physicalDevice;
@@ -34,9 +36,12 @@ namespace dg
 
     private:
       [[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
+      void initMemoryAllocator() const;
 
       std::vector<const char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};
       std::vector<const char*> m_deviceExtensions = {vk::KHRSwapchainExtensionName};
+      vk::DebugUtilsMessengerEXT m_debugMessenger;
+      vk::DispatchLoaderDynamic m_dispatchLoader;
 
 #ifdef NDEBUG
       const bool m_enableValidationLayers = false;

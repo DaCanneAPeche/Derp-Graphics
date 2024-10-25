@@ -22,10 +22,13 @@ namespace dg
 	{
 	public:
 		Renderer(const WindowInfo& windowInfo, VulkanToolBox& vulkanToolBox);
-		~Renderer();
+		~Renderer() {};
 
 		Renderer(const Renderer &) = delete;
 		Renderer &operator=(const Renderer &) = delete;
+
+    void init();
+    void clean();
 
 		void draw();
 		void pollEvents() const { glfwPollEvents(); };
@@ -50,7 +53,6 @@ namespace dg
 		void recordCommandBuffer(int imageIndex);
 		void loadModels();
 		[[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
-		void initMemoryAllocator() const;
     void createDescriptorSetLayout();
     void createDescriptorPool();
     void createDescriptorSets();
@@ -63,12 +65,9 @@ namespace dg
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
-		// vk::DispatchLoaderDynamic m_dispatchLoader;
     std::unique_ptr<Sprite> m_sprite;
 		std::shared_ptr<Texture> m_texture;
     vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;
-
-		vk::DebugUtilsMessengerEXT m_debugMessenger;
 	};
 } /* dg */ 

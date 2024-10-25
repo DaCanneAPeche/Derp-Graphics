@@ -1,6 +1,7 @@
 #include "_vulkan/vulkan_tool_box.hpp"
 #include "_vulkan/instance.hpp"
 #include "_vulkan/device_builder.hpp"
+#include "dg_logger.hpp"
 
 namespace dg
 {
@@ -20,6 +21,9 @@ namespace dg
     instance = createInstance(getRequestedExtensions(), m_validationLayers,
         appInfo);
 
+    m_dispatchLoader = vk::DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
+    m_debugMessenger = Logger::createDebugMessenger(instance, m_dispatchLoader);
+
     DeviceBuilder deviceBuilder(*this, m_deviceExtensions, window);
 
     device = deviceBuilder.device;
@@ -32,6 +36,22 @@ namespace dg
     swapChainSupport = deviceBuilder.getSwapChainSupport();
     physicalDeviceQueueFamilyIndices =
       deviceBuilder.physicalDeviceQueueFamilyIndices();
+
+    initMemoryAllocator();
+  }
+
+  VulkanToolBox::~VulkanToolBox()
+  {
+    gAllocator.destroy();
+
+		device.destroyCommandPool(commandPool);
+		device.destroy();
+    instance.destroySurfaceKHR(surface);
+
+    if (m_enableValidationLayers)
+      instance.destroyDebugUtilsMessengerEXT(m_debugMessenger, nullptr, m_dispatchLoader);
+
+    instance.destroy();
   }
 
   std::vector<const char*> VulkanToolBox::getRequestedExtensions() const
@@ -86,6 +106,30 @@ namespace dg
 			}
 		}
 		throw std::runtime_error("failed to find supported format!");
+  }
+
+  void VulkanToolBox::initMemoryAllocator() const
+  {
+    vma::VulkanFunctions vulkanFunctions(
+        &vkGetInstanceProcAddr,
+        &vkGetDeviceProcAddr
+        );
+
+    vma::AllocatorCreateInfo allocatorCreateInfo(
+        vma::AllocatorCreateFlagBits::eExtMemoryBudget,
+        physicalDevice,
+        device,
+        {},
+        nullptr,
+        nullptr,
+        {},
+        &vulkanFunctions,
+        instance,
+        vk::ApiVersion13,
+        {}
+        );
+
+    gAllocator = vma::createAllocator(allocatorCreateInfo);
   }
 
 }
