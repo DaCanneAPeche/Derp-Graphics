@@ -18,7 +18,8 @@ namespace dg
 	void Model::createVertexBuffer(const std::vector<Vertex>& vertices)
 	{
 		m_vertexCount = static_cast<uint32_t>(vertices.size());
-		assert(m_vertexCount >= 3 && "Model::createVertexBuffer : you need to provide at least 3 vertices");
+		assert(m_vertexCount >= 3 &&
+        "Model::createVertexBuffer : you need to provide at least 3 vertices");
 
 		vk::DeviceSize vertexSize = sizeof(vertices[0]);
 		vk::DeviceSize bufferSize = vertexSize * m_vertexCount;  
@@ -54,7 +55,8 @@ namespace dg
 		commandBuffer.bindVertexBuffers(0, m_vertexBuffer->buffer, vk::DeviceSize {0});
 
 		if (m_hasIndices)
-			commandBuffer.bindIndexBuffer(m_indexBuffer->buffer, vk::DeviceSize {0}, vk::IndexType::eUint16);
+			commandBuffer.bindIndexBuffer(m_indexBuffer->buffer, vk::DeviceSize {0},
+          vk::IndexType::eUint16);
 	}
 	
 	void Model::draw(const vk::CommandBuffer& commandBuffer) const

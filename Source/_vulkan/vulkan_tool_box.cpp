@@ -1,7 +1,7 @@
 #include "_vulkan/vulkan_tool_box.hpp"
 #include "_vulkan/instance.hpp"
 #include "_vulkan/device_builder.hpp"
-#include "dg_logger.hpp"
+#include "_vulkan/debug_messenger.hpp"
 
 namespace dg
 {
@@ -22,7 +22,7 @@ namespace dg
         appInfo);
 
     m_dispatchLoader = vk::DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
-    m_debugMessenger = Logger::createDebugMessenger(instance, m_dispatchLoader);
+    m_debugMessenger = createDebugMessenger(instance, m_dispatchLoader);
 
     DeviceBuilder deviceBuilder(*this, m_deviceExtensions, window);
 

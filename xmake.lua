@@ -1,22 +1,23 @@
 add_rules("mode.debug", "mode.release")
-add_requires("glm", "glfw", "vulkan-memory-allocator-hpp", "vulkan-hpp", "vulkan-memory-allocator",
-    "stb")
+add_requires("glm", "glfw", "vulkan-memory-allocator-hpp", "vulkan-hpp",
+    "vulkan-memory-allocator", "stb", "plog")
 
 target("Derp_Graphics")
+
     set_kind("binary")
     add_files("Source/**.cpp")
     add_includedirs("Header")
-
+    set_languages("c++23")
     set_symbols("debug")
 
-    add_packages("glm", "glfw", "vulkan-memory-allocator-hpp", "vulkan-hpp", "vulkan-memory-allocator", "stb")
-    set_languages("c++23")
+    add_packages("glm", "glfw", "vulkan-memory-allocator-hpp", "vulkan-hpp",
+        "vulkan-memory-allocator", "stb", "plog")
 
     after_build(function (target)
        
         -- Compile shaders
         for _, file in ipairs(os.files("$(projectdir)/assets/shaders/*")) do
-            cmd = "glslc " .. file ..  " --target-spv=spv1.6 --target-env=vulkan1.3 -o assets/compiled_shaders/" .. file:match("^.+/(.+)$") .. ".spv"
+            cmd = "glslc " .. file ..  " -o assets/compiled_shaders/" .. file:match("^.+/(.+)$") .. ".spv"
             print(cmd)
             os.run(cmd)
         end

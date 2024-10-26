@@ -1,5 +1,5 @@
 #include "dg_window.hpp"
-#include "dg_logger.hpp"
+#include <plog/Log.h>
 
 #include <stdexcept>
 
@@ -19,8 +19,6 @@ namespace dg
 
     void Window::init()
     {
-        Logger::msgLn("Initing window");
-
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
@@ -29,7 +27,7 @@ namespace dg
         glfwSetWindowUserPointer(m_window, this);
         // glfwSetFramebufferSizeCallback(window, frameBufferResizeCallback);
         
-        Logger::msgLn("Window inited");
+        PLOG_INFO << "Window created";
     }
 
     bool Window::shouldClose() const
@@ -39,12 +37,11 @@ namespace dg
 
     void Window::createWindowSurface(vk::Instance& instance, VkSurfaceKHR* pSurface)
     {
-        Logger::msgLn("Creating window surface");
 
         if (glfwCreateWindowSurface(instance, m_window, nullptr, pSurface) != VK_SUCCESS)
             throw std::runtime_error("Failed to create window surface");
 
-        Logger::msgLn("Window surface created");
+        PLOG_INFO << "Window surface created";
     }
 
     vk::Extent2D Window::getVkExtent() const

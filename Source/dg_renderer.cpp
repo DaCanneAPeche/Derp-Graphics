@@ -1,5 +1,4 @@
 #include "dg_renderer.hpp"
-#include "dg_logger.hpp"
 #include "dg_globals.hpp"
 #include "dg_file.hpp"
 #include "dg_push_constant.hpp"
@@ -9,6 +8,8 @@
 #include "vulkan/vulkan.hpp"
 
 #include "glm/gtc/constants.hpp"
+
+#include <plog/Log.h>
 
 // std
 #include <cstring>
@@ -75,26 +76,11 @@ namespace dg
 
   void Renderer::loadModels()
   {
-    Logger::msgLn("Loading models");
-
-    /*std::vector<Vertex> vertices 
-      {
-      {{-0.5f, -0.5f}, {0.0f, 0.0f}},
-      {{0.5f, -0.5f}, {1.0f, 0.0f}},
-      {{0.5f, 0.5f}, {1.0f, 1.0f}},
-      {{-0.5f, 0.5f}, {0.0f, 1.0f}}
-      };
-
-      std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
-
-      m_model = std::make_unique<Model>(m_device, vertices, indices);*/
     m_sprite = std::make_unique<Sprite>(m_texture);
   }
 
   void Renderer::createPipelineLayout()
   {
-    Logger::msgLn("Creating pipeline layout");
-
     vk::PushConstantRange pushConstantRange(
         vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
         0, sizeof(PushConstant)
@@ -104,6 +90,8 @@ namespace dg
         pushConstantRange);
 
     m_pipelineLayout = m_toolBox.device.createPipelineLayout(pipelineLayoutInfo);
+
+    PLOG_INFO << "Pipeline layout created";
   }
 
   std::unique_ptr<Pipeline> Renderer::createPipeline(
@@ -192,7 +180,6 @@ namespace dg
 
   void Renderer::createPipelines()
   {
-    Logger::msgLn("Creating pipelines");
 
     assert(m_swapChain != nullptr && "Cannot create pipelines before swapchain");
     assert(m_pipelineLayout != nullptr && "Cannot create pipelines before pipeline layout");
@@ -203,35 +190,38 @@ namespace dg
         Vertex::getBindingDescriptions(),
         Vertex::getAttributeDescriptions()
         );
+
+    LOG_INFO << "Pipelines created";
   }
 
   void Renderer::recreateSwapChain()
   {
-    Logger::msg("Swapchain ");
-
     vk::Extent2D extent = window.getVkExtent();
     while (extent.width == 0 || extent.height == 0)
     {
-      Logger::msgLn("waiting for correct dimensions");
       extent = window.getVkExtent();
       glfwWaitEvents();
+
+      LOG_INFO << "Swapchain waiting for correct dimensions";
     }
 
     m_toolBox.device.waitIdle();
 
     if (m_swapChain == nullptr)
     {
-      Logger::msgLn("creating");
       m_swapChain = std::make_unique<SwapChain>(m_toolBox, extent);
+
+      LOG_INFO << "Swapchain created";
     }
     else
     {
-      Logger::msgLn("recreating");
       m_swapChain = std::make_unique<SwapChain>(m_toolBox, extent, std::move(m_swapChain));
       if (m_swapChain->imageCount() != m_commandBuffers.size())
       {
         freeCommandBuffers();
         createCommandBuffers();
+
+      LOG_INFO << "Swapchain recreated";
       }
     }
 
@@ -242,7 +232,6 @@ namespace dg
   void Renderer::createCommandBuffers()
   {
     assert(m_swapChain != nullptr && "Renderer::createCommandBuffers : swapchain shall not be null");
-    Logger::msgLn("Creating command buffers");
 
     m_commandBuffers.resize(m_swapChain->imageCount());
     vk::CommandBufferAllocateInfo allocateInfo(
@@ -252,14 +241,16 @@ namespace dg
         );
 
     m_commandBuffers = m_toolBox.device.allocateCommandBuffers(allocateInfo);
+
+    LOG_INFO << "Command buffers created";
   }
 
   void Renderer::freeCommandBuffers()
   {
-    Logger::msgLn("Freeing command buffers");
-
     m_toolBox.device.freeCommandBuffers(m_toolBox.commandPool, m_commandBuffers);
     m_commandBuffers.clear();
+
+    LOG_INFO << "Command buffers freed";
   }
 
   void Renderer::recordCommandBuffer(int imageIndex)

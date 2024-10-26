@@ -1,6 +1,5 @@
 #include "dg_pipeline.hpp"
 #include "dg_file.hpp"
-#include "dg_logger.hpp"
 #include "dg_model.hpp"
 
 namespace dg

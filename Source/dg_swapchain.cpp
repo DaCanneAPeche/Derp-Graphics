@@ -1,5 +1,4 @@
 #include "dg_swapchain.hpp"
-#include "dg_logger.hpp"
 
 // std
 #include <array>
@@ -8,6 +7,8 @@
 #include <limits>
 #include <set>
 #include <stdexcept>
+
+#include <plog/Log.h>
 
 namespace dg
 {
@@ -76,9 +77,9 @@ namespace dg
 				std::numeric_limits<uint64_t>::max()
 				) == vk::Result::eTimeout)
 		{
-			// Shouldn't happend because of the very hight timeout, but I didn't like the [[nodiscard]] warning
-			// Should maybe be an error I guess
-			Logger::msgLn("Warning (SwapChain::acquireNextImage) : Timeout while waiting for fences");
+			// Shouldn't appear because of the very hight timeout,
+      // but I didn't like the [[nodiscard]] warning
+      PLOG_ERROR << "Timeout while waiting for fences";
 		}
 
 		auto handle = m_toolBox.device.acquireNextImageKHR(
@@ -352,22 +353,23 @@ namespace dg
 		return availableFormats[0];
 	}
 
+  // TODO : give a vector of modes, take the first available
 	vk::PresentModeKHR SwapChain::chooseSwapPresentMode(
 			const std::vector<vk::PresentModeKHR>& availablePresentModes)
 	{
 		for (const auto &availablePresentMode : availablePresentModes)
 		{
 			if (availablePresentMode == vk::PresentModeKHR::eMailbox) {
-				Logger::msgLn("Present mode: Mailbox");
+        PLOG_INFO << "Present mode : Mailbox";
 				return availablePresentMode;
 			}
 			/*else if (availablePresentMode == vk::PresentModeKHR::eImmediate) {
-				Logger::msgLn("Present mode: Immediate");
+        PLOG_INFO << "Present mode : Immediate";
 				return availablePresentMode;
 			}*/
 		}
 
-		Logger::msgLn("Present mode: V-Sync");
+    PLOG_INFO << "Present mode : V-SYNC (Fifo)";
 		return vk::PresentModeKHR::eFifo;
 	}
 

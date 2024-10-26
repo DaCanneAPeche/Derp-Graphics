@@ -1,10 +1,11 @@
-#include "dg_logger.hpp"
 #include "_vulkan/device_builder.hpp"
 #include "dg_buffer.hpp"
 
 // std
 #include <stdexcept>
 #include <set>
+
+#include <plog/Log.h>
 
 namespace dg
 {
@@ -28,11 +29,13 @@ namespace dg
 			if (isDeviceSuitable(device))
 			{
 				physical = device;
-				Logger::msgLn("Physical device was correctly choosen");
+        PLOG_INFO << "Physical device correctly choosen : "
+          << device.getProperties().deviceName;
 				return;
 			}
 		}
 
+    PLOG_FATAL << "No devices are suitable";
 		throw std::runtime_error("No devices are suitable");
 	}
 	
@@ -43,7 +46,6 @@ namespace dg
 		std::set<uint32_t> uniqueQueueFamilies = {
 			queueFamilyIndices.graphicsFamily.value(), queueFamilyIndices.presentFamily.value()
 		};
-		std::cout << uniqueQueueFamilies.size() << std::endl;
 		std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos(0);
 
 		float queuePriority = 1.0f;
@@ -71,7 +73,7 @@ namespace dg
 				);
 
 		device = physical.createDevice(deviceInfo);
-		Logger::msgLn("Logical device created");
+    PLOG_INFO << "Logical device created";
 
 		graphicsQueue = device.getQueue(queueFamilyIndices.graphicsFamily.value(), 0);
 		presentQueue = device.getQueue(queueFamilyIndices.presentFamily.value(), 0);
@@ -100,9 +102,7 @@ namespace dg
 		std::vector<vk::ExtensionProperties> availableExtensions =
 			physicalDevice.enumerateDeviceExtensionProperties();
 
-		std::cout << m_extensions[0] << std::endl;
 		std::set<std::string> requiredExtensions(m_extensions.begin(), m_extensions.end());
-		std::cout << requiredExtensions.size() << std::endl;
 
 		for (const auto &extension : availableExtensions) {
 			requiredExtensions.erase(extension.extensionName);
