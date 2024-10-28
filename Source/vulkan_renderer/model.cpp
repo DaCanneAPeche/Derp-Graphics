@@ -1,5 +1,5 @@
-#include "dg_model.hpp"
-#include "dg_globals.hpp"
+#include "vulkan_renderer/model.hpp"
+#include "vulkan_renderer/globals.hpp"
 
 namespace dg
 {

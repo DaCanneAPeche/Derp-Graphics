@@ -1,9 +1,9 @@
 #pragma once
 
-#include "dg_model.hpp"
-#include "dg_texture.hpp"
-#include "dg_transform2d.hpp"
-#include "dg_push_constant.hpp"
+#include "vulkan_renderer/model.hpp"
+#include "vulkan_renderer/texture.hpp"
+#include "core/transform2d.hpp"
+#include "vulkan_renderer/push_constant.hpp"
 
 #include <memory>
 #include "vulkan/vulkan.hpp"

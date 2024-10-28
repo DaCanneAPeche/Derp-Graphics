@@ -1,7 +1,7 @@
 #pragma once
 
-#include "dg_globals.hpp"
-#include "dg_buffer.hpp"
+#include "vulkan_renderer/globals.hpp"
+#include "_vulkan/buffer.hpp"
 
 // glm
 #define GLM_FORCE_RADIANS

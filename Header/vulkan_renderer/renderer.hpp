@@ -1,11 +1,11 @@
 #pragma once
 
-#include "dg_window.hpp"
-#include "dg_pipeline.hpp"
-#include "dg_swapchain.hpp"
-#include "dg_model.hpp"
-#include "dg_sprite.hpp"
-#include "dg_texture.hpp"
+#include "vulkan_renderer/window.hpp"
+#include "vulkan_renderer/pipeline.hpp"
+#include "vulkan_renderer/swapchain.hpp"
+#include "vulkan_renderer/model.hpp"
+#include "vulkan_renderer/sprite.hpp"
+#include "vulkan_renderer/texture.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
 
 #include <vk_mem_alloc.hpp>

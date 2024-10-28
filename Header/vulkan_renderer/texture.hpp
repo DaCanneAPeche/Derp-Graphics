@@ -1,11 +1,11 @@
 #pragma once
 #include "stb/stb_image.h"
 #include "vulkan/vulkan.hpp"
-#include "dg_buffer.hpp"
+#include "_vulkan/buffer.hpp"
 #include <string>
 #include "vk_mem_alloc.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
-#include "dg_globals.hpp"
+#include "vulkan_renderer/globals.hpp"
 
 namespace dg
 {

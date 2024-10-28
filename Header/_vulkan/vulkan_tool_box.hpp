@@ -4,10 +4,10 @@
 #include <GLFW/glfw3.h>
 
 #include "core/application_info.hpp"
-#include "dg_window.hpp"
+#include "vulkan_renderer/window.hpp"
 #include "_vulkan/structs.hpp"
 
-#include "dg_globals.hpp"
+#include "vulkan_renderer/globals.hpp"
 
 namespace dg
 {

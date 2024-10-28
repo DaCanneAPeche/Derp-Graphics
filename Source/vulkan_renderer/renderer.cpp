@@ -1,8 +1,8 @@
-#include "dg_renderer.hpp"
-#include "dg_globals.hpp"
-#include "dg_file.hpp"
-#include "dg_push_constant.hpp"
-#include "dg_transform2d.hpp"
+#include "vulkan_renderer/renderer.hpp"
+#include "vulkan_renderer/globals.hpp"
+#include "utils/file.hpp"
+#include "vulkan_renderer/push_constant.hpp"
+#include "core/transform2d.hpp"
 
 // vulkan
 #include "vulkan/vulkan.hpp"
@@ -42,7 +42,6 @@ namespace dg
     for (auto& pipeline : m_pipelines)
       pipeline = nullptr;
     m_swapChain = nullptr;
-    // m_model = nullptr;
     m_sprite = nullptr;
     m_texture = nullptr;
 

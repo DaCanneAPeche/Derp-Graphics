@@ -1,7 +1,7 @@
 #pragma once
 
 #include "_vulkan/vulkan_tool_box.hpp"
-#include "dg_globals.hpp"
+#include "vulkan_renderer/globals.hpp"
 
 // vulkan headers
 #include <vulkan/vulkan.hpp>

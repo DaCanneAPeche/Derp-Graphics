@@ -1,4 +1,4 @@
-#include "dg_sprite.hpp"
+#include "vulkan_renderer/sprite.hpp"
 
 namespace dg
 {

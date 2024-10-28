@@ -1,6 +1,6 @@
-#include "dg_pipeline.hpp"
-#include "dg_file.hpp"
-#include "dg_model.hpp"
+#include "vulkan_renderer/pipeline.hpp"
+#include "utils/file.hpp"
+#include "vulkan_renderer/model.hpp"
 
 namespace dg
 {

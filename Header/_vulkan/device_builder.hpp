@@ -2,7 +2,7 @@
 
 #include "vulkan/vulkan.hpp"
 
-#include "dg_window.hpp"
+#include "vulkan_renderer/window.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
 #include "_vulkan/structs.hpp"
 

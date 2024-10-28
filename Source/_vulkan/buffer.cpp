@@ -1,5 +1,5 @@
-#include "dg_buffer.hpp"
-#include "dg_globals.hpp"
+#include "_vulkan/buffer.hpp"
+#include "vulkan_renderer/globals.hpp"
 #include <iostream>
 
 namespace dg

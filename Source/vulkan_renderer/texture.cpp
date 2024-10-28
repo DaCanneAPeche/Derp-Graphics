@@ -1,4 +1,4 @@
-#include "dg_texture.hpp"
+#include "vulkan_renderer/texture.hpp"
 
 namespace dg {
 
