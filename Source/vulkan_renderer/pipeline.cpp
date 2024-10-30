@@ -160,7 +160,7 @@ namespace dg
 	vk::ShaderModule Pipeline::createShaderModule(const std::vector<char>& code)
 	{
 		// TODO : Fix the vector casting
-		std::vector<uint32_t> iCode(code.begin(), code.end());
+		// std::vector<uint32_t> iCode(code.begin(), code.end());
 		const uint32_t* c = reinterpret_cast<const uint32_t*>(code.data());
 
 		vk::ShaderModuleCreateInfo createInfo(
