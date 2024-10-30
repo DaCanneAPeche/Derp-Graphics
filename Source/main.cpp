@@ -3,41 +3,33 @@
 #include <iostream>
 #include "vulkan_renderer/renderer.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
+#include "core/application.hpp"
 
-#include <plog/Log.h>
-#include "plog/Init.h"
-#include "plog/Formatters/TxtFormatter.h"
-#include "plog/Appenders/ColorConsoleAppender.h"
-#include "plog/Appenders/RollingFileAppender.h"
-
-void run()
+class MainScene : public dg::Scene
 {
-    static plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
-    static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender("log.txt",
-        1000000, 5);
-    plog::init(plog::verbose, &consoleAppender).addAppender(&rollingFileAppender);
 
-    dg::WindowInfo windowInfo {1000, 1000, "Hello, world !"};
-    dg::ApplicationInfo appInfo {"Hello, world program !", {1, 0, 0}};
+};
 
-    dg::VulkanToolBox vulkanToolBox;
-    dg::Renderer renderer(windowInfo, vulkanToolBox);
-
-    vulkanToolBox.init(appInfo, renderer.window);
-    renderer.init();
-
-    PLOG_INFO << "Init finished";
-    while (!renderer.shouldWindowClose())
+class Game : public dg::Application
+{
+  public:
+    Game(const dg::WindowInfo& windowInfo, const dg::ApplicationInfo& appInfo)
+      : dg::Application(windowInfo, appInfo)
     {
-        renderer.pollEvents();
-        renderer.draw();
+      addScene<MainScene>(dg::config::Scenes::MAIN);
     }
-    renderer.waitIdle();
 
-    renderer.clean();
-}
+    ~Game()
+    {
+
+    }
+};
 
 int main(void)
 {
-    run();
+  dg::WindowInfo windowInfo {1000, 1000, "Hello, world !"};
+  dg::ApplicationInfo appInfo {"Hello, world program !", {1, 0, 0}};
+  
+  Game game(windowInfo, appInfo);
+  game.run();
 }
