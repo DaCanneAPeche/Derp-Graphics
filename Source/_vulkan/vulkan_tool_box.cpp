@@ -22,7 +22,8 @@ namespace dg
         appInfo);
 
     m_dispatchLoader = vk::DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
-    m_debugMessenger = createDebugMessenger(instance, m_dispatchLoader);
+    if (m_enableValidationLayers)
+      m_debugMessenger = createDebugMessenger(instance, m_dispatchLoader);
 
     DeviceBuilder deviceBuilder(*this, m_deviceExtensions, window);
 

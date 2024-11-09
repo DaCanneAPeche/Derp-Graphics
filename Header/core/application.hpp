@@ -27,13 +27,14 @@ namespace dg
       ~Application();
 
       void run();
+      virtual void update() {};
 
     protected:
       template <class T>
       void addScene(config::Scenes sceneId)
       {
         static_assert(std::is_base_of<Scene, T>(), "Scene not a child of dg::Scene");
-        DG_CONFIG_SCENES_TYPE id = static_cast<DG_CONFIG_SCENES_TYPE>(sceneId);
+        size_t id = static_cast<size_t>(sceneId);
 
         if (m_scenes.size() <= id + 1)
           m_scenes.resize(id + 1);
