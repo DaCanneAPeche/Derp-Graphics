@@ -14,6 +14,7 @@
 #include <memory>
 #include <array>
 #include <any>
+#include <functional>
 
 namespace dg
 {
@@ -30,6 +31,7 @@ namespace dg
     void init();
     void clean();
 
+    std::function<void(vk::CommandBuffer&, vk::PipelineLayout&)> render;
 		void draw();
 		void pollEvents() const { glfwPollEvents(); };
 		[[nodiscard]] bool shouldWindowClose() const { return window.shouldClose(); };

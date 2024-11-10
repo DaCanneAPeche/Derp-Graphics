@@ -1,6 +1,6 @@
 add_rules("mode.debug", "mode.release")
 add_requires("glm", "glfw", "vulkan-memory-allocator-hpp", "vulkan-hpp",
-    "vulkan-memory-allocator", "stb", "plog")
+    "vulkan-memory-allocator", "stb", "plog", "entt")
 
 target("Derp_Graphics")
 
@@ -11,7 +11,7 @@ target("Derp_Graphics")
     set_symbols("debug")
 
     add_packages("glm", "glfw", "vulkan-memory-allocator-hpp", "vulkan-hpp",
-        "vulkan-memory-allocator", "stb", "plog")
+        "vulkan-memory-allocator", "stb", "plog", "entt")
 
     after_build(function (target)
        

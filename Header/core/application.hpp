@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include "entt/entt.hpp"
+
 #include "config/scenes.hpp"
 #include "core/scene.hpp"
 #include "core/application_info.hpp"
@@ -27,7 +29,10 @@ namespace dg
       ~Application();
 
       void run();
-      virtual void update() {};
+
+      dg::VulkanToolBox vulkanToolBox;
+      dg::Renderer renderer;
+      entt::registry registry;
 
     protected:
       template <class T>
@@ -49,9 +54,8 @@ namespace dg
       void changeScene(config::Scenes sceneId);
 
       std::unique_ptr<Scene> currentScene;
-      dg::VulkanToolBox vulkanToolBox;
-      dg::Renderer renderer;
 
+      virtual void update() {};
     private:
 
       std::vector<std::function<std::unique_ptr<Scene>()>> m_scenes;

@@ -286,7 +286,8 @@ namespace dg
         0, m_descriptorSets, {}
         );
 
-    m_sprite->draw(m_commandBuffers[imageIndex], m_pipelineLayout);
+    // m_sprite->draw(m_commandBuffers[imageIndex], m_pipelineLayout);
+    render(m_commandBuffers[imageIndex], m_pipelineLayout);
 
     m_commandBuffers[imageIndex].endRenderPass();
     m_commandBuffers[imageIndex].end();

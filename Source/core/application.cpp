@@ -25,7 +25,10 @@ namespace dg
 
   void Application::changeScene(config::Scenes sceneId)
   {
+    if (currentScene != nullptr) currentScene->end();
     currentScene = m_scenes[static_cast<size_t>(sceneId)]();
+    currentScene->application = this;
+    currentScene->start();
   }
 
   void Application::run()
