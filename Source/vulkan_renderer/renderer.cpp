@@ -287,7 +287,7 @@ namespace dg
         );
 
     // m_sprite->draw(m_commandBuffers[imageIndex], m_pipelineLayout);
-    externalRendering(m_commandBuffers[imageIndex], m_pipelineLayout);
+    externalRendering(m_commandBuffers[imageIndex]);
 
     m_commandBuffers[imageIndex].endRenderPass();
     m_commandBuffers[imageIndex].end();

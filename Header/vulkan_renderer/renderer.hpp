@@ -31,11 +31,19 @@ namespace dg
     void init();
     void clean();
 
-    std::function<void(vk::CommandBuffer&, vk::PipelineLayout&)> externalRendering;
+    std::function<void(vk::CommandBuffer&)> externalRendering;
 		void draw();
 		void pollEvents() const { glfwPollEvents(); };
 		[[nodiscard]] bool shouldWindowClose() const { return window.shouldClose(); };
 		void waitIdle() const { m_toolBox.device.waitIdle(); }
+    
+    template <class T>
+    void pushConstant(vk::CommandBuffer& commandBuffer, const T& pushData)
+    {
+      commandBuffer.pushConstants(m_pipelineLayout,
+          vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+          0, sizeof(T), &pushData);
+    }
 		
 		Window window;
 

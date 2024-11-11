@@ -46,8 +46,7 @@ class Game : public dg::Application
 
     }
     
-    void render(vk::CommandBuffer& commandBuffer,
-        vk::PipelineLayout& pipelineLayout) override
+    void render(vk::CommandBuffer& commandBuffer) override
     {
         auto renderView = registry.view<comp::Sprite>();
         
@@ -58,9 +57,8 @@ class Game : public dg::Application
           dg::PushConstant push {
             .transform = sprite.transform.getMatrix(),
               .offset = sprite.transform.translation};
-          commandBuffer.pushConstants(pipelineLayout,
-              vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-              0, sizeof(dg::PushConstant), &push);
+
+          renderer.pushConstant(commandBuffer, push);
 
           sprite.model->bind(commandBuffer);
           sprite.model->draw(commandBuffer);

@@ -14,9 +14,9 @@ namespace dg
 
     vulkanToolBox.init(appInfo, renderer.window);
     renderer.init();
-    renderer.externalRendering = [=](vk::CommandBuffer& commandBuffer, vk::PipelineLayout& pipelineLayout)
+    renderer.externalRendering = [this](vk::CommandBuffer& commandBuffer)
     {
-      render(commandBuffer, pipelineLayout);
+      render(commandBuffer);
     };
 
     PLOG_INFO << "Init finished";
