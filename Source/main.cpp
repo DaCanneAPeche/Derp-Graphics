@@ -39,9 +39,16 @@ class Game : public dg::Application
       : dg::Application(windowInfo, appInfo)
     {
       addScene<MainScene>(dg::config::Scenes::MAIN);
+    }
 
-      renderer.render = [this](vk::CommandBuffer& commandBuffer, vk::PipelineLayout& pipelineLayout)
-      {
+    ~Game()
+    {
+
+    }
+    
+    void render(vk::CommandBuffer& commandBuffer,
+        vk::PipelineLayout& pipelineLayout) override
+    {
         auto renderView = registry.view<comp::Sprite>();
         
         for (auto entity : renderView)
@@ -58,12 +65,6 @@ class Game : public dg::Application
           sprite.model->bind(commandBuffer);
           sprite.model->draw(commandBuffer);
         }
-
-      };
-    }
-
-    ~Game()
-    {
 
     }
 };

@@ -56,6 +56,8 @@ namespace dg
       std::unique_ptr<Scene> currentScene;
 
       virtual void update() {};
+      virtual void render(vk::CommandBuffer& commandBuffer,
+          vk::PipelineLayout& pipelineLayout) {};
     private:
 
       std::vector<std::function<std::unique_ptr<Scene>()>> m_scenes;

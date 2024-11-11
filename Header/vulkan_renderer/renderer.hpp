@@ -31,7 +31,7 @@ namespace dg
     void init();
     void clean();
 
-    std::function<void(vk::CommandBuffer&, vk::PipelineLayout&)> render;
+    std::function<void(vk::CommandBuffer&, vk::PipelineLayout&)> externalRendering;
 		void draw();
 		void pollEvents() const { glfwPollEvents(); };
 		[[nodiscard]] bool shouldWindowClose() const { return window.shouldClose(); };
