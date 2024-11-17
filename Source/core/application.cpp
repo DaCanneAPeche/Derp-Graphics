@@ -19,6 +19,8 @@ namespace dg
       render(commandBuffer);
     };
 
+    setupSignalHandler();
+
     PLOG_INFO << "Init finished";
   }
 
@@ -49,5 +51,22 @@ namespace dg
         renderer.draw();
     }
     renderer.waitIdle();
+  }
+
+  void Application::setupSignalHandler()
+  {
+    
+    renderer.window.keyInputCallback = [this](GLFWwindow* window, int key, int scancode,
+        int action, int mods)
+    {
+      LOG_DEBUG << "key pressed";
+    };
+
+    renderer.window.mouseMoveCallback = [this](GLFWwindow* window, double xPos,
+        double yPos)
+    {
+      LOG_DEBUG << "Mouse move | x : " << xPos << ", y : " << yPos;
+    };
+
   }
 }

@@ -7,6 +7,7 @@
 
 // std
 #include <string>
+#include <functional>
 
 namespace dg
 {
@@ -36,9 +37,14 @@ namespace dg
 
 		void createWindowSurface(vk::Instance& instance, VkSurfaceKHR* pSurface);
 
+    std::function<void(GLFWwindow*, int, int, int, int)> keyInputCallback;
+    std::function<void(GLFWwindow*, double, double)> mouseMoveCallback;
+
 	private:
 
 		static void frameBufferResizeCallback(GLFWwindow* pWindow, int width, int height);
+    static void _keyInputCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods);
+    static void _mouseMoveCallback(GLFWwindow* pWindow, double xPos, double yPos);
 		void init();
 
 		GLFWwindow* m_window;
