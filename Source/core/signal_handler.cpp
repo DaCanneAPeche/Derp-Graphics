@@ -9,6 +9,8 @@ namespace dg
 
   void SignalHandler::send(size_t signal, void* data)
   {
+    if (!m_signalMap.contains(signal)) return;
+
     m_signalMap[signal](data);
   }
 }

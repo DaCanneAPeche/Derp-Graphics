@@ -29,6 +29,7 @@ namespace dg
         // glfwSetFramebufferSizeCallback(window, frameBufferResizeCallback);
         glfwSetKeyCallback(m_window, _keyInputCallback);
         glfwSetCursorPosCallback(m_window, _mouseMoveCallback);
+        glfwSetMouseButtonCallback(m_window, _mouseButtonCallback);
         
         PLOG_INFO << "Window created";
     }
@@ -73,6 +74,12 @@ namespace dg
     {
       static_cast<Window*>(glfwGetWindowUserPointer(pWindow))
         ->mouseMoveCallback(pWindow, xPos, yPos);
+    }
+
+    void Window::_mouseButtonCallback(GLFWwindow* pWindow, int button, int action, int mods)
+    {
+      static_cast<Window*>(glfwGetWindowUserPointer(pWindow))
+        ->mouseButtonCallback(pWindow, button, action, mods);
     }
 
 } /* dg */ 

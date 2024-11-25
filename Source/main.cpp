@@ -39,6 +39,29 @@ class Game : public dg::Application
       : dg::Application(windowInfo, appInfo)
     {
       addScene<MainScene>(dg::config::Scenes::MAIN);
+
+      signalHandler.on(dg::config::Signals::KEY_PRESS, [this](void* data)
+          {
+            dg::config::signalPackets::KeyInput* keyInputData = 
+              static_cast<dg::config::signalPackets::KeyInput*>(data); 
+            
+            LOG_DEBUG << "Key press signal received : " <<
+              glfwGetKeyName(keyInputData->key, keyInputData->scancode);
+          });
+
+      signalHandler.on(dg::config::Signals::MOUSE_PRESS, [this](void* data)
+          {
+            dg::config::signalPackets::MouseButton* mouseButton = 
+            static_cast<dg::config::signalPackets::MouseButton*>(data);
+            if (mouseButton->button != GLFW_MOUSE_BUTTON_LEFT) return;
+
+            auto renderView = registry.view<comp::Sprite>();
+            for (auto entity : renderView)
+            {
+              auto [sprite] = renderView.get(entity);
+              sprite.transform.rotation += glm::pi<float>()/2;
+            }
+          });
     }
 
     ~Game()

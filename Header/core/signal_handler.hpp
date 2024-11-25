@@ -13,11 +13,11 @@ namespace dg
       void on(size_t signal, std::function<void(void*)> callback);
       void send(size_t signal, void* data);
 
-      void on(Signals signal, std::function<void(void*)> callback)
+      void on(config::Signals signal, std::function<void(void*)> callback)
       {
         on(static_cast<size_t>(signal), callback);
       }
-      void send(Signals signal, void* data)
+      void send(config::Signals signal, void* data)
       {
         send(static_cast<size_t>(signal), data);
       }
