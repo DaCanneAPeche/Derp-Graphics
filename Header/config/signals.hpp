@@ -7,17 +7,6 @@ namespace dg
   namespace config
   {
 
-    namespace signalPackets
-    {
-      struct KeyInput {
-        int key, scancode, mods;
-      };
-
-      struct MouseButton {
-        int button, scancode;
-      };
-    }
-
     enum class Signals : uint32_t
     {
       KEY_PRESS = 0,

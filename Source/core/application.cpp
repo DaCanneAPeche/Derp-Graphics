@@ -59,7 +59,6 @@ namespace dg
     renderer.window.keyInputCallback = [this](GLFWwindow* window, int key, int scancode,
         int action, int mods)
     {
-      config::signalPackets::KeyInput data { key, scancode, mods };
       std::unordered_map<int, config::Signals> actionMap = 
       {
         {GLFW_PRESS, config::Signals::KEY_PRESS},
@@ -67,27 +66,26 @@ namespace dg
         {GLFW_RELEASE, config::Signals::KEY_RELEASE}
       };
 
-      signalHandler.send(actionMap[action], &data);
+      signalHandler.send(actionMap[action], key, scancode, mods);
     };
 
     renderer.window.mouseMoveCallback = [this](GLFWwindow* window, double xPos,
         double yPos)
     {
       glm::vec<2, double> mousePosition = {xPos, yPos};
-      signalHandler.send(config::Signals::MOUSE_MOVE, &mousePosition);
+      signalHandler.send(config::Signals::MOUSE_MOVE, mousePosition);
     };
 
     renderer.window.mouseButtonCallback = [this](GLFWwindow* window, int button,
         int action, int mods)
     {
-      config::signalPackets::MouseButton data { button, mods };
       std::unordered_map<int, config::Signals> actionMap = 
       {
         {GLFW_PRESS, config::Signals::MOUSE_PRESS},
         {GLFW_RELEASE, config::Signals::MOUSE_RELEASE}
       };
 
-      signalHandler.send(actionMap[action], &data);
+      signalHandler.send(actionMap[action], button, mods);
     };
 
   }

@@ -2,28 +2,46 @@
 
 #include <unordered_map>
 #include <functional>
+#include <any>
 
 #include "config/signals.hpp"
+#include <plog/Log.h>
 
 namespace dg
 {
   class SignalHandler
   {
     public:
-      void on(size_t signal, std::function<void(void*)> callback);
-      void send(size_t signal, void* data);
+      template <typename F>
+      void on(size_t signal, F callback)
+      {
+        m_signalMap[signal] = std::function(callback);
+      }
 
-      void on(config::Signals signal, std::function<void(void*)> callback)
+      template <class... Types>
+      void send(size_t signal, Types... args)
+      {
+        if (!m_signalMap.contains(signal)) return;
+
+        auto func =
+          std::any_cast<std::function<void(Types...)>>(m_signalMap[signal]);
+        func(args...);
+      }
+
+      template <typename F>
+      void on(config::Signals signal, F callback)
       {
         on(static_cast<size_t>(signal), callback);
       }
-      void send(config::Signals signal, void* data)
+
+      template <class... Types>
+      void send(config::Signals signal, Types... args)
       {
-        send(static_cast<size_t>(signal), data);
+        send(static_cast<size_t>(signal), args...);
       }
 
     private:
-      std::unordered_map<size_t, std::function<void(void*)>> m_signalMap;
+      std::unordered_map<size_t, std::any> m_signalMap;
 
   };
 }
