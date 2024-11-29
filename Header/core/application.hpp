@@ -12,7 +12,6 @@
 #include "core/application_info.hpp"
 #include "vulkan_renderer/renderer.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
-#include "core/signal_handler.hpp"
 
 #include <plog/Log.h>
 #include "plog/Init.h"
@@ -55,7 +54,6 @@ namespace dg
       void changeScene(config::Scenes sceneId);
 
       std::unique_ptr<Scene> currentScene;
-      SignalHandler signalHandler;
 
       virtual void update() {};
       virtual void render(vk::CommandBuffer& commandBuffer) {};

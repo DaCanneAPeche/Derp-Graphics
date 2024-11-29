@@ -1,8 +1,8 @@
 - [x] Sprite class
 - [x] Detach image sampler from the texture
 - [x] Code refactoring
-- [ ] Main class
-- [ ] Scene system
-- [ ] ECS
+- [x] Main class
+- [x] Scene system
+- [x] ECS
 - [ ] Multi texturing
 

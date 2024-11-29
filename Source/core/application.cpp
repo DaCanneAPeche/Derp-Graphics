@@ -66,14 +66,14 @@ namespace dg
         {GLFW_RELEASE, config::Signals::KEY_RELEASE}
       };
 
-      signalHandler.send(actionMap[action], key, scancode, mods);
+      currentScene->signalHandler.send(actionMap[action], key, scancode, mods);
     };
 
     renderer.window.mouseMoveCallback = [this](GLFWwindow* window, double xPos,
         double yPos)
     {
       glm::vec<2, double> mousePosition = {xPos, yPos};
-      signalHandler.send(config::Signals::MOUSE_MOVE, mousePosition);
+      currentScene->signalHandler.send(config::Signals::MOUSE_MOVE, mousePosition);
     };
 
     renderer.window.mouseButtonCallback = [this](GLFWwindow* window, int button,
@@ -85,7 +85,7 @@ namespace dg
         {GLFW_RELEASE, config::Signals::MOUSE_RELEASE}
       };
 
-      signalHandler.send(actionMap[action], button, mods);
+      currentScene->signalHandler.send(actionMap[action], button, mods);
     };
 
   }

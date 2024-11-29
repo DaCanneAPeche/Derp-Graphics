@@ -9,10 +9,13 @@
 
 class MainScene : public dg::Scene
 {
+  private:
+    entt::entity rick;
+
   public:
     void start() override
     {
-      entt::entity rick = application->registry.create();
+      rick = application->registry.create();
       comp::Sprite& sprite = application->registry.emplace<comp::Sprite>(rick);
 
       std::vector<dg::Vertex> vertices 
@@ -28,6 +31,31 @@ class MainScene : public dg::Scene
       sprite.transform.rotation = glm::pi<float>()/4;
       sprite.transform.translation = { 0.3, 0.5 };
       sprite.transform.scaling = {1.3, 1.0};
+
+      signalHandler.on(dg::config::Signals::KEY_PRESS, [this](int key, int scancode,
+            int mods)
+      {
+        auto& sprite = application->registry.get<comp::Sprite>(rick);
+
+        if (key == GLFW_KEY_W)
+          sprite.transform.translation.y -= 0.1;
+        else if (key == GLFW_KEY_S)
+          sprite.transform.translation.y += 0.1;
+        else if (key == GLFW_KEY_A)
+          sprite.transform.translation.x -= 0.1;
+        else if (key == GLFW_KEY_D)
+          sprite.transform.translation.x += 0.1;
+
+      });
+
+      signalHandler.on(dg::config::Signals::MOUSE_PRESS, [this](int button,
+            int mods)
+      {
+        if (button != GLFW_MOUSE_BUTTON_LEFT) return;
+
+        auto& sprite = application->registry.get<comp::Sprite>(rick);
+        sprite.transform.rotation += glm::pi<float>()/4;
+      });
     }
 
 };
@@ -39,26 +67,6 @@ class Game : public dg::Application
       : dg::Application(windowInfo, appInfo)
     {
       addScene<MainScene>(dg::config::Scenes::MAIN);
-
-      signalHandler.on(dg::config::Signals::KEY_PRESS, [this](int key, int scancode,
-          int mods)
-          {
-            LOG_DEBUG << "Key press signal received : " <<
-              glfwGetKeyName(key, scancode);
-          });
-
-      signalHandler.on(dg::config::Signals::MOUSE_PRESS, [this](int button,
-            int mods)
-          {
-            if (button != GLFW_MOUSE_BUTTON_LEFT) return;
-
-            auto renderView = registry.view<comp::Sprite>();
-            for (auto entity : renderView)
-            {
-              auto [sprite] = renderView.get(entity);
-              sprite.transform.rotation += glm::pi<float>()/2;
-            }
-          });
     }
 
     ~Game()

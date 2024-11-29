@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "core/signal_handler.hpp"
 
 namespace dg
 {
@@ -15,6 +16,7 @@ namespace dg
       virtual void end() {};
 
       Application* application = nullptr; 
+      SignalHandler signalHandler;
     protected:
 
     private:
