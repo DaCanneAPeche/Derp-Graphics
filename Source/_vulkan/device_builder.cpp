@@ -63,6 +63,7 @@ namespace dg
 
 		vk::PhysicalDeviceFeatures deviceFeatures;
 		deviceFeatures.samplerAnisotropy = vk::True;
+    deviceFeatures.fillModeNonSolid = vk::True;
 
 		vk::DeviceCreateInfo deviceInfo(
 				vk::DeviceCreateFlags(),

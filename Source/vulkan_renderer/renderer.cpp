@@ -102,6 +102,7 @@ namespace dg
   {
     PipelineConfigInfo pipelineConfig {};
     Pipeline::defaultPipelineConfigInfo(pipelineConfig);
+
     pipelineConfig.renderPass = m_swapChain->getRenderPass();
     pipelineConfig.pipelineLayout = m_pipelineLayout;
 
@@ -113,6 +114,7 @@ namespace dg
         attributeDescriptions
         );
   }
+
   void Renderer::createDescriptorSetLayout()
   {
     vk::DescriptorSetLayoutBinding samplerLayoutBinding(
@@ -183,12 +185,16 @@ namespace dg
     assert(m_swapChain != nullptr && "Cannot create pipelines before swapchain");
     assert(m_pipelineLayout != nullptr && "Cannot create pipelines before pipeline layout");
 
-    m_pipelines[pl::shapes] = createPipeline(
-        "./assets/compiled_shaders/shape.vert.spv",
-        "./assets/compiled_shaders/shape.frag.spv",
-        Vertex::getBindingDescriptions(),
-        Vertex::getAttributeDescriptions()
-        );
+
+    for (const auto& pipelineInfo : pipelinesInfo)
+    {
+      m_pipelines[static_cast<uint32_t>(pipelineInfo.id)] = createPipeline(
+          pipelineInfo.vertexShaderPath,
+          pipelineInfo.fragmentShaderPath,
+          Vertex::getBindingDescriptions(),
+          Vertex::getAttributeDescriptions()
+          );
+    }
 
     LOG_INFO << "Pipelines created";
   }
@@ -279,14 +285,6 @@ namespace dg
     m_commandBuffers[imageIndex].setViewport(0, viewport);
     m_commandBuffers[imageIndex].setScissor(0, scissor);
 
-    m_pipelines[pl::shapes]->bind(m_commandBuffers[imageIndex]); 
-    m_commandBuffers[imageIndex].bindDescriptorSets(
-        vk::PipelineBindPoint::eGraphics,
-        m_pipelineLayout,
-        0, m_descriptorSets, {}
-        );
-
-    // m_sprite->draw(m_commandBuffers[imageIndex], m_pipelineLayout);
     externalRendering(m_commandBuffers[imageIndex]);
 
     m_commandBuffers[imageIndex].endRenderPass();

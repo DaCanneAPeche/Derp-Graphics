@@ -39,7 +39,7 @@ namespace dg
       void addScene(config::Scenes sceneId)
       {
         static_assert(std::is_base_of<Scene, T>(), "Scene not a child of dg::Scene");
-        size_t id = static_cast<size_t>(sceneId);
+        uint32_t id = static_cast<uint32_t>(sceneId);
 
         if (m_scenes.size() <= id + 1)
           m_scenes.resize(id + 1);

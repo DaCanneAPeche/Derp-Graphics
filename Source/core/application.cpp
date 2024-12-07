@@ -32,7 +32,7 @@ namespace dg
   void Application::changeScene(config::Scenes sceneId)
   {
     if (currentScene != nullptr) currentScene->end();
-    currentScene = m_scenes[static_cast<size_t>(sceneId)]();
+    currentScene = m_scenes[static_cast<uint32_t>(sceneId)]();
     currentScene->application = this;
     currentScene->start();
   }
@@ -40,6 +40,7 @@ namespace dg
   void Application::run()
   {
     changeScene(static_cast<config::Scenes>(0));
+    renderer.recreateSwapChain();
     while (!renderer.shouldWindowClose())
     {
         renderer.pollEvents();

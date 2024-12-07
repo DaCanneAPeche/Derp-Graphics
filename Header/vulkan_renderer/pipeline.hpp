@@ -7,14 +7,19 @@ namespace dg
 {
 
 	// Pipelines, not a enum class to avoid static cast everywhere
-	namespace pl
+  enum class Pl : uint32_t
 	{
-		enum
-		{
-			shapes = 0,
-			Count // As the be the last element, to get the number of elements in the enum		
-		};
-	}
+    sprites = 0,
+
+    Count
+	};
+
+  struct PipelineInfo
+  {
+    Pl id;
+    std::string vertexShaderPath;
+    std::string fragmentShaderPath;
+  };
 
 	struct PipelineConfigInfo
 	{

@@ -6,6 +6,8 @@
 #include "core/application.hpp"
 #include "components/sprite.hpp"
 #include <glm/gtc/constants.hpp>
+#include <rfl.hpp>
+#include <rfl/json.hpp>
 
 class MainScene : public dg::Scene
 {
@@ -66,6 +68,14 @@ class Game : public dg::Application
     Game(const dg::WindowInfo& windowInfo, const dg::ApplicationInfo& appInfo)
       : dg::Application(windowInfo, appInfo)
     {
+      renderer.pipelinesInfo = {
+        dg::PipelineInfo {
+            dg::Pl::sprites,
+            "./assets/compiled_shaders/shape.vert.spv",
+            "./assets/compiled_shaders/shape.frag.spv",
+        },
+      };
+
       addScene<MainScene>(dg::config::Scenes::MAIN);
     }
 
@@ -76,6 +86,7 @@ class Game : public dg::Application
     
     void render(vk::CommandBuffer& commandBuffer) override
     {
+        renderer.bindPipeline(dg::Pl::sprites, commandBuffer);
         auto renderView = registry.view<comp::Sprite>();
         
         for (auto entity : renderView)
@@ -99,6 +110,11 @@ int main(void)
 {
   dg::WindowInfo windowInfo {1000, 1000, "Hello, world !"};
   dg::ApplicationInfo appInfo {"Hello, world program !", {1, 0, 0}};
+
+  const std::string json_windowInfo = rfl::json::write(windowInfo);
+  const std::string json_appInfo = rfl::json::write(appInfo);
+
+  std::cout << json_windowInfo << std::endl << json_appInfo << std::endl;
   
   Game game(windowInfo, appInfo);
   game.run();

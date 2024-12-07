@@ -13,13 +13,13 @@ namespace dg
   {
     public:
       template <typename F>
-      void on(size_t signal, F callback)
+      void on(uint32_t signal, F callback)
       {
         m_signalMap[signal] = std::function(callback);
       }
 
       template <class... Types>
-      void send(size_t signal, Types... args)
+      void send(uint32_t signal, Types... args)
       {
         if (!m_signalMap.contains(signal)) return;
 
@@ -31,17 +31,17 @@ namespace dg
       template <typename F>
       void on(config::Signals signal, F callback)
       {
-        on(static_cast<size_t>(signal), callback);
+        on(static_cast<uint32_t>(signal), callback);
       }
 
       template <class... Types>
       void send(config::Signals signal, Types... args)
       {
-        send(static_cast<size_t>(signal), args...);
+        send(static_cast<uint32_t>(signal), args...);
       }
 
     private:
-      std::unordered_map<size_t, std::any> m_signalMap;
+      std::unordered_map<uint32_t, std::any> m_signalMap;
 
   };
 }

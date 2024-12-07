@@ -44,8 +44,20 @@ namespace dg
           vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
           0, sizeof(T), &pushData);
     }
+
+    void bindPipeline(Pl pipelineId, vk::CommandBuffer& commandBuffer)
+    {
+      m_pipelines[static_cast<uint32_t>(Pl::sprites)]->bind(commandBuffer); 
+      commandBuffer.bindDescriptorSets(
+          vk::PipelineBindPoint::eGraphics,
+          m_pipelineLayout,
+          0, m_descriptorSets, {}
+          );
+    }
 		
+		void recreateSwapChain();
 		Window window;
+    std::vector<PipelineInfo> pipelinesInfo;
 
 	private:
 
@@ -59,7 +71,6 @@ namespace dg
 				);
 		void createCommandBuffers();
 		void freeCommandBuffers();
-		void recreateSwapChain();
 		void recordCommandBuffer(int imageIndex);
 		void loadModels();
 		[[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
@@ -72,7 +83,7 @@ namespace dg
     vk::DescriptorSetLayout m_descriptorSetLayout;
     vk::DescriptorPool m_descriptorPool;
     std::vector<vk::DescriptorSet> m_descriptorSets;
-		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(pl::Count)> m_pipelines;
+		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
     std::unique_ptr<Sprite> m_sprite;

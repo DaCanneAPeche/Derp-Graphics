@@ -4,5 +4,7 @@
 - [x] Main class
 - [x] Scene system
 - [x] ECS
+- [ ] TOML implementation
+- [ ] Pipeline control
 - [ ] Multi texturing
 
