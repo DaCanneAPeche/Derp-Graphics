@@ -260,10 +260,11 @@ namespace dg
 
   void Renderer::recordCommandBuffer(int imageIndex)
   {
+    pCurrentCommandBuffer = &m_commandBuffers[imageIndex];
     vk::Extent2D swapchainExtent = m_swapChain->getSwapChainExtent();
 
     vk::CommandBufferBeginInfo beginInfo;
-    m_commandBuffers[imageIndex].begin(beginInfo);
+    pCurrentCommandBuffer->begin(beginInfo);
 
     std::array<vk::ClearValue, 2> clearValues = {
       vk::ClearColorValue(0.01f, 0.01f, 0.01f, 0.01f),
@@ -277,18 +278,18 @@ namespace dg
         clearValues
         );
 
-    m_commandBuffers[imageIndex].beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+    pCurrentCommandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
     vk::Viewport viewport(0.0f, 0.0f, swapchainExtent.width, swapchainExtent.height, 0.0f, 1.0f);
     vk::Rect2D scissor({0, 0}, swapchainExtent);
 
-    m_commandBuffers[imageIndex].setViewport(0, viewport);
-    m_commandBuffers[imageIndex].setScissor(0, scissor);
+    pCurrentCommandBuffer->setViewport(0, viewport);
+    pCurrentCommandBuffer->setScissor(0, scissor);
 
-    externalRendering(m_commandBuffers[imageIndex]);
+    externalRendering();
 
-    m_commandBuffers[imageIndex].endRenderPass();
-    m_commandBuffers[imageIndex].end();
+    pCurrentCommandBuffer->endRenderPass();
+    pCurrentCommandBuffer->end();
   }
 
   void Renderer::draw()

@@ -84,9 +84,9 @@ class Game : public dg::Application
 
     }
     
-    void render(vk::CommandBuffer& commandBuffer) override
+    void render() override
     {
-        renderer.bindPipeline(dg::Pl::sprites, commandBuffer);
+        renderer.bindPipeline(dg::Pl::sprites);
         auto renderView = registry.view<comp::Sprite>();
         
         for (auto entity : renderView)
@@ -97,10 +97,10 @@ class Game : public dg::Application
             .transform = sprite.transform.getMatrix(),
               .offset = sprite.transform.translation};
 
-          renderer.pushConstant(commandBuffer, push);
+          renderer.pushConstant(push);
 
-          sprite.model->bind(commandBuffer);
-          sprite.model->draw(commandBuffer);
+          sprite.model->bind(*renderer.pCurrentCommandBuffer);
+          sprite.model->draw(*renderer.pCurrentCommandBuffer);
         }
 
     }

@@ -56,7 +56,7 @@ namespace dg
       std::unique_ptr<Scene> currentScene;
 
       virtual void update() {};
-      virtual void render(vk::CommandBuffer& commandBuffer) {};
+      virtual void render() {};
     private:
       void setupSignalHandler();
 

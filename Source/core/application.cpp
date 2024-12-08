@@ -14,9 +14,9 @@ namespace dg
 
     vulkanToolBox.init(appInfo, renderer.window);
     renderer.init();
-    renderer.externalRendering = [this](vk::CommandBuffer& commandBuffer)
+    renderer.externalRendering = [this]()
     {
-      render(commandBuffer);
+      render();
     };
 
     setupSignalHandler();
