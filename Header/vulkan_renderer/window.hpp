@@ -36,6 +36,7 @@ namespace dg
 		WindowInfo info;
 
 		void createWindowSurface(vk::Instance& instance, VkSurfaceKHR* pSurface);
+    GLFWwindow* _getWindow() { return m_window; }
 
     std::function<void(GLFWwindow*, int, int, int, int)> keyInputCallback;
     std::function<void(GLFWwindow*, double, double)> mouseMoveCallback;

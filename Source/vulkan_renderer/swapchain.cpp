@@ -158,7 +158,7 @@ namespace dg
 				m_oldSwapChain == nullptr ? VK_NULL_HANDLE : m_oldSwapChain->m_swapChain
 				);
 
-		QueueFamilyIndices indices = m_toolBox.physicalDeviceQueueFamilyIndices;
+		QueueFamilyIndices indices = m_toolBox.queueFamilyIndices;
 		uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
 		if (indices.graphicsFamily != indices.presentFamily) {
@@ -345,7 +345,7 @@ namespace dg
 	{
 		for (const auto &availableFormat : availableFormats)
 		{
-			if (availableFormat.format == vk::Format::eB8G8R8Srgb &&
+			if (availableFormat.format == vk::Format::eB8G8R8Unorm &&
 					availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear)
 				return availableFormat;
 		}

@@ -35,7 +35,7 @@ namespace dg
     commandPool = deviceBuilder.commandPool;
 
     swapChainSupport = deviceBuilder.getSwapChainSupport();
-    physicalDeviceQueueFamilyIndices =
+    queueFamilyIndices =
       deviceBuilder.physicalDeviceQueueFamilyIndices();
 
     initMemoryAllocator();

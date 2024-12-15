@@ -9,6 +9,9 @@
 #include "_vulkan/vulkan_tool_box.hpp"
 
 #include <vk_mem_alloc.hpp>
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_vulkan.h"
 
 // std
 #include <memory>
@@ -81,6 +84,8 @@ namespace dg
     void createDescriptorPool();
     void createDescriptorSets();
     void createImageSampler();
+    void setupImGui();
+    void renderImGui(int imageIndex);
 
 		vk::PipelineLayout m_pipelineLayout;
     vk::DescriptorSetLayout m_descriptorSetLayout;

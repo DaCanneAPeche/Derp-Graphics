@@ -25,7 +25,7 @@ namespace dg
 			vk::Queue presentQueue;
 			vk::CommandPool commandPool;
       SwapChainSupportDetails swapChainSupport;
-      QueueFamilyIndices physicalDeviceQueueFamilyIndices;
+      QueueFamilyIndices queueFamilyIndices;
 
 			[[nodiscard]] vk::CommandBuffer beginSingleTimeCommands() const; 
 			void endSingleTimeCommands(const vk::CommandBuffer& commandBuffer) const;

@@ -14,6 +14,16 @@
 // std
 #include <cstring>
 
+static void imgui_check_vk_result(VkResult err)
+{
+    if (err == 0)
+        return;
+
+    LOG_FATAL << "[ImGui vulkan] Error : VkResult = " << err;
+    if (err < 0)
+      throw std::runtime_error("Imgui vulkan error, see log files");
+}
+
 namespace dg
 {
   Renderer::Renderer(const WindowInfo& windowInfo, VulkanToolBox& vulkanToolBox)
@@ -35,6 +45,8 @@ namespace dg
     createPipelineLayout();
     recreateSwapChain();
     createCommandBuffers();
+
+    setupImGui();
   }
 
   void Renderer::clean()
@@ -44,6 +56,10 @@ namespace dg
     m_swapChain = nullptr;
     m_sprite = nullptr;
     m_texture = nullptr;
+
+    ImGui_ImplVulkan_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     m_toolBox.device.destroyDescriptorPool(m_descriptorPool);
     m_toolBox.device.destroyDescriptorSetLayout(m_descriptorSetLayout);
@@ -135,12 +151,13 @@ namespace dg
   void Renderer::createDescriptorPool()
   {
     std::array<vk::DescriptorPoolSize, 1> poolSizes = {
-      vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 
-          static_cast<uint32_t>(1))
+      vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler,
+          static_cast<uint32_t>(2))
     };
 
     vk::DescriptorPoolCreateInfo poolInfo(
-        {}, static_cast<uint32_t>(1),
+        vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
+        static_cast<uint32_t>(2),
         poolSizes
         );
 
@@ -287,6 +304,7 @@ namespace dg
     pCurrentCommandBuffer->setScissor(0, scissor);
 
     externalRendering();
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *pCurrentCommandBuffer);
 
     pCurrentCommandBuffer->endRenderPass();
     pCurrentCommandBuffer->end();
@@ -305,7 +323,21 @@ namespace dg
     if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR)
       throw std::runtime_error("Failed to acquire swap chain image");
 
+    ImGui_ImplVulkan_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+
+    ImGui::NewFrame();
+
+    ImGui::ShowDemoWindow();
+
+    ImGui::Begin("FPS");
+    ImGui::Text("[Put that number here]");
+    ImGui::End();
+
+    ImGui::Render();
+
     recordCommandBuffer(imageIndex);
+
     result = m_swapChain->submitCommandBuffers(m_commandBuffers[imageIndex], imageIndex);
 
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR
@@ -318,6 +350,39 @@ namespace dg
 
     if (result != vk::Result::eSuccess)
       throw std::runtime_error("Failed to present swap chain image");
+  }
+
+  void Renderer::setupImGui()
+  {
+     // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    // ImGui::StyleColorsLight();
+
+    ImGui_ImplGlfw_InitForVulkan(window._getWindow(), true);
+    ImGui_ImplVulkan_InitInfo initInfo {};
+    initInfo.Instance = m_toolBox.instance;
+    initInfo.PhysicalDevice = m_toolBox.physicalDevice;
+    initInfo.Device = m_toolBox.device;
+    initInfo.QueueFamily = m_toolBox.queueFamilyIndices.graphicsFamily.value();
+    initInfo.Queue = m_toolBox.graphicsQueue;
+    initInfo.PipelineCache = VK_NULL_HANDLE;
+    initInfo.DescriptorPool = m_descriptorPool;
+    initInfo.RenderPass = m_swapChain->getRenderPass();
+    initInfo.Subpass = 0;
+    initInfo.MinImageCount = 2;
+    initInfo.ImageCount = m_swapChain->imageCount();
+    initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+    // initInfo.Allocator = g_Allocator;
+    initInfo.CheckVkResultFn = imgui_check_vk_result;
+    ImGui_ImplVulkan_Init(&initInfo);
   }
 
 } /* dg */ 
