@@ -57,6 +57,7 @@ namespace dg
 
       virtual void update() {};
       virtual void render() {};
+      virtual void imguiRender() {};
     private:
       void setupSignalHandler();
 

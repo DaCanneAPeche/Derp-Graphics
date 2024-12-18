@@ -14,13 +14,6 @@ namespace dg
     Count
 	};
 
-  struct PipelineInfo
-  {
-    Pl id;
-    std::string vertexShaderPath;
-    std::string fragmentShaderPath;
-  };
-
 	struct PipelineConfigInfo
 	{
 		vk::PipelineViewportStateCreateInfo viewportInfo;
@@ -36,6 +29,15 @@ namespace dg
 		vk::RenderPass renderPass = nullptr;
 		uint32_t subpass = 0;
 	};
+
+  struct PipelineInfo
+  {
+    Pl id;
+    std::string vertexShaderPath;
+    std::string fragmentShaderPath;
+
+    PipelineConfigInfo* config = nullptr;
+  };
 
 	class Pipeline
 	{

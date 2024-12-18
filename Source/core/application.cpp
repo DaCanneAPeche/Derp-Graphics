@@ -14,10 +14,8 @@ namespace dg
 
     vulkanToolBox.init(appInfo, renderer.window);
     renderer.init();
-    renderer.externalRendering = [this]()
-    {
-      render();
-    };
+    renderer.externalRendering = [this]() { render(); };
+    renderer.imguiRendering = [this]() { imguiRender(); };
 
     setupSignalHandler();
 

@@ -65,6 +65,8 @@ class MainScene : public dg::Scene
 class Game : public dg::Application
 {
   public:
+    dg::PipelineConfigInfo outlineConfig = getOutlineConfig();
+
     Game(const dg::WindowInfo& windowInfo, const dg::ApplicationInfo& appInfo)
       : dg::Application(windowInfo, appInfo)
     {
@@ -73,6 +75,7 @@ class Game : public dg::Application
             dg::Pl::sprites,
             "./assets/compiled_shaders/shape.vert.spv",
             "./assets/compiled_shaders/shape.frag.spv",
+            &outlineConfig
         },
       };
 
@@ -82,6 +85,20 @@ class Game : public dg::Application
     ~Game()
     {
 
+    }
+
+    dg::PipelineConfigInfo getOutlineConfig()
+    {
+      dg::PipelineConfigInfo configInfo {};
+      dg::Pipeline::defaultPipelineConfigInfo(configInfo);
+
+      configInfo.rasterizationInfo = vk::PipelineRasterizationStateCreateInfo(
+				{}, vk::False, vk::False, vk::PolygonMode::eLine,
+				vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise, vk::False,
+				0.0f, 0.0f, 0.0f, 1.0f
+          );
+
+      return configInfo;
     }
     
     void render() override
@@ -103,6 +120,13 @@ class Game : public dg::Application
           sprite.model->draw(*renderer.pCurrentCommandBuffer);
         }
 
+    }
+
+    void imguiRender() override
+    {
+      ImGui::Begin("Debug");
+
+      ImGui::End();
     }
 };
 

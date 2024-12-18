@@ -113,19 +113,24 @@ namespace dg
       const std::string& vertShaderPath,
       const std::string& fragShaderPath,
       const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
-      const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions
+      const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions,
+      PipelineConfigInfo* pPipelineConfig
       )
   {
     PipelineConfigInfo pipelineConfig {};
-    Pipeline::defaultPipelineConfigInfo(pipelineConfig);
+    if (pPipelineConfig == nullptr)
+    {
+      Pipeline::defaultPipelineConfigInfo(pipelineConfig);
+      pPipelineConfig = &pipelineConfig;
+    }
 
-    pipelineConfig.renderPass = m_swapChain->getRenderPass();
-    pipelineConfig.pipelineLayout = m_pipelineLayout;
+    pPipelineConfig->renderPass = m_swapChain->getRenderPass();
+    pPipelineConfig->pipelineLayout = m_pipelineLayout;
 
     return std::make_unique<Pipeline>(m_toolBox,
         vertShaderPath,
         fragShaderPath,
-        pipelineConfig,
+        *pPipelineConfig,
         bindingDescriptions,
         attributeDescriptions
         );
@@ -203,13 +208,14 @@ namespace dg
     assert(m_pipelineLayout != nullptr && "Cannot create pipelines before pipeline layout");
 
 
-    for (const auto& pipelineInfo : pipelinesInfo)
+    for (auto& pipelineInfo : pipelinesInfo)
     {
       m_pipelines[static_cast<uint32_t>(pipelineInfo.id)] = createPipeline(
           pipelineInfo.vertexShaderPath,
           pipelineInfo.fragmentShaderPath,
           Vertex::getBindingDescriptions(),
-          Vertex::getAttributeDescriptions()
+          Vertex::getAttributeDescriptions(),
+          pipelineInfo.config
           );
     }
 
@@ -312,6 +318,14 @@ namespace dg
 
   void Renderer::draw()
   {
+
+    // ImGui rendering
+    ImGui_ImplVulkan_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    imguiRendering();
+    ImGui::Render();
+
     uint32_t imageIndex;
     vk::Result result = m_swapChain->acquireNextImage(imageIndex);
     if (result == vk::Result::eErrorOutOfDateKHR)
@@ -322,19 +336,6 @@ namespace dg
 
     if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR)
       throw std::runtime_error("Failed to acquire swap chain image");
-
-    ImGui_ImplVulkan_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-
-    ImGui::NewFrame();
-
-    ImGui::ShowDemoWindow();
-
-    ImGui::Begin("FPS");
-    ImGui::Text("[Put that number here]");
-    ImGui::End();
-
-    ImGui::Render();
 
     recordCommandBuffer(imageIndex);
 

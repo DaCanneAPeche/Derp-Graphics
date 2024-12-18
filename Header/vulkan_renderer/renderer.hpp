@@ -35,6 +35,8 @@ namespace dg
     void clean();
 
     std::function<void()> externalRendering;
+    std::function<void()> imguiRendering;
+
 		void draw();
 		void pollEvents() const { glfwPollEvents(); };
 		[[nodiscard]] bool shouldWindowClose() const { return window.shouldClose(); };
@@ -73,7 +75,8 @@ namespace dg
 				const std::string& vertShaderPath,
 				const std::string& fragShaderPath,
 				const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
-				const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions
+				const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions,
+        PipelineConfigInfo* pPipelineConfig
 				);
 		void createCommandBuffers();
 		void freeCommandBuffers();
