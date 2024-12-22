@@ -5,7 +5,8 @@ namespace dg
 {
 	
 	Model::Model(const std::vector<Vertex>& vertices,
-			const std::vector<uint16_t>& indices)
+			const std::vector<uint16_t>& indices,
+      VulkanToolBox& vulkanToolBox) : m_toolBox(vulkanToolBox)
 	{
 		createVertexBuffer(vertices);
 		createIndexBuffer(indices);
@@ -24,12 +25,24 @@ namespace dg
 		vk::DeviceSize vertexSize = sizeof(vertices[0]);
 		vk::DeviceSize bufferSize = vertexSize * m_vertexCount;  
 
-		m_vertexBuffer = std::make_unique<Buffer>(vertexSize, m_vertexCount,
+    Buffer stagingBuffer(
+        m_toolBox, vertexSize, m_vertexCount,
+        vk::BufferUsageFlagBits::eTransferSrc,
+        vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
+				vma::MemoryUsage::eAuto
+        );
+
+		stagingBuffer.write((void*)vertices.data(), bufferSize);
+
+		m_vertexBuffer = std::make_unique<Buffer>(
+        m_toolBox, vertexSize, m_vertexCount,
         vk::BufferUsageFlagBits::eVertexBuffer |
 				vk::BufferUsageFlagBits::eTransferDst,
         vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
-				vma::MemoryUsage::eAuto);
-		m_vertexBuffer->write((void*)vertices.data(), bufferSize);
+				vma::MemoryUsage::eAuto
+        );
+
+    stagingBuffer.copyToBuffer(*m_vertexBuffer, bufferSize);
 	}
 
 	void Model::createIndexBuffer(const std::vector<uint16_t>& indices)
@@ -42,12 +55,24 @@ namespace dg
 		vk::DeviceSize indexSize = sizeof(indices[0]);
 		vk::DeviceSize bufferSize = indexSize * m_indicesCount;
 
-		m_indexBuffer = std::make_unique<Buffer>(indexSize, m_indicesCount,
+    Buffer stagingBuffer(
+        m_toolBox, indexSize, m_indicesCount,
+        vk::BufferUsageFlagBits::eTransferSrc,
+        vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
+				vma::MemoryUsage::eAuto
+        );
+
+    stagingBuffer.write((void*)indices.data(), bufferSize);
+
+		m_indexBuffer = std::make_unique<Buffer>(
+        m_toolBox, indexSize, m_indicesCount,
         vk::BufferUsageFlagBits::eIndexBuffer |
 				vk::BufferUsageFlagBits::eTransferDst,
         vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
-				vma::MemoryUsage::eCpuToGpu);
-		m_indexBuffer->write((void*)indices.data(), bufferSize);
+				vma::MemoryUsage::eAuto
+        );
+
+    stagingBuffer.copyToBuffer(*m_indexBuffer, bufferSize);
 	}
 
 	void Model::bind(const vk::CommandBuffer& commandBuffer) const

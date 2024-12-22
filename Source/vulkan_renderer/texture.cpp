@@ -24,8 +24,10 @@ namespace dg {
 
 		uint32_t pixelsCount = width * height;
 
-		Buffer stagingBuffer(desiredChannels, pixelsCount,
-				vk::BufferUsageFlagBits::eTransferSrc, vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
+		Buffer stagingBuffer(
+        m_toolBox, desiredChannels, pixelsCount,
+				vk::BufferUsageFlagBits::eTransferSrc,
+        vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
 		stagingBuffer.write(pixels, desiredChannels * pixelsCount);
 		stbi_image_free(pixels);
 
@@ -40,7 +42,7 @@ namespace dg {
 		m_allocation = handle.second;
 
 		transitionImageLayout(vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal);
-		copyBufferToImage(stagingBuffer, m_image, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+    stagingBuffer.copyToImage(m_image, width, height);
 		transitionImageLayout(vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
 	}
 
@@ -84,16 +86,4 @@ namespace dg {
 		m_toolBox.endSingleTimeCommands(commandBuffer);
 	}
 	
-	void Texture::copyBufferToImage(Buffer& buffer, vk::Image& image, uint32_t width, uint32_t height) const
-	{
-		vk::CommandBuffer commandBuffer = m_toolBox.beginSingleTimeCommands();
-
-		vk::ImageSubresourceLayers subresourceLayers(vk::ImageAspectFlagBits::eColor, 0, 0, 1);
-		vk::BufferImageCopy region(0, 0, 0, subresourceLayers, {0, 0, 0}, {width, height, 1});
-		commandBuffer.copyBufferToImage(buffer.buffer, image, vk::ImageLayout::eTransferDstOptimal, region);
-
-		m_toolBox.endSingleTimeCommands(commandBuffer);
-	}
-	
-
 } // dg 

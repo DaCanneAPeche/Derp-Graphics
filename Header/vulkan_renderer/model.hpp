@@ -47,7 +47,8 @@ namespace dg
 	public:
 
 		Model(const std::vector<Vertex>& vertices,
-        const std::vector<uint16_t>& indices);
+        const std::vector<uint16_t>& indices,
+        VulkanToolBox& vulkanToolBox);
 		~Model();
 		
 		Model(const Model &) = delete;
@@ -65,6 +66,7 @@ namespace dg
 		std::unique_ptr<Buffer> m_vertexBuffer;
 		std::unique_ptr<Buffer> m_indexBuffer;
 		bool m_hasIndices = false;
+    VulkanToolBox& m_toolBox;
 	};
 	
 } /* dg */ 

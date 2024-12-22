@@ -6,6 +6,7 @@ namespace dg
 {
 
 	Buffer::Buffer(
+      VulkanToolBox& vulkanToolBox,
 			vk::DeviceSize instanceSize,
 			uint32_t instanceCount,
 			vk::BufferUsageFlags bufferUsageFlags,
@@ -14,7 +15,8 @@ namespace dg
 			vk::DeviceSize minOffsetAlignement,
 			vk::SharingMode sharingMode
 			) : m_bufferUsageFlags(bufferUsageFlags), m_sharingMode(sharingMode),
-					m_memoryUsage(memoryUsage), m_instanceSize(instanceSize), m_allocFlag(allocFlag)
+					m_memoryUsage(memoryUsage), m_instanceSize(instanceSize),
+          m_allocFlag(allocFlag), m_toolBox(vulkanToolBox)
 	{
 		m_alignementSize = getAlignment(instanceSize, minOffsetAlignement);
 		m_bufferSize = m_alignementSize * instanceCount;
@@ -63,5 +65,26 @@ namespace dg
 		
 		return instanceSize;
 	}
+
+  void Buffer::copyToBuffer(Buffer& otherBuffer, vk::DeviceSize size)
+  {
+		vk::CommandBuffer commandBuffer = m_toolBox.beginSingleTimeCommands();
+
+    vk::BufferCopy copyRegion(0, 0, size);
+    commandBuffer.copyBuffer(buffer, otherBuffer.buffer, copyRegion);
+
+		m_toolBox.endSingleTimeCommands(commandBuffer);
+  }
+
+  void Buffer::copyToImage(vk::Image& image, uint32_t width, uint32_t height)
+  {
+		vk::CommandBuffer commandBuffer = m_toolBox.beginSingleTimeCommands();
+
+		vk::ImageSubresourceLayers subresourceLayers(vk::ImageAspectFlagBits::eColor, 0, 0, 1);
+		vk::BufferImageCopy region(0, 0, 0, subresourceLayers, {0, 0, 0}, {width, height, 1});
+		commandBuffer.copyBufferToImage(buffer, image, vk::ImageLayout::eTransferDstOptimal, region);
+
+		m_toolBox.endSingleTimeCommands(commandBuffer);
+  }
 
 }

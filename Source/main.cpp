@@ -31,7 +31,8 @@ class MainScene : public dg::Scene
       };
 
       std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
-      sprite.model = std::make_unique<dg::Model>(vertices, indices);
+      sprite.model = std::make_unique<dg::Model>(vertices, indices,
+          application->vulkanToolBox);
       sprite.transform.rotation = glm::pi<float>()/4;
       sprite.transform.translation = { 0.3, 0.5 };
       sprite.transform.scaling = {1.3, 1.0};

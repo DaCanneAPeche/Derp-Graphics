@@ -31,9 +31,7 @@ namespace dg
 			void createImageView();
 			void createSampler(float maxAnistrophy, vk::Filter minifiedFilter, vk::Filter magnifiedFilter,
 					vk::SamplerAddressMode adressingMode);
-
 			void transitionImageLayout(vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
-			void copyBufferToImage(Buffer& buffer, vk::Image& image, uint32_t width, uint32_t height) const;
 
 			VulkanToolBox& m_toolBox;
 			int m_mipLevels;

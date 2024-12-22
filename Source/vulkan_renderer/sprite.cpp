@@ -29,7 +29,7 @@ namespace dg
 
     std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 
-    model = std::make_unique<Model>(vertices, indices);
+    // model = std::make_unique<Model>(vertices, indices);
   }
 
   void Sprite::draw(vk::CommandBuffer& commandBuffer,
