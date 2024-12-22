@@ -5,7 +5,6 @@
 #include <string>
 #include "vk_mem_alloc.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
-#include "vulkan_renderer/globals.hpp"
 
 namespace dg
 {
@@ -16,7 +15,7 @@ namespace dg
           const vk::Sampler& _sampler);
 			~Texture()
 			{
-				gAllocator.destroyImage(m_image, m_allocation);
+				m_toolBox.allocator.destroyImage(m_image, m_allocation);
 				m_toolBox.device.destroySampler(sampler);
 				m_toolBox.device.destroyImageView(imageView);
 			}

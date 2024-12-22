@@ -7,7 +7,7 @@
 #include "vulkan_renderer/window.hpp"
 #include "_vulkan/structs.hpp"
 
-#include "vulkan_renderer/globals.hpp"
+#include "vk_mem_alloc.hpp"
 
 namespace dg
 {
@@ -24,6 +24,7 @@ namespace dg
 			vk::Queue graphicsQueue;
 			vk::Queue presentQueue;
 			vk::CommandPool commandPool;
+      vma::Allocator allocator;
       SwapChainSupportDetails swapChainSupport;
       QueueFamilyIndices queueFamilyIndices;
 
@@ -36,7 +37,7 @@ namespace dg
 
     private:
       [[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
-      void initMemoryAllocator() const;
+      void initMemoryAllocator();
 
       std::vector<const char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};
       std::vector<const char*> m_deviceExtensions = {vk::KHRSwapchainExtensionName};

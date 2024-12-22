@@ -1,5 +1,4 @@
 #include "_vulkan/buffer.hpp"
-#include "vulkan_renderer/globals.hpp"
 #include <iostream>
 
 namespace dg
@@ -25,14 +24,14 @@ namespace dg
 
 	Buffer::~Buffer()
 	{
-		gAllocator.destroyBuffer(buffer, allocation);
+		m_toolBox.allocator.destroyBuffer(buffer, allocation);
 	}
 
 	void Buffer::createBuffer()
 	{
 		vk::BufferCreateInfo bufferInfo({}, m_bufferSize, m_bufferUsageFlags, m_sharingMode);
 		vma::AllocationCreateInfo allocInfo(m_allocFlag, m_memoryUsage);
-		auto handle = gAllocator.createBuffer(bufferInfo, allocInfo);
+		auto handle = m_toolBox.allocator.createBuffer(bufferInfo, allocInfo);
 		buffer = handle.first;
 		allocation = handle.second;
 	}
@@ -40,7 +39,7 @@ namespace dg
 	void Buffer::write(void* data, vk::DeviceSize size, vk::DeviceSize offset)
 	{
 		assert(buffer && "Buffer can't be written to before creation");
-		gAllocator.copyMemoryToAllocation(data, allocation, offset, size);
+		m_toolBox.allocator.copyMemoryToAllocation(data, allocation, offset, size);
 	}
 
 	vk::DescriptorBufferInfo Buffer::descriptorInfo(vk::DeviceSize size, vk::DeviceSize offset) const

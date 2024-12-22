@@ -1,6 +1,5 @@
 #pragma once
 
-#include "vulkan_renderer/globals.hpp"
 #include "_vulkan/buffer.hpp"
 
 // glm

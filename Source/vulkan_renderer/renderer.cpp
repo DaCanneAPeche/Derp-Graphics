@@ -1,5 +1,4 @@
 #include "vulkan_renderer/renderer.hpp"
-#include "vulkan_renderer/globals.hpp"
 #include "utils/file.hpp"
 #include "vulkan_renderer/push_constant.hpp"
 #include "core/transform2d.hpp"
@@ -180,10 +179,6 @@ namespace dg
     m_descriptorSets.resize(1);
     m_descriptorSets = m_toolBox.device.allocateDescriptorSets(allocInfo);
 
-    /*vk::DescriptorImageInfo imageInfo(
-      m_texture->sampler,
-      m_texture->imageView,
-      vk::ImageLayout::eShaderReadOnlyOptimal);*/
     vk::DescriptorImageInfo imageInfo = m_sprite->getImageInfo();
 
     std::array<vk::WriteDescriptorSet, 1> descriptorWrites = {

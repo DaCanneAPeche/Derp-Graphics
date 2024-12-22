@@ -43,7 +43,7 @@ namespace dg
 
   VulkanToolBox::~VulkanToolBox()
   {
-    gAllocator.destroy();
+    allocator.destroy();
 
 		device.destroyCommandPool(commandPool);
 		device.destroy();
@@ -109,7 +109,7 @@ namespace dg
 		throw std::runtime_error("failed to find supported format!");
   }
 
-  void VulkanToolBox::initMemoryAllocator() const
+  void VulkanToolBox::initMemoryAllocator()
   {
     vma::VulkanFunctions vulkanFunctions(
         &vkGetInstanceProcAddr,
@@ -130,7 +130,7 @@ namespace dg
         {}
         );
 
-    gAllocator = vma::createAllocator(allocatorCreateInfo);
+    allocator = vma::createAllocator(allocatorCreateInfo);
   }
 
 }

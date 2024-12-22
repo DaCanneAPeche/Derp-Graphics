@@ -52,7 +52,7 @@ namespace dg
 		for (size_t i = 0; i < m_depthImages.size(); i++)
 		{
 			m_toolBox.device.destroyImageView(m_depthImageViews[i]);
-			gAllocator.destroyImage(m_depthImages[i], m_depthImageAllocations[i]);
+			m_toolBox.allocator.destroyImage(m_depthImages[i], m_depthImageAllocations[i]);
 		}
 
 		for (auto framebuffer : m_swapChainFramebuffers)
@@ -304,7 +304,7 @@ namespace dg
 					{}
 					);
 			
-			auto imageHandle = gAllocator.createImage(imageInfo, {{}, vma::MemoryUsage::eAuto});
+			auto imageHandle = m_toolBox.allocator.createImage(imageInfo, {{}, vma::MemoryUsage::eAuto});
 			m_depthImages[i] = imageHandle.first; 
 			m_depthImageAllocations[i] = imageHandle.second; 
 

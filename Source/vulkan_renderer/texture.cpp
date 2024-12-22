@@ -37,7 +37,7 @@ namespace dg {
 		
 		vma::AllocationCreateInfo allocInfo({}, vma::MemoryUsage::eAuto);
 
-		auto handle = gAllocator.createImage(imageInfo, allocInfo);
+		auto handle = m_toolBox.allocator.createImage(imageInfo, allocInfo);
 		m_image = handle.first;
 		m_allocation = handle.second;
 

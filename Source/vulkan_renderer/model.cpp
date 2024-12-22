@@ -1,5 +1,4 @@
 #include "vulkan_renderer/model.hpp"
-#include "vulkan_renderer/globals.hpp"
 
 namespace dg
 {
