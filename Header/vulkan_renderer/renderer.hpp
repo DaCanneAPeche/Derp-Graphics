@@ -4,7 +4,6 @@
 #include "vulkan_renderer/pipeline.hpp"
 #include "vulkan_renderer/swapchain.hpp"
 #include "vulkan_renderer/model.hpp"
-#include "vulkan_renderer/sprite.hpp"
 #include "vulkan_renderer/texture.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
 
@@ -97,7 +96,6 @@ namespace dg
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
-    std::unique_ptr<Sprite> m_sprite;
 		std::shared_ptr<Texture> m_texture;
     vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;

@@ -5,6 +5,11 @@
 - [x] Scene system
 - [x] ECS
 - [ ] TOML implementation
-- [ ] Pipeline control
+- [x] Pipeline control
+- [ ] Descriptor sets abstraction ??
 - [ ] Multi texturing
+- [ ] Betterippeline abstraction
+- [ ] Time control
+- [ ] Game loop
+- [ ] Input control 
 

@@ -2,10 +2,9 @@
 
 namespace dg {
 
-	Texture::Texture(VulkanToolBox& toolBox, const std::string& filepath,
-      const vk::Sampler& _sampler) :
+	Texture::Texture(VulkanToolBox& toolBox, const std::string& filepath) :
 		m_toolBox(toolBox), c_subresourceRange(vk::ImageAspectFlagBits::eColor,
-        0, 1, 0, 1), sampler(_sampler)
+        0, 1, 0, 1)
 	{
 		createImage(filepath);
 		createImageView();

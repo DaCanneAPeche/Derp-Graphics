@@ -11,17 +11,14 @@ namespace dg
 	class Texture {
 		public:
 
-			Texture(VulkanToolBox& toolBox, const std::string& filepath,
-          const vk::Sampler& _sampler);
+			Texture(VulkanToolBox& toolBox, const std::string& filepath);
 			~Texture()
 			{
 				m_toolBox.allocator.destroyImage(m_image, m_allocation);
-				m_toolBox.device.destroySampler(sampler);
 				m_toolBox.device.destroyImageView(imageView);
 			}
 
 			vk::ImageView imageView;
-			const vk::Sampler& sampler; 
 			vk::ImageLayout imageLayout;
       int width, height;
 

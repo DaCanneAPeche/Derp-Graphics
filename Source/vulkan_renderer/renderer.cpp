@@ -33,8 +33,7 @@ namespace dg
   {
     createImageSampler();
     m_texture = std::make_shared<Texture>(m_toolBox,
-        "./assets/textures/nothing_suspicious.jpeg",
-        m_imageSampler);
+        "./assets/textures/nothing_suspicious.jpeg");
     loadModels();
 
     createDescriptorSetLayout();
@@ -53,13 +52,13 @@ namespace dg
     for (auto& pipeline : m_pipelines)
       pipeline = nullptr;
     m_swapChain = nullptr;
-    m_sprite = nullptr;
     m_texture = nullptr;
 
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    m_toolBox.device.destroy(m_imageSampler);
     m_toolBox.device.destroyDescriptorPool(m_descriptorPool);
     m_toolBox.device.destroyDescriptorSetLayout(m_descriptorSetLayout);
     m_toolBox.device.destroyPipelineLayout(m_pipelineLayout);
@@ -90,7 +89,6 @@ namespace dg
 
   void Renderer::loadModels()
   {
-    m_sprite = std::make_unique<Sprite>(m_texture);
   }
 
   void Renderer::createPipelineLayout()
@@ -179,7 +177,8 @@ namespace dg
     m_descriptorSets.resize(1);
     m_descriptorSets = m_toolBox.device.allocateDescriptorSets(allocInfo);
 
-    vk::DescriptorImageInfo imageInfo = m_sprite->getImageInfo();
+    vk::DescriptorImageInfo imageInfo(m_imageSampler, m_texture->imageView,
+        vk::ImageLayout::eShaderReadOnlyOptimal);
 
     std::array<vk::WriteDescriptorSet, 1> descriptorWrites = {
       vk::WriteDescriptorSet(
