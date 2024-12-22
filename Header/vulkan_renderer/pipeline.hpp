@@ -2,6 +2,7 @@
 
 #include "vulkan/vulkan.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
+#include <memory>
 
 namespace dg
 {
@@ -10,6 +11,7 @@ namespace dg
   enum class Pl : uint32_t
 	{
     sprites = 0,
+    outline,
 
     Count
 	};
@@ -36,7 +38,7 @@ namespace dg
     std::string vertexShaderPath;
     std::string fragmentShaderPath;
 
-    PipelineConfigInfo* config = nullptr;
+    std::shared_ptr<PipelineConfigInfo> config = nullptr;
   };
 
 	class Pipeline

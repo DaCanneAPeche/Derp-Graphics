@@ -54,7 +54,7 @@ namespace dg
     void bindPipeline(Pl pipelineId)
     {
       assert(pCurrentCommandBuffer != nullptr);
-      m_pipelines[static_cast<uint32_t>(Pl::sprites)]->bind(*pCurrentCommandBuffer); 
+      m_pipelines[static_cast<uint32_t>(pipelineId)]->bind(*pCurrentCommandBuffer); 
       pCurrentCommandBuffer->bindDescriptorSets(
           vk::PipelineBindPoint::eGraphics,
           m_pipelineLayout,
@@ -76,7 +76,7 @@ namespace dg
 				const std::string& fragShaderPath,
 				const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
 				const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions,
-        PipelineConfigInfo* pPipelineConfig
+        std::shared_ptr<PipelineConfigInfo> pPipelineConfig
 				);
 		void createCommandBuffers();
 		void freeCommandBuffers();

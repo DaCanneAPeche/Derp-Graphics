@@ -114,23 +114,21 @@ namespace dg
       const std::string& fragShaderPath,
       const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
       const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions,
-      PipelineConfigInfo* pPipelineConfig
+      std::shared_ptr<PipelineConfigInfo> pPipelineConfig
       )
   {
-    PipelineConfigInfo pipelineConfig {};
+    PipelineConfigInfo pipelineConfig;
     if (pPipelineConfig == nullptr)
-    {
       Pipeline::defaultPipelineConfigInfo(pipelineConfig);
-      pPipelineConfig = &pipelineConfig;
-    }
+    else pipelineConfig = *pPipelineConfig;
 
-    pPipelineConfig->renderPass = m_swapChain->getRenderPass();
-    pPipelineConfig->pipelineLayout = m_pipelineLayout;
+    pipelineConfig.renderPass = m_swapChain->getRenderPass();
+    pipelineConfig.pipelineLayout = m_pipelineLayout;
 
     return std::make_unique<Pipeline>(m_toolBox,
         vertShaderPath,
         fragShaderPath,
-        *pPipelineConfig,
+        pipelineConfig,
         bindingDescriptions,
         attributeDescriptions
         );
