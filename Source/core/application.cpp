@@ -78,6 +78,10 @@ namespace dg
     renderer.window.mouseButtonCallback = [this](GLFWwindow* window, int button,
         int action, int mods)
     {
+      // stop event propagation with imgui
+      auto& io = ImGui::GetIO();
+      if (io.WantCaptureMouse || io.WantCaptureKeyboard) return;
+
       std::unordered_map<int, config::Signals> actionMap = 
       {
         {GLFW_PRESS, config::Signals::MOUSE_PRESS},
