@@ -61,16 +61,24 @@ namespace dg
 			queueCreateInfos.push_back(queueCreateInfo);
 		}
 
-		vk::PhysicalDeviceFeatures deviceFeatures;
-		deviceFeatures.samplerAnisotropy = vk::True;
-    deviceFeatures.fillModeNonSolid = vk::True;
+		vk::PhysicalDeviceFeatures features;
+		features.samplerAnisotropy = vk::True;
+    features.fillModeNonSolid = vk::True;
+
+
+    vk::PhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures;
+    descriptorIndexingFeatures.descriptorBindingPartiallyBound = vk::True;
+
+    vk::PhysicalDeviceRobustness2FeaturesEXT robustnessFeatures(vk::False,
+        vk::False, vk::True, &descriptorIndexingFeatures);
+
+    vk::PhysicalDeviceFeatures2 deviceFeatures(features,
+        &robustnessFeatures); 
 
 		vk::DeviceCreateInfo deviceInfo(
-				vk::DeviceCreateFlags(),
-				queueCreateInfos,
+        {}, queueCreateInfos,
 				{}, // enabledLayers, deprecated and ignored (see doc)
-				m_extensions,
-				&deviceFeatures
+				m_extensions, nullptr, &deviceFeatures
 				);
 
 		device = physical.createDevice(deviceInfo);

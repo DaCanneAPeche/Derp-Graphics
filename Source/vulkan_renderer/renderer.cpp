@@ -26,8 +26,7 @@ static void imgui_check_vk_result(VkResult err)
 namespace dg
 {
   Renderer::Renderer(const WindowInfo& windowInfo, VulkanToolBox& vulkanToolBox)
-    : window(windowInfo), m_toolBox(vulkanToolBox)
-  {}
+    : window(windowInfo), m_toolBox(vulkanToolBox) { }
 
   void Renderer::init()
   {
@@ -146,7 +145,7 @@ namespace dg
         );
 
     vk::DescriptorSetLayoutBinding texturesLayoutBinding(
-        2, vk::DescriptorType::eSampledImage, 10,
+        2, vk::DescriptorType::eSampledImage, MAX_TEXTURE_NUMBER,
         vk::ShaderStageFlagBits::eFragment
         );
 
@@ -155,7 +154,12 @@ namespace dg
       imageSamplerLayoutBinding, samplerLayoutBinding, texturesLayoutBinding
     };
 
-    vk::DescriptorSetLayoutCreateInfo layoutInfo({}, bindings);
+    std::array<vk::DescriptorBindingFlags, 3> flags;
+    flags[2] = vk::DescriptorBindingFlagBits::ePartiallyBound;
+
+    vk::DescriptorSetLayoutBindingFlagsCreateInfo bindingFlags(flags);
+
+    vk::DescriptorSetLayoutCreateInfo layoutInfo({}, bindings, &bindingFlags);
     m_descriptorSetLayout = m_toolBox.device.createDescriptorSetLayout(layoutInfo);
   }
 
@@ -164,7 +168,7 @@ namespace dg
     std::array<vk::DescriptorPoolSize, 3> poolSizes = {
       vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 2),
       vk::DescriptorPoolSize(vk::DescriptorType::eSampler, 1),
-      vk::DescriptorPoolSize(vk::DescriptorType::eSampledImage, 10)
+      vk::DescriptorPoolSize(vk::DescriptorType::eSampledImage, MAX_TEXTURE_NUMBER)
     };
 
     vk::DescriptorPoolCreateInfo poolInfo(

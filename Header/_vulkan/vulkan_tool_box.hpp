@@ -40,7 +40,10 @@ namespace dg
       void initMemoryAllocator();
 
       std::vector<const char*> m_validationLayers = {"VK_LAYER_KHRONOS_validation"};
-      std::vector<const char*> m_deviceExtensions = {vk::KHRSwapchainExtensionName};
+      std::vector<const char*> m_deviceExtensions = {
+        vk::KHRSwapchainExtensionName,
+        vk::EXTRobustness2ExtensionName
+      };
       vk::DebugUtilsMessengerEXT m_debugMessenger;
       vk::DispatchLoaderDynamic m_dispatchLoader;
 

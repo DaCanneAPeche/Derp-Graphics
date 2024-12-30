@@ -67,6 +67,8 @@ namespace dg
     std::vector<PipelineInfo> pipelinesInfo;
     vk::CommandBuffer* pCurrentCommandBuffer = nullptr;
 
+    static const int MAX_TEXTURE_NUMBER = 1000;
+
 	private:
 
 		void createPipelineLayout();
