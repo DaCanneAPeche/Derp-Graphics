@@ -2,9 +2,10 @@
 
 namespace dg {
 
-	Texture::Texture(VulkanToolBox& toolBox, const std::string& filepath) :
+	Texture::Texture(VulkanToolBox& toolBox, const std::string& filepath,
+      vk::ImageUsageFlags imageUsage) : 
 		m_toolBox(toolBox), c_subresourceRange(vk::ImageAspectFlagBits::eColor,
-        0, 1, 0, 1)
+        0, 1, 0, 1), m_imageUsage { imageUsage }
 	{
 		createImage(filepath);
 		createImageView();
@@ -32,7 +33,7 @@ namespace dg {
 
 		vk::ImageCreateInfo imageInfo({}, vk::ImageType::e2D, c_format, vk::Extent3D(width, height, 1),
 				1, 1, vk::SampleCountFlagBits::e1, vk::ImageTiling::eOptimal, vk::ImageUsageFlagBits::eTransferDst |
-				vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferSrc, vk::SharingMode::eExclusive);	
+				m_imageUsage, vk::SharingMode::eExclusive);	
 		
 		vma::AllocationCreateInfo allocInfo({}, vma::MemoryUsage::eAuto);
 

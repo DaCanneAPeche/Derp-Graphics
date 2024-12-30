@@ -94,7 +94,8 @@ namespace dg
 		vk::PhysicalDeviceFeatures supportedFeatures = physicalDevice.getFeatures();
 
 		return indices.isComplete() && extensionsSupported && swapChainAdequate &&
-					 supportedFeatures.samplerAnisotropy;
+					 supportedFeatures.samplerAnisotropy &&
+           supportedFeatures.fillModeNonSolid;
 
 	}
 

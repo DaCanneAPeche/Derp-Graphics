@@ -6,6 +6,7 @@
 #include "vulkan_renderer/model.hpp"
 #include "vulkan_renderer/texture.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
+#include "vulkan_renderer/asset_manager.hpp"
 
 #include <vk_mem_alloc.hpp>
 #include "imgui.h"
@@ -99,5 +100,8 @@ namespace dg
 		std::shared_ptr<Texture> m_texture;
     vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;
+    AssetManager m_assetManager { 
+      {{0, "./assets/textures/leclerc.jpg"}},
+      m_toolBox };
 	};
 } /* dg */ 

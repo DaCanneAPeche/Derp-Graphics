@@ -11,7 +11,8 @@ namespace dg
 	class Texture {
 		public:
 
-			Texture(VulkanToolBox& toolBox, const std::string& filepath);
+			Texture(VulkanToolBox& toolBox, const std::string& filepath,
+          vk::ImageUsageFlags imageUsage);
 			~Texture()
 			{
 				m_toolBox.allocator.destroyImage(m_image, m_allocation);
@@ -35,5 +36,6 @@ namespace dg
 			vma::Allocation m_allocation;
 			const vk::Format c_format = vk::Format::eR8G8B8Srgb;
 			const vk::ImageSubresourceRange c_subresourceRange;
+      vk::ImageUsageFlags m_imageUsage;
 	};
 }

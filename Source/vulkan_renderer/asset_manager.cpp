@@ -29,9 +29,8 @@ namespace dg
       return;
     }
 
-    textureMap.insert(
-        { id, Texture(m_toolBox, loadMap[id]) }
-        );
+    textureMap.emplace(id, std::make_unique<Texture>(m_toolBox, loadMap[id],
+          vk::ImageUsageFlagBits::eSampled));
   }
 
   void AssetManager::unloadTexture(uint64_t id)
@@ -41,12 +40,28 @@ namespace dg
 
   Texture& AssetManager::getTexture(uint64_t id)
   {
-    return textureMap.at(id);
+    return *textureMap.at(id);
   }
 
-  Texture* AssetManager::getTexturePointer(uint64_t id)
+  std::weak_ptr<Texture> AssetManager::getTexturePointer(uint64_t id)
   {
-    return &textureMap.at(id);
+    // return textureMap.at(id);
+  }
+
+  // NOTE : switching from a map to a vector to store textures might optimize this
+  std::vector<vk::DescriptorImageInfo> AssetManager::textureInfos() const
+  {
+    uint64_t maxId = 1;
+    for (const auto& [id, _] : textureMap)
+      if (maxId < id) maxId = id;
+
+    std::vector<vk::DescriptorImageInfo> infos(maxId);
+
+    for (const auto& [id, texture] : textureMap)
+      infos[id] = vk::DescriptorImageInfo({}, texture->imageView,
+          vk::ImageLayout::eShaderReadOnlyOptimal);
+
+    return infos;
   }
 
 }

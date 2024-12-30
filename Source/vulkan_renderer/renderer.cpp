@@ -33,7 +33,9 @@ namespace dg
   {
     createImageSampler();
     m_texture = std::make_shared<Texture>(m_toolBox,
-        "./assets/textures/nothing_suspicious.jpeg");
+        "./assets/textures/nothing_suspicious.jpeg",
+        vk::ImageUsageFlagBits::eSampled);
+    m_assetManager.loadAll();
     loadModels();
 
     createDescriptorSetLayout();
@@ -133,15 +135,24 @@ namespace dg
 
   void Renderer::createDescriptorSetLayout()
   {
-    vk::DescriptorSetLayoutBinding samplerLayoutBinding(
-        0,
-        vk::DescriptorType::eCombinedImageSampler, 1,
+    vk::DescriptorSetLayoutBinding imageSamplerLayoutBinding(
+        0, vk::DescriptorType::eCombinedImageSampler, 1,
         vk::ShaderStageFlagBits::eFragment
         );
 
-    std::array<vk::DescriptorSetLayoutBinding, 1> bindings =
+    vk::DescriptorSetLayoutBinding samplerLayoutBinding(
+        1, vk::DescriptorType::eSampler, 1,
+        vk::ShaderStageFlagBits::eFragment
+        );
+
+    vk::DescriptorSetLayoutBinding texturesLayoutBinding(
+        2, vk::DescriptorType::eSampledImage, 10,
+        vk::ShaderStageFlagBits::eFragment
+        );
+
+    std::array<vk::DescriptorSetLayoutBinding, 3> bindings =
     {
-      samplerLayoutBinding
+      imageSamplerLayoutBinding, samplerLayoutBinding, texturesLayoutBinding
     };
 
     vk::DescriptorSetLayoutCreateInfo layoutInfo({}, bindings);
@@ -150,9 +161,10 @@ namespace dg
 
   void Renderer::createDescriptorPool()
   {
-    std::array<vk::DescriptorPoolSize, 1> poolSizes = {
-      vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler,
-          static_cast<uint32_t>(2))
+    std::array<vk::DescriptorPoolSize, 3> poolSizes = {
+      vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 2),
+      vk::DescriptorPoolSize(vk::DescriptorType::eSampler, 1),
+      vk::DescriptorPoolSize(vk::DescriptorType::eSampledImage, 10)
     };
 
     vk::DescriptorPoolCreateInfo poolInfo(
@@ -177,16 +189,27 @@ namespace dg
     m_descriptorSets.resize(1);
     m_descriptorSets = m_toolBox.device.allocateDescriptorSets(allocInfo);
 
-    vk::DescriptorImageInfo imageInfo(m_imageSampler, m_texture->imageView,
+    vk::DescriptorImageInfo combinedSamperImageInfo(m_imageSampler,
+        m_texture->imageView, vk::ImageLayout::eShaderReadOnlyOptimal);
+
+    vk::DescriptorImageInfo samplerInfo(m_imageSampler, {},
         vk::ImageLayout::eShaderReadOnlyOptimal);
 
-    std::array<vk::WriteDescriptorSet, 1> descriptorWrites = {
+    auto texturesInfo = m_assetManager.textureInfos();
+
+    std::array<vk::WriteDescriptorSet, 3> descriptorWrites = {
       vk::WriteDescriptorSet(
-          m_descriptorSets[0],
-          0,
-          0,
-          vk::DescriptorType::eCombinedImageSampler,
-          imageInfo
+          m_descriptorSets[0], 0, 0, vk::DescriptorType::eCombinedImageSampler,
+          combinedSamperImageInfo
+          ),
+
+      vk::WriteDescriptorSet(
+          m_descriptorSets[0], 1, 0, vk::DescriptorType::eSampler, samplerInfo
+          ),
+
+      vk::WriteDescriptorSet(
+          m_descriptorSets[0], 2, 0, vk::DescriptorType::eSampledImage,
+          texturesInfo
           )
     };
 
