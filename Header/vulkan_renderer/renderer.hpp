@@ -99,7 +99,6 @@ namespace dg
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
-		std::shared_ptr<Texture> m_texture;
     vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;
     AssetManager m_assetManager { 

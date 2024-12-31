@@ -31,10 +31,6 @@ namespace dg
   void Renderer::init()
   {
     createImageSampler();
-    m_texture = std::make_shared<Texture>(m_toolBox,
-        "./assets/textures/nothing_suspicious.jpeg",
-        vk::ImageUsageFlagBits::eSampled);
-    m_assetManager.loadAll();
     loadModels();
 
     createDescriptorSetLayout();
@@ -53,7 +49,6 @@ namespace dg
     for (auto& pipeline : m_pipelines)
       pipeline = nullptr;
     m_swapChain = nullptr;
-    m_texture = nullptr;
 
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -90,6 +85,7 @@ namespace dg
 
   void Renderer::loadModels()
   {
+    m_assetManager.loadAll();
   }
 
   void Renderer::createPipelineLayout()
@@ -134,28 +130,24 @@ namespace dg
 
   void Renderer::createDescriptorSetLayout()
   {
-    vk::DescriptorSetLayoutBinding imageSamplerLayoutBinding(
-        0, vk::DescriptorType::eCombinedImageSampler, 1,
-        vk::ShaderStageFlagBits::eFragment
-        );
 
     vk::DescriptorSetLayoutBinding samplerLayoutBinding(
-        1, vk::DescriptorType::eSampler, 1,
+        0, vk::DescriptorType::eSampler, 1,
         vk::ShaderStageFlagBits::eFragment
         );
 
     vk::DescriptorSetLayoutBinding texturesLayoutBinding(
-        2, vk::DescriptorType::eSampledImage, MAX_TEXTURE_NUMBER,
+        1, vk::DescriptorType::eSampledImage, MAX_TEXTURE_NUMBER,
         vk::ShaderStageFlagBits::eFragment
         );
 
-    std::array<vk::DescriptorSetLayoutBinding, 3> bindings =
+    std::array<vk::DescriptorSetLayoutBinding, 2> bindings =
     {
-      imageSamplerLayoutBinding, samplerLayoutBinding, texturesLayoutBinding
+      samplerLayoutBinding, texturesLayoutBinding
     };
 
-    std::array<vk::DescriptorBindingFlags, 3> flags;
-    flags[2] = vk::DescriptorBindingFlagBits::ePartiallyBound;
+    std::array<vk::DescriptorBindingFlags, 2> flags;
+    flags[1] = vk::DescriptorBindingFlagBits::ePartiallyBound;
 
     vk::DescriptorSetLayoutBindingFlagsCreateInfo bindingFlags(flags);
 
@@ -166,15 +158,16 @@ namespace dg
   void Renderer::createDescriptorPool()
   {
     std::array<vk::DescriptorPoolSize, 3> poolSizes = {
-      vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 2),
+      // For ImGui font
+      vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 1),
+
       vk::DescriptorPoolSize(vk::DescriptorType::eSampler, 1),
       vk::DescriptorPoolSize(vk::DescriptorType::eSampledImage, MAX_TEXTURE_NUMBER)
     };
 
+    // One descriptor set is used by ImGui
     vk::DescriptorPoolCreateInfo poolInfo(
-        vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
-        static_cast<uint32_t>(2),
-        poolSizes
+        vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, 2, poolSizes
         );
 
     m_descriptorPool = m_toolBox.device.createDescriptorPool(poolInfo);
@@ -193,26 +186,19 @@ namespace dg
     m_descriptorSets.resize(1);
     m_descriptorSets = m_toolBox.device.allocateDescriptorSets(allocInfo);
 
-    vk::DescriptorImageInfo combinedSamperImageInfo(m_imageSampler,
-        m_texture->imageView, vk::ImageLayout::eShaderReadOnlyOptimal);
-
     vk::DescriptorImageInfo samplerInfo(m_imageSampler, {},
         vk::ImageLayout::eShaderReadOnlyOptimal);
 
     auto texturesInfo = m_assetManager.textureInfos();
 
-    std::array<vk::WriteDescriptorSet, 3> descriptorWrites = {
+    std::array<vk::WriteDescriptorSet, 2> descriptorWrites = {
+
       vk::WriteDescriptorSet(
-          m_descriptorSets[0], 0, 0, vk::DescriptorType::eCombinedImageSampler,
-          combinedSamperImageInfo
+          m_descriptorSets[0], 0, 0, vk::DescriptorType::eSampler, samplerInfo
           ),
 
       vk::WriteDescriptorSet(
-          m_descriptorSets[0], 1, 0, vk::DescriptorType::eSampler, samplerInfo
-          ),
-
-      vk::WriteDescriptorSet(
-          m_descriptorSets[0], 2, 0, vk::DescriptorType::eSampledImage,
+          m_descriptorSets[0], 1, 0, vk::DescriptorType::eSampledImage,
           texturesInfo
           )
     };
