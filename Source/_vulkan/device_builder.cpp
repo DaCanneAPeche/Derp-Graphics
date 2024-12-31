@@ -65,15 +65,16 @@ namespace dg
 		features.samplerAnisotropy = vk::True;
     features.fillModeNonSolid = vk::True;
 
-
-    vk::PhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures;
-    descriptorIndexingFeatures.descriptorBindingPartiallyBound = vk::True;
-
     vk::PhysicalDeviceRobustness2FeaturesEXT robustnessFeatures(vk::False,
-        vk::False, vk::True, &descriptorIndexingFeatures);
+        vk::False, vk::True);
+
+    vk::PhysicalDeviceVulkan12Features vk12Features;
+    vk12Features.pNext = &robustnessFeatures;
+    vk12Features.runtimeDescriptorArray = vk::True;
+    vk12Features.descriptorBindingPartiallyBound = vk::True;
 
     vk::PhysicalDeviceFeatures2 deviceFeatures(features,
-        &robustnessFeatures); 
+        &vk12Features); 
 
 		vk::DeviceCreateInfo deviceInfo(
         {}, queueCreateInfos,

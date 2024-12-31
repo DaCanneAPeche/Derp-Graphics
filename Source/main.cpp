@@ -36,6 +36,7 @@ class MainScene : public dg::Scene
       sprite.transform.rotation = glm::pi<float>()/4;
       sprite.transform.translation = { 0.3, 0.5 };
       sprite.transform.scaling = {1.3, 1.0};
+      sprite.textureId = 0;
 
       signalHandler.on(dg::config::Signals::KEY_PRESS, [this](int key, int scancode,
             int mods)
@@ -50,6 +51,10 @@ class MainScene : public dg::Scene
           sprite.transform.translation.x -= 0.1;
         else if (key == GLFW_KEY_D)
           sprite.transform.translation.x += 0.1;
+        else if (key == GLFW_KEY_UP)
+          sprite.textureId++;
+        else if (key == GLFW_KEY_DOWN)
+          sprite.textureId--;
 
       });
 
@@ -125,7 +130,8 @@ class Game : public dg::Application
 
         dg::PushConstant push {
           .transform = sprite.transform.getMatrix(),
-            .offset = sprite.transform.translation};
+            .offset = sprite.transform.translation,
+            .textureId = sprite.textureId};
 
         renderer.pushConstant(push);
 
@@ -139,7 +145,24 @@ class Game : public dg::Application
     {
       ImGui::Begin("Debug");
 
-      ImGui::Checkbox("Show only outlines", &showOnlyOutlines);
+      if (ImGui::TreeNode("Timing"))
+      {
+        ImGui::Text("Frame duration : %f ms", deltaTime.count());
+        ImGui::Text("FPS : %d", static_cast<int>(1000/deltaTime.count()));
+        ImGui::TreePop();
+      }
+
+      ImGui::Spacing();
+
+      if (ImGui::TreeNode("Rendering"))
+      {
+        ImGui::Checkbox("Show only outlines", &showOnlyOutlines);
+        unsigned long maxPushConstantSize =
+          vulkanToolBox.physicalDevice.getProperties().limits.maxPushConstantsSize;
+        ImGui::Text("Push constant size : %lu bits out of %lu",
+            sizeof(dg::PushConstant), maxPushConstantSize);
+        ImGui::TreePop();
+      }
 
       ImGui::End();
     }

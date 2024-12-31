@@ -14,17 +14,17 @@ namespace dg
   {
     public:
       
-      AssetManager(const std::unordered_map<uint64_t, std::string>& _loadMap,
+      AssetManager(const std::unordered_map<uint32_t, std::string>& _loadMap,
           VulkanToolBox& vulkanToolBox);
       
-      std::map<uint64_t, std::unique_ptr<Texture>> textureMap;
-      std::unordered_map<uint64_t, std::string> loadMap;
+      std::map<uint32_t, std::unique_ptr<Texture>> textureMap;
+      std::unordered_map<uint32_t, std::string> loadMap;
 
-      void loadTexture(uint64_t id);
-      void unloadTexture(uint64_t id);
+      void loadTexture(uint32_t id);
+      void unloadTexture(uint32_t id);
 
-      Texture& getTexture(uint64_t id);
-      std::weak_ptr<Texture> getTexturePointer(uint64_t id);
+      Texture& getTexture(uint32_t id);
+      std::weak_ptr<Texture> getTexturePointer(uint32_t id);
       std::vector<vk::DescriptorImageInfo> textureInfos() const;
 
       void loadAll();

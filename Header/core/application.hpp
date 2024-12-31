@@ -10,6 +10,7 @@
 #include "config/scenes.hpp"
 #include "core/scene.hpp"
 #include "core/application_info.hpp"
+#include "core/timer.hpp"
 #include "vulkan_renderer/renderer.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
 
@@ -52,6 +53,7 @@ namespace dg
       }
 
       void changeScene(config::Scenes sceneId);
+      timerUnit deltaTime;
 
       std::unique_ptr<Scene> currentScene;
 
@@ -62,5 +64,6 @@ namespace dg
       void setupSignalHandler();
 
       std::vector<std::function<std::unique_ptr<Scene>()>> m_scenes;
+      Timer m_timer;
   };
 }

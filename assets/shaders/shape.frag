@@ -1,4 +1,5 @@
 #version 450
+#extension GL_EXT_nonuniform_qualifier : enable
 
 layout(location = 0) in vec2 fragTextureCoordinates;
 layout(location = 0) out vec4 outColor;
@@ -11,10 +12,12 @@ layout(push_constant) uniform Push
 {
 	mat2 transform;
 	vec2 offset;
+  uint textureId;
 } push;
 
 void main()
 {
-	outColor = texture(sampler2D(textures[0], samp), fragTextureCoordinates);
+	outColor = texture(sampler2D(textures[push.textureId], samp),
+      fragTextureCoordinates);
 }
 

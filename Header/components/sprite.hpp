@@ -16,6 +16,7 @@ namespace comp
 	public:
     dg::Transform2d transform {};
     std::unique_ptr<dg::Model> model;
+    uint32_t textureId = 0;
 
 	private:
 	};

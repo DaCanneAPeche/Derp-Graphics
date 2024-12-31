@@ -41,13 +41,17 @@ namespace dg
     renderer.recreateSwapChain();
     while (!renderer.shouldWindowClose())
     {
-        renderer.pollEvents();
+      m_timer.start();
 
-        currentScene->update();
-        update();
-        currentScene->lateUpdate();
+      renderer.pollEvents();
 
-        renderer.draw();
+      currentScene->update();
+      update();
+      currentScene->lateUpdate();
+
+      renderer.draw();
+
+      deltaTime = m_timer.getElapsedTime();
     }
     renderer.waitIdle();
   }

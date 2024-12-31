@@ -4,7 +4,7 @@
 namespace dg
 {
 
-  AssetManager::AssetManager(const std::unordered_map<uint64_t, std::string>&
+  AssetManager::AssetManager(const std::unordered_map<uint32_t, std::string>&
       _loadMap, VulkanToolBox& vulkanToolBox) : m_toolBox(vulkanToolBox),
   loadMap(_loadMap) { }
 
@@ -21,7 +21,7 @@ namespace dg
     textureMap.clear();
   }
 
-  void AssetManager::loadTexture(uint64_t id)
+  void AssetManager::loadTexture(uint32_t id)
   {
     if (textureMap.contains(id))
     {
@@ -33,17 +33,17 @@ namespace dg
           vk::ImageUsageFlagBits::eSampled));
   }
 
-  void AssetManager::unloadTexture(uint64_t id)
+  void AssetManager::unloadTexture(uint32_t id)
   {
     textureMap.erase(id);
   }
 
-  Texture& AssetManager::getTexture(uint64_t id)
+  Texture& AssetManager::getTexture(uint32_t id)
   {
     return *textureMap.at(id);
   }
 
-  std::weak_ptr<Texture> AssetManager::getTexturePointer(uint64_t id)
+  std::weak_ptr<Texture> AssetManager::getTexturePointer(uint32_t id)
   {
     // return textureMap.at(id);
   }
@@ -51,11 +51,11 @@ namespace dg
   // NOTE : switching from a map to a vector to store textures might optimize this
   std::vector<vk::DescriptorImageInfo> AssetManager::textureInfos() const
   {
-    uint64_t maxId = 1;
+    uint32_t maxId = 0;
     for (const auto& [id, _] : textureMap)
       if (maxId < id) maxId = id;
 
-    std::vector<vk::DescriptorImageInfo> infos(maxId);
+    std::vector<vk::DescriptorImageInfo> infos(maxId + 1);
 
     for (const auto& [id, texture] : textureMap)
       infos[id] = vk::DescriptorImageInfo({}, texture->imageView,

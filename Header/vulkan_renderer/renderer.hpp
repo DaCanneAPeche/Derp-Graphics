@@ -102,7 +102,10 @@ namespace dg
     vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;
     AssetManager m_assetManager { 
-      {{0, "./assets/textures/leclerc.jpg"}},
-      m_toolBox };
+      {
+        {0, "./assets/textures/leclerc.jpg"},
+        {1, "./assets/textures/nothing_suspicious.jpeg"},
+        {2, "./assets/textures/text_atlas_test.png"}
+      }, m_toolBox };
 	};
 } /* dg */ 

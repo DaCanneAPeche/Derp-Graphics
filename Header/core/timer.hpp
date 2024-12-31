@@ -9,7 +9,7 @@
 
 namespace dg
 {
-  using timerUnit = std::chrono::milliseconds;
+  using timerUnit = std::chrono::duration<double, std::ratio<1, 1000>>;
 
   class Timer
   {
