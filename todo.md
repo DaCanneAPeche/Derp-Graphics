@@ -7,9 +7,10 @@
 - [ ] TOML implementation
 - [x] Pipeline control
 - [ ] Descriptor sets abstraction ??
-- [ ] Multi texturing
+- [x] Multi texturing
 - [ ] Betterippeline abstraction
 - [ ] Time control
 - [ ] Game loop
 - [ ] Input control 
+- [ ] Error handling
 

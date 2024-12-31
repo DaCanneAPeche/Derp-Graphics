@@ -12,8 +12,7 @@ namespace dg
   class SignalHandler
   {
     public:
-      template <typename F>
-      void on(uint32_t signal, F callback)
+      void on(uint32_t signal, auto callback)
       {
         m_signalMap[signal] = std::function(callback);
       }
@@ -28,8 +27,7 @@ namespace dg
         func(args...);
       }
 
-      template <typename F>
-      void on(config::Signals signal, F callback)
+      void on(config::Signals signal, auto callback)
       {
         on(static_cast<uint32_t>(signal), callback);
       }
