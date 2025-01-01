@@ -127,16 +127,7 @@ class Game : public dg::Application
       for (auto entity : renderView)
       {
         auto [sprite] = renderView.get(entity);
-
-        dg::PushConstant push {
-          .transform = sprite.transform.getMatrix(),
-            .offset = sprite.transform.translation,
-            .textureId = sprite.textureId};
-
-        renderer.pushConstant(push);
-
-        sprite.model->bind(*renderer.pCurrentCommandBuffer);
-        sprite.model->draw(*renderer.pCurrentCommandBuffer);
+        sprite.draw(renderer);
       }
 
     }

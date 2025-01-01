@@ -2,6 +2,13 @@
 
 namespace dg
 {
+
+  static bool doesImGuiRequestInputs()
+  {
+    auto& io = ImGui::GetIO();
+    return io.WantCaptureMouse || io.WantCaptureKeyboard;
+  }
+
   Application::Application(const dg::WindowInfo& windowInfo,
       const dg::ApplicationInfo& appInfo) : renderer(windowInfo, vulkanToolBox)
   {
@@ -62,6 +69,8 @@ namespace dg
     renderer.window.keyInputCallback = [this](GLFWwindow* window, int key, int scancode,
         int action, int mods)
     {
+      if (doesImGuiRequestInputs()) return;
+
       std::unordered_map<int, config::Signals> actionMap = 
       {
         {GLFW_PRESS, config::Signals::KEY_PRESS},
@@ -75,6 +84,8 @@ namespace dg
     renderer.window.mouseMoveCallback = [this](GLFWwindow* window, double xPos,
         double yPos)
     {
+      if (doesImGuiRequestInputs()) return;
+
       glm::vec<2, double> mousePosition = {xPos, yPos};
       currentScene->signalHandler.send(config::Signals::MOUSE_MOVE, mousePosition);
     };
@@ -82,9 +93,7 @@ namespace dg
     renderer.window.mouseButtonCallback = [this](GLFWwindow* window, int button,
         int action, int mods)
     {
-      // stop event propagation with imgui
-      auto& io = ImGui::GetIO();
-      if (io.WantCaptureMouse || io.WantCaptureKeyboard) return;
+      if (doesImGuiRequestInputs()) return;
 
       std::unordered_map<int, config::Signals> actionMap = 
       {
