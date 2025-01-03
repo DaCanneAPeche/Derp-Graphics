@@ -17,6 +17,7 @@ namespace dg
       descriptorSets[i].m_descriptorSet = sets[i];
   }
 
+  // NOTE : maybe use reference_wrapper to avoid copies ??
   void DescriptorSet::fetchWrites(std::vector<DescriptorSet>& descriptorSets,
       std::vector<vk::WriteDescriptorSet>& writes)
   {
@@ -26,6 +27,7 @@ namespace dg
           descriptorSet.m_writes.end());
   }
 
+  // NOTE : maybe use reference_wrapper to avoid copies ??
   void DescriptorSet::fetchLayouts(std::vector<DescriptorSet>& descriptorSets,
       std::vector<vk::DescriptorSetLayout>& layouts)
   {
@@ -42,6 +44,18 @@ namespace dg
     std::vector<vk::WriteDescriptorSet> writes;
     fetchWrites(descriptorSets, writes);
     toolBox.device.updateDescriptorSets(writes, {});
+  }
+
+  // NOTE : copying all descriptor sets EVERY frame kinda sucks
+  // Maybe making that as a conversion operator would be nice
+  void DescriptorSet::fetchRawSets(std::vector<DescriptorSet>& descriptorSets,
+      std::vector<vk::DescriptorSet>& rawSets)
+  {
+    assert(rawSets.size() == 0 && "Please give an empty vector");
+    rawSets.resize(descriptorSets.size());
+
+    for (size_t i = 0 ; i < descriptorSets.size() ; i++)
+      rawSets[i] = descriptorSets[i].m_descriptorSet;
   }
 
   DescriptorSet::DescriptorSet(VulkanToolBox& toolBox) : m_toolBox(toolBox) {}

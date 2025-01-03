@@ -7,6 +7,7 @@
 #include "vulkan_renderer/texture.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
 #include "vulkan_renderer/asset_manager.hpp"
+#include "_vulkan/descriptor_set.hpp"
 
 #include <vk_mem_alloc.hpp>
 #include "imgui.h"
@@ -55,10 +56,14 @@ namespace dg
     {
       assert(pCurrentCommandBuffer != nullptr);
       m_pipelines[static_cast<uint32_t>(pipelineId)]->bind(*pCurrentCommandBuffer); 
+
+      std::vector<vk::DescriptorSet> rawDescriptorSets;
+      DescriptorSet::fetchRawSets(m_descriptorSets, rawDescriptorSets);
+
       pCurrentCommandBuffer->bindDescriptorSets(
           vk::PipelineBindPoint::eGraphics,
           m_pipelineLayout,
-          0, m_descriptorSets, {}
+          0, rawDescriptorSets, {}
           );
     }
 		
@@ -93,9 +98,10 @@ namespace dg
     void renderImGui(int imageIndex);
 
 		vk::PipelineLayout m_pipelineLayout;
-    vk::DescriptorSetLayout m_descriptorSetLayout;
+    // vk::DescriptorSetLayout m_descriptorSetLayout;
     vk::DescriptorPool m_descriptorPool;
-    std::vector<vk::DescriptorSet> m_descriptorSets;
+    // std::vector<vk::DescriptorSet> m_descriptorSets;
+    std::vector<DescriptorSet> m_descriptorSets;
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;

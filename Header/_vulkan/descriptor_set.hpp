@@ -19,8 +19,14 @@ namespace dg
           std::vector<vk::DescriptorSetLayout>& layouts);
       static void update(std::vector<DescriptorSet>& descriptorSets,
           VulkanToolBox& toolBox);
+      static void fetchRawSets(std::vector<DescriptorSet>& descriptorSets,
+          std::vector<vk::DescriptorSet>& rawSets);
 
       DescriptorSet(VulkanToolBox& toolBox);
+      ~DescriptorSet()
+      {
+        m_toolBox.device.destroy(m_layout);
+      }
 
       // Layout creation
       void addBinding(vk::DescriptorType descriptorType,
@@ -30,8 +36,8 @@ namespace dg
 
       // Update
       void write(uint32_t binding,
-          const vk::ArrayProxyNoTemporaries<const vk::DescriptorImageInfo>& imageInfo,
-          const vk::ArrayProxyNoTemporaries<const vk::DescriptorBufferInfo>& bufferInfo,
+          const vk::ArrayProxyNoTemporaries<const vk::DescriptorImageInfo>& imageInfo = {},
+          const vk::ArrayProxyNoTemporaries<const vk::DescriptorBufferInfo>& bufferInfo = {},
           uint32_t firstElement = 0);
 
     private:

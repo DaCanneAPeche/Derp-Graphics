@@ -56,7 +56,6 @@ namespace dg
 
     m_toolBox.device.destroy(m_imageSampler);
     m_toolBox.device.destroyDescriptorPool(m_descriptorPool);
-    m_toolBox.device.destroyDescriptorSetLayout(m_descriptorSetLayout);
     m_toolBox.device.destroyPipelineLayout(m_pipelineLayout);
   }
 
@@ -95,7 +94,10 @@ namespace dg
         0, sizeof(PushConstant)
         );
 
-    vk::PipelineLayoutCreateInfo pipelineLayoutInfo({}, m_descriptorSetLayout,
+    std::vector<vk::DescriptorSetLayout> descriptorLayouts;
+    DescriptorSet::fetchLayouts(m_descriptorSets, descriptorLayouts);
+
+    vk::PipelineLayoutCreateInfo pipelineLayoutInfo({}, descriptorLayouts,
         pushConstantRange);
 
     m_pipelineLayout = m_toolBox.device.createPipelineLayout(pipelineLayoutInfo);
@@ -130,8 +132,7 @@ namespace dg
 
   void Renderer::createDescriptorSetLayout()
   {
-
-    vk::DescriptorSetLayoutBinding samplerLayoutBinding(
+    /*vk::DescriptorSetLayoutBinding samplerLayoutBinding(
         0, vk::DescriptorType::eSampler, 1,
         vk::ShaderStageFlagBits::eFragment
         );
@@ -152,7 +153,18 @@ namespace dg
     vk::DescriptorSetLayoutBindingFlagsCreateInfo bindingFlags(flags);
 
     vk::DescriptorSetLayoutCreateInfo layoutInfo({}, bindings, &bindingFlags);
-    m_descriptorSetLayout = m_toolBox.device.createDescriptorSetLayout(layoutInfo);
+    m_descriptorSetLayout = m_toolBox.device.createDescriptorSetLayout(layoutInfo);*/
+
+    m_descriptorSets.push_back(DescriptorSet(m_toolBox));
+
+    m_descriptorSets[0].addBinding(vk::DescriptorType::eSampler,
+        vk::ShaderStageFlagBits::eFragment);
+
+    m_descriptorSets[0].addBinding(vk::DescriptorType::eSampledImage,
+        vk::ShaderStageFlagBits::eFragment, MAX_TEXTURE_NUMBER,
+        vk::DescriptorBindingFlagBits::ePartiallyBound);
+
+    m_descriptorSets[0].createLayout();
   }
 
   void Renderer::createDescriptorPool()
@@ -175,7 +187,7 @@ namespace dg
 
   void Renderer::createDescriptorSets()
   {
-    std::vector<vk::DescriptorSetLayout> layouts = {
+    /*std::vector<vk::DescriptorSetLayout> layouts = {
       m_descriptorSetLayout
     };
 
@@ -203,7 +215,19 @@ namespace dg
           )
     };
 
-    m_toolBox.device.updateDescriptorSets(descriptorWrites, {});
+    m_toolBox.device.updateDescriptorSets(descriptorWrites, {});*/
+
+    DescriptorSet::allocate(m_descriptorSets, m_descriptorPool, m_toolBox);
+
+    vk::DescriptorImageInfo samplerInfo(m_imageSampler, {},
+        vk::ImageLayout::eShaderReadOnlyOptimal);
+
+    auto texturesInfo = m_assetManager.textureInfos();
+
+    m_descriptorSets[0].write(0, samplerInfo);
+    m_descriptorSets[0].write(1, texturesInfo);
+
+    DescriptorSet::update(m_descriptorSets, m_toolBox);
   }
 
   void Renderer::createPipelines()

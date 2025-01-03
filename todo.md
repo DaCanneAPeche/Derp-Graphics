@@ -1,3 +1,5 @@
+# Todo list
+
 - [x] Sprite class
 - [x] Detach image sampler from the texture
 - [x] Code refactoring
@@ -9,8 +11,12 @@
 - [ ] Descriptor sets abstraction ??
 - [x] Multi texturing
 - [ ] Betterippeline abstraction
-- [ ] Time control
+- [x] Time control
 - [ ] Game loop
 - [ ] Input control 
 - [ ] Error handling
+- [ ] DescriptorPool abstraction class
+
+## Urgent
+- [ ] DescriptorSet abstraction class : find a way to avoid copies
 
