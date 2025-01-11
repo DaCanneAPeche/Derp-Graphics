@@ -57,13 +57,10 @@ namespace dg
       assert(pCurrentCommandBuffer != nullptr);
       m_pipelines[static_cast<uint32_t>(pipelineId)]->bind(*pCurrentCommandBuffer); 
 
-      std::vector<vk::DescriptorSet> rawDescriptorSets;
-      DescriptorSet::fetchRawSets(m_descriptorSets, rawDescriptorSets);
-
       pCurrentCommandBuffer->bindDescriptorSets(
           vk::PipelineBindPoint::eGraphics,
           m_pipelineLayout,
-          0, rawDescriptorSets, {}
+          0, m_rawDescriptorSets, {}
           );
     }
 		
@@ -96,11 +93,18 @@ namespace dg
     void createImageSampler();
     void setupImGui();
     void renderImGui(int imageIndex);
+    void addDescriptorSet()
+    {
+      m_rawDescriptorSets.push_back(vk::DescriptorSet());
+      m_descriptorSets.push_back(DescriptorSet(m_toolBox,
+            m_rawDescriptorSets[m_rawDescriptorSets.size() - 1]));
+    }
 
 		vk::PipelineLayout m_pipelineLayout;
     // vk::DescriptorSetLayout m_descriptorSetLayout;
     vk::DescriptorPool m_descriptorPool;
     // std::vector<vk::DescriptorSet> m_descriptorSets;
+    std::vector<vk::DescriptorSet> m_rawDescriptorSets;
     std::vector<DescriptorSet> m_descriptorSets;
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;

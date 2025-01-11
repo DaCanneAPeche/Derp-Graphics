@@ -58,10 +58,12 @@ namespace dg
       rawSets[i] = descriptorSets[i].m_descriptorSet;
   }
 
-  DescriptorSet::DescriptorSet(VulkanToolBox& toolBox) : m_toolBox(toolBox) {}
+  DescriptorSet::DescriptorSet(VulkanToolBox& toolBox,
+      vk::DescriptorSet& rawDescriptorSet) : m_toolBox(toolBox),
+      m_descriptorSet(rawDescriptorSet) {}
 
   // Layout creation
-  void DescriptorSet::addBinding(vk::DescriptorType descriptorType,
+  DescriptorSet& DescriptorSet::addBinding(vk::DescriptorType descriptorType,
       vk::ShaderStageFlags shaderStages, uint32_t arraySize,
       vk::DescriptorBindingFlags flags)
   {
@@ -72,6 +74,8 @@ namespace dg
         );
 
     m_bindingFlags.push_back(flags);
+
+    return *this;
   }
 
   void DescriptorSet::createLayout()

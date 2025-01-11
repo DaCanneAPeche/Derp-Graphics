@@ -155,6 +155,26 @@ class Game : public dg::Application
         ImGui::TreePop();
       }
 
+      ImGui::Spacing();
+
+      if (ImGui::TreeNode("Entities"))
+      {
+        for (auto entity : registry.view<entt::entity>())
+        {
+          for(auto [id, storage] : registry.storage())
+          {
+            auto type = entt::resolve(id);
+
+            if (auto func = type.func(entt::hashed_string("Inspector")); func) {
+              void* comp = storage.value(entity);
+              func.invoke(type.from_void(comp), comp);
+            }
+          }
+
+        }
+
+        ImGui::TreePop();
+      }
       ImGui::End();
     }
 };

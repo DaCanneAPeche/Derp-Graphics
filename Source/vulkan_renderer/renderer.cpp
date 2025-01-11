@@ -132,39 +132,15 @@ namespace dg
 
   void Renderer::createDescriptorSetLayout()
   {
-    /*vk::DescriptorSetLayoutBinding samplerLayoutBinding(
-        0, vk::DescriptorType::eSampler, 1,
-        vk::ShaderStageFlagBits::eFragment
-        );
+    addDescriptorSet();
 
-    vk::DescriptorSetLayoutBinding texturesLayoutBinding(
-        1, vk::DescriptorType::eSampledImage, MAX_TEXTURE_NUMBER,
-        vk::ShaderStageFlagBits::eFragment
-        );
-
-    std::array<vk::DescriptorSetLayoutBinding, 2> bindings =
-    {
-      samplerLayoutBinding, texturesLayoutBinding
-    };
-
-    std::array<vk::DescriptorBindingFlags, 2> flags;
-    flags[1] = vk::DescriptorBindingFlagBits::ePartiallyBound;
-
-    vk::DescriptorSetLayoutBindingFlagsCreateInfo bindingFlags(flags);
-
-    vk::DescriptorSetLayoutCreateInfo layoutInfo({}, bindings, &bindingFlags);
-    m_descriptorSetLayout = m_toolBox.device.createDescriptorSetLayout(layoutInfo);*/
-
-    m_descriptorSets.push_back(DescriptorSet(m_toolBox));
-
-    m_descriptorSets[0].addBinding(vk::DescriptorType::eSampler,
-        vk::ShaderStageFlagBits::eFragment);
-
-    m_descriptorSets[0].addBinding(vk::DescriptorType::eSampledImage,
+    m_descriptorSets[0]
+      .addBinding(vk::DescriptorType::eSampler,
+        vk::ShaderStageFlagBits::eFragment)
+      .addBinding(vk::DescriptorType::eSampledImage,
         vk::ShaderStageFlagBits::eFragment, MAX_TEXTURE_NUMBER,
-        vk::DescriptorBindingFlagBits::ePartiallyBound);
-
-    m_descriptorSets[0].createLayout();
+        vk::DescriptorBindingFlagBits::ePartiallyBound)
+      .createLayout();
   }
 
   void Renderer::createDescriptorPool()
@@ -187,36 +163,6 @@ namespace dg
 
   void Renderer::createDescriptorSets()
   {
-    /*std::vector<vk::DescriptorSetLayout> layouts = {
-      m_descriptorSetLayout
-    };
-
-    vk::DescriptorSetAllocateInfo allocInfo(
-        m_descriptorPool,
-        layouts);
-
-    m_descriptorSets.resize(1);
-    m_descriptorSets = m_toolBox.device.allocateDescriptorSets(allocInfo);
-
-    vk::DescriptorImageInfo samplerInfo(m_imageSampler, {},
-        vk::ImageLayout::eShaderReadOnlyOptimal);
-
-    auto texturesInfo = m_assetManager.textureInfos();
-
-    std::array<vk::WriteDescriptorSet, 2> descriptorWrites = {
-
-      vk::WriteDescriptorSet(
-          m_descriptorSets[0], 0, 0, vk::DescriptorType::eSampler, samplerInfo
-          ),
-
-      vk::WriteDescriptorSet(
-          m_descriptorSets[0], 1, 0, vk::DescriptorType::eSampledImage,
-          texturesInfo
-          )
-    };
-
-    m_toolBox.device.updateDescriptorSets(descriptorWrites, {});*/
-
     DescriptorSet::allocate(m_descriptorSets, m_descriptorPool, m_toolBox);
 
     vk::DescriptorImageInfo samplerInfo(m_imageSampler, {},

@@ -9,8 +9,12 @@
 #include <memory>
 #include "vulkan/vulkan.hpp"
 
+#include "entt/entt.hpp"
+#include "imgui.h"
+
 namespace comp
 {
+  using namespace entt::literals;
 
 	class Sprite
 	{
@@ -18,6 +22,11 @@ namespace comp
     dg::Transform2d transform {};
     std::unique_ptr<dg::Model> model;
     uint32_t textureId = 0;
+
+    Sprite()
+    {
+      entt::meta<Sprite>().func<&Sprite::inspect>("Inspector"_hs);
+    }
 
     void draw(dg::Renderer& renderer)
     {
@@ -30,6 +39,13 @@ namespace comp
 
       model->bind(*renderer.pCurrentCommandBuffer);
       model->draw(*renderer.pCurrentCommandBuffer);
+    }
+
+    static void inspect(void* instance)
+    {
+      Sprite* self = static_cast<Sprite*>(instance);
+      
+      ImGui::SliderFloat2("Position", reinterpret_cast<float*>(&self->transform.translation), -1, 1);
     }
 
 	private:

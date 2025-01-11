@@ -22,14 +22,14 @@ namespace dg
       static void fetchRawSets(std::vector<DescriptorSet>& descriptorSets,
           std::vector<vk::DescriptorSet>& rawSets);
 
-      DescriptorSet(VulkanToolBox& toolBox);
+      DescriptorSet(VulkanToolBox& toolBox, vk::DescriptorSet& rawDescriptorSet);
       ~DescriptorSet()
       {
         m_toolBox.device.destroy(m_layout);
       }
 
       // Layout creation
-      void addBinding(vk::DescriptorType descriptorType,
+      DescriptorSet& addBinding(vk::DescriptorType descriptorType,
           vk::ShaderStageFlags shaderStages = vk::ShaderStageFlagBits::eAll,
           uint32_t arraySize = 1, vk::DescriptorBindingFlags flags = {});
       void createLayout();
@@ -44,7 +44,7 @@ namespace dg
 
       VulkanToolBox& m_toolBox;
       vk::DescriptorSetLayout m_layout;
-      vk::DescriptorSet m_descriptorSet;
+      vk::DescriptorSet& m_descriptorSet;
       std::vector<vk::WriteDescriptorSet> m_writes;
       std::vector<vk::DescriptorSetLayoutBinding> m_bindings;
       std::vector<vk::DescriptorBindingFlags> m_bindingFlags;
