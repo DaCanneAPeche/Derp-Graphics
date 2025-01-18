@@ -16,11 +16,19 @@ class MainScene : public dg::Scene
     entt::entity rick;
 
   public:
+    std::unordered_map<uint32_t, std::string> getAssets() override
+    {
+      return {
+        {0, "./assets/textures/leclerc.jpg"},
+        {1, "./assets/textures/nothing_suspicious.jpeg"},
+        {2, "./assets/textures/text_atlas_test.png"}
+      };
+    }
+
     void start() override
     {
-      rick = application->registry.create();
-      comp::Sprite& sprite = application->registry.emplace<comp::Sprite>(rick);
-      application->registry.emplace<comp::Position>(rick);
+      rick = app->registry.create();
+      comp::Sprite& sprite = app->registry.emplace<comp::Sprite>(rick);
 
       std::vector<dg::Vertex> vertices 
       {
@@ -32,16 +40,16 @@ class MainScene : public dg::Scene
 
       std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
       sprite.model = std::make_unique<dg::Model>(vertices, indices,
-          application->vulkanToolBox);
+          app->vulkanToolBox);
       sprite.transform.rotation = glm::pi<float>()/4;
       sprite.transform.translation = { 0.3, 0.5 };
-      sprite.transform.scaling = {1.3, 1.0};
-      sprite.textureId = 0;
+      sprite.textureId = 1;
+      sprite.transform.ratio = assetManager->getTexture(sprite.textureId).getRatio();
 
       signalHandler.on(dg::config::Signals::KEY_PRESS, [this](int key, int scancode,
             int mods)
       {
-        auto& sprite = application->registry.get<comp::Sprite>(rick);
+        auto& sprite = app->registry.get<comp::Sprite>(rick);
 
         if (key == GLFW_KEY_W)
           sprite.transform.translation.y -= 0.1;
@@ -63,7 +71,7 @@ class MainScene : public dg::Scene
       {
         if (button != GLFW_MOUSE_BUTTON_LEFT) return;
 
-        auto& sprite = application->registry.get<comp::Sprite>(rick);
+        auto& sprite = app->registry.get<comp::Sprite>(rick);
         sprite.transform.rotation += glm::pi<float>()/4;
       });
     }
@@ -138,8 +146,8 @@ class Game : public dg::Application
 
       if (ImGui::TreeNode("Timing"))
       {
-        ImGui::Text("Frame duration : %f ms", deltaTime.count());
-        ImGui::Text("FPS : %d", static_cast<int>(1000/deltaTime.count()));
+        ImGui::Text("Frame duration : %f ms", deltaTime);
+        ImGui::Text("FPS : %d", static_cast<int>(1000 / deltaTime));
         ImGui::TreePop();
       }
 
@@ -161,16 +169,23 @@ class Game : public dg::Application
       {
         for (auto entity : registry.view<entt::entity>())
         {
-          for(auto [id, storage] : registry.storage())
+          char label[8 + sizeof(int)];
+          sprintf(label, "Entity %i", static_cast<int>(entity));
+
+          if (ImGui::TreeNode(label))
           {
-            auto type = entt::resolve(id);
+            for(auto [id, storage] : registry.storage())
+            {
+              auto type = entt::resolve(id);
 
-            if (auto func = type.func(entt::hashed_string("Inspector")); func) {
-              void* comp = storage.value(entity);
-              func.invoke(type.from_void(comp), comp);
+              if (auto func = type.func(entt::hashed_string("Inspector"));
+                  storage.contains(entity) && func) {
+                void* comp = storage.value(entity);
+                func.invoke(type.from_void(comp), comp);
+              }
             }
+            ImGui::TreePop();
           }
-
         }
 
         ImGui::TreePop();

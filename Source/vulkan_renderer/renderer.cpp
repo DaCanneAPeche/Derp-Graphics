@@ -84,7 +84,6 @@ namespace dg
 
   void Renderer::loadModels()
   {
-    m_assetManager.loadAll();
   }
 
   void Renderer::createPipelineLayout()
@@ -167,10 +166,15 @@ namespace dg
 
     vk::DescriptorImageInfo samplerInfo(m_imageSampler, {},
         vk::ImageLayout::eShaderReadOnlyOptimal);
-
-    auto texturesInfo = m_assetManager.textureInfos();
-
     m_descriptorSets[0].write(0, samplerInfo);
+
+    DescriptorSet::update(m_descriptorSets, m_toolBox);
+  }
+
+  void Renderer::updateTextures(AssetManager& assetManager)
+  {
+    auto texturesInfo = assetManager.textureInfos();
+
     m_descriptorSets[0].write(1, texturesInfo);
 
     DescriptorSet::update(m_descriptorSets, m_toolBox);

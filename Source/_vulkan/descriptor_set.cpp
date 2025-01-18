@@ -44,6 +44,9 @@ namespace dg
     std::vector<vk::WriteDescriptorSet> writes;
     fetchWrites(descriptorSets, writes);
     toolBox.device.updateDescriptorSets(writes, {});
+
+    for (auto& instance : descriptorSets)
+      instance.m_writes.clear();
   }
 
   // NOTE : copying all descriptor sets EVERY frame kinda sucks

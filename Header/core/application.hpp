@@ -53,7 +53,7 @@ namespace dg
       }
 
       void changeScene(config::Scenes sceneId);
-      timerUnit deltaTime;
+      float deltaTime;
 
       std::unique_ptr<Scene> currentScene;
 

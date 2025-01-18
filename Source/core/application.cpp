@@ -38,7 +38,7 @@ namespace dg
   {
     if (currentScene != nullptr) currentScene->end();
     currentScene = m_scenes[static_cast<uint32_t>(sceneId)]();
-    currentScene->application = this;
+    currentScene->init(this);
     currentScene->start();
   }
 
@@ -58,7 +58,7 @@ namespace dg
 
       renderer.draw();
 
-      deltaTime = m_timer.getElapsedTime();
+      deltaTime = m_timer.getElapsedTime().count();
     }
     renderer.waitIdle();
   }

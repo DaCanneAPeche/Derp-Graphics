@@ -65,6 +65,7 @@ namespace dg
     }
 		
 		void recreateSwapChain();
+    void updateTextures(AssetManager& assetManager);
 		Window window;
     std::vector<PipelineInfo> pipelinesInfo;
     vk::CommandBuffer* pCurrentCommandBuffer = nullptr;
@@ -111,11 +112,5 @@ namespace dg
 		std::vector<vk::CommandBuffer> m_commandBuffers;
     vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;
-    AssetManager m_assetManager { 
-      {
-        {0, "./assets/textures/leclerc.jpg"},
-        {1, "./assets/textures/nothing_suspicious.jpeg"},
-        {2, "./assets/textures/text_atlas_test.png"}
-      }, m_toolBox };
 	};
 } /* dg */ 

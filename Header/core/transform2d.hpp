@@ -9,6 +9,7 @@ namespace dg
 		glm::vec2 translation = {0.0f, 0.0f};
 		glm::vec2 scaling = {1.0f, 1.0f};
 		float rotation;
+    float ratio = 1;
 
 		[[nodiscard]] glm::mat2 getMatrix() const
 		{
@@ -16,7 +17,7 @@ namespace dg
 			const float cos = glm::cos(rotation);
 			glm::mat2 rotationMatrix {{cos, sin}, {-sin, cos}};
 
-			glm::mat2 scaleMatrix = {{scaling.x, 0.0f}, {0.0f, scaling.y}};
+			glm::mat2 scaleMatrix = {{scaling.x * ratio, 0.0f}, {0.0f, scaling.y}};
 			return rotationMatrix * scaleMatrix;
 		}
 	};
