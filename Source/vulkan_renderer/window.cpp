@@ -21,12 +21,12 @@ namespace dg
     {
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
         m_window = glfwCreateWindow(info.width, info.height, info.name.c_str(), nullptr, nullptr);
         glfwSetWindowUserPointer(m_window, this);
 
-        // glfwSetFramebufferSizeCallback(window, frameBufferResizeCallback);
+        glfwSetFramebufferSizeCallback(m_window, frameBufferResizeCallback);
         glfwSetKeyCallback(m_window, _keyInputCallback);
         glfwSetCursorPosCallback(m_window, _mouseMoveCallback);
         glfwSetMouseButtonCallback(m_window, _mouseButtonCallback);

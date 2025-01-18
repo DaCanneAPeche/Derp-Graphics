@@ -127,7 +127,7 @@ namespace dg
 	}
 
 	void SwapChain::createSwapChain() {
-		SwapChainSupportDetails swapChainSupport = m_toolBox.swapChainSupport;
+		SwapChainSupportDetails swapChainSupport = m_toolBox.swapChainSupport();
 
 		vk::SurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
 		vk::PresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);

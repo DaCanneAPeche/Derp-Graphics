@@ -34,7 +34,7 @@ namespace dg
     presentQueue = deviceBuilder.presentQueue;
     commandPool = deviceBuilder.commandPool;
 
-    swapChainSupport = deviceBuilder.getSwapChainSupport();
+    // swapChainSupport = deviceBuilder.getSwapChainSupport();
     queueFamilyIndices =
       deviceBuilder.physicalDeviceQueueFamilyIndices();
 

@@ -25,7 +25,15 @@ namespace dg
 			vk::Queue presentQueue;
 			vk::CommandPool commandPool;
       vma::Allocator allocator;
-      SwapChainSupportDetails swapChainSupport;
+      SwapChainSupportDetails swapChainSupport()
+      {
+        return {
+          physicalDevice.getSurfaceCapabilitiesKHR(surface),
+            physicalDevice.getSurfaceFormatsKHR(surface),
+            physicalDevice.getSurfacePresentModesKHR(surface)
+        };
+
+      }
       QueueFamilyIndices queueFamilyIndices;
 
 			[[nodiscard]] vk::CommandBuffer beginSingleTimeCommands() const; 
