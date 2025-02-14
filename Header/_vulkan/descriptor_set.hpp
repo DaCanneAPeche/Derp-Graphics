@@ -4,6 +4,7 @@
 #include "_vulkan/vulkan_tool_box.hpp"
 
 #include <vector>
+#include <memory>
 
 namespace dg
 {
@@ -11,15 +12,15 @@ namespace dg
   {
     public:
 
-      static void allocate(std::vector<DescriptorSet>& descriptorSets,
+      static void allocate(std::vector<std::unique_ptr<DescriptorSet>>& descriptorSets,
           vk::DescriptorPool& pool, VulkanToolBox& toolBox);
-      static void fetchWrites(std::vector<DescriptorSet>& descriptorSets,
+      static void fetchWrites(std::vector<std::unique_ptr<DescriptorSet>>& descriptorSets,
           std::vector<vk::WriteDescriptorSet>& writes);
-      static void fetchLayouts(std::vector<DescriptorSet>& descriptorSets,
+      static void fetchLayouts(std::vector<std::unique_ptr<DescriptorSet>>& descriptorSets,
           std::vector<vk::DescriptorSetLayout>& layouts);
-      static void update(std::vector<DescriptorSet>& descriptorSets,
+      static void update(std::vector<std::unique_ptr<DescriptorSet>>& descriptorSets,
           VulkanToolBox& toolBox);
-      static void fetchRawSets(std::vector<DescriptorSet>& descriptorSets,
+      static void fetchRawSets(std::vector<std::unique_ptr<DescriptorSet>>& descriptorSets,
           std::vector<vk::DescriptorSet>& rawSets);
 
       DescriptorSet(VulkanToolBox& toolBox, vk::DescriptorSet& rawDescriptorSet);
@@ -39,6 +40,11 @@ namespace dg
           const vk::ArrayProxyNoTemporaries<const vk::DescriptorImageInfo>& imageInfo = {},
           const vk::ArrayProxyNoTemporaries<const vk::DescriptorBufferInfo>& bufferInfo = {},
           uint32_t firstElement = 0);
+
+      void clearWrites()
+      {
+        m_writes.clear();
+      }
 
     private:
 

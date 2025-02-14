@@ -1,9 +1,9 @@
 #include "_vulkan/buffer.hpp"
 #include <iostream>
+#include <plog/Log.h>
 
 namespace dg
 {
-
 	Buffer::Buffer(
       VulkanToolBox& vulkanToolBox,
 			vk::DeviceSize instanceSize,
@@ -39,12 +39,17 @@ namespace dg
 	void Buffer::write(void* data, vk::DeviceSize size, vk::DeviceSize offset)
 	{
 		assert(buffer && "Buffer can't be written to before creation");
-		m_toolBox.allocator.copyMemoryToAllocation(data, allocation, offset, size);
+		// m_toolBox.allocator.copyMemoryToAllocation(data, allocation, offset, size);
+
+    void* _data;
+    auto result = m_toolBox.allocator.mapMemory(allocation, &_data);
+    memcpy(_data, data, size);
+    m_toolBox.allocator.unmapMemory(allocation);
 	}
 
 	vk::DescriptorBufferInfo Buffer::descriptorInfo(vk::DeviceSize size, vk::DeviceSize offset) const
 	{
-		return vk::DescriptorBufferInfo(buffer, size, offset);
+		return vk::DescriptorBufferInfo(buffer, offset, size);
 	}
 
 	void Buffer::writeToIndex(void* data, int index)

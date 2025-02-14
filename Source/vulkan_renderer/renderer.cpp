@@ -2,11 +2,13 @@
 #include "utils/file.hpp"
 #include "vulkan_renderer/push_constant.hpp"
 #include "core/transform2d.hpp"
+#include "core/timer.hpp"
 
 // vulkan
 #include "vulkan/vulkan.hpp"
 
 #include "glm/gtc/constants.hpp"
+#include <glm/ext/matrix_clip_space.hpp>
 
 #include <plog/Log.h>
 
@@ -26,26 +28,38 @@ static void imgui_check_vk_result(VkResult err)
 namespace dg
 {
   Renderer::Renderer(const WindowInfo& windowInfo, VulkanToolBox& vulkanToolBox)
-    : window(windowInfo), m_toolBox(vulkanToolBox) { }
+    : window(windowInfo), m_toolBox(vulkanToolBox),
+    m_descriptorSetManager(vulkanToolBox) { }
 
   void Renderer::init()
   {
     createImageSampler();
     loadModels();
 
+    recreateSwapChain(false);
+    createUniformBuffer();
+
     createDescriptorSetLayout();
     createDescriptorPool();
     createDescriptorSets();
 
     createPipelineLayout();
-    recreateSwapChain();
     createCommandBuffers();
+    recreateSwapChain();
 
     setupImGui();
+
+    window.resizeCallback = [this](GLFWwindow*, int, int)
+    {
+      // updateUniformBuffer();
+    };
   }
 
   void Renderer::clean()
   {
+    m_uniformBuffer = nullptr;
+    m_descriptorSetManager.clean();
+
     for (auto& pipeline : m_pipelines)
       pipeline = nullptr;
     m_swapChain = nullptr;
@@ -86,6 +100,23 @@ namespace dg
   {
   }
 
+  void Renderer::createUniformBuffer()
+  {
+    vk::DeviceSize bufferSize = sizeof(UniformBufferObject);
+
+    m_uniformBuffer = std::make_unique<Buffer>(m_toolBox, bufferSize, 1,
+        vk::BufferUsageFlagBits::eUniformBuffer,
+        vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
+
+    Transform2d transform {};
+    transform.rotation = 1.5;
+
+    UniformBufferObject ubo {};
+    ubo.screenTransform = transform.getMatrix();
+
+    m_uniformBuffer->write(&ubo, sizeof(UniformBufferObject));
+  }
+
   void Renderer::createPipelineLayout()
   {
     vk::PushConstantRange pushConstantRange(
@@ -93,11 +124,8 @@ namespace dg
         0, sizeof(PushConstant)
         );
 
-    std::vector<vk::DescriptorSetLayout> descriptorLayouts;
-    DescriptorSet::fetchLayouts(m_descriptorSets, descriptorLayouts);
-
-    vk::PipelineLayoutCreateInfo pipelineLayoutInfo({}, descriptorLayouts,
-        pushConstantRange);
+    vk::PipelineLayoutCreateInfo pipelineLayoutInfo({},
+        m_descriptorSetManager.layouts, pushConstantRange);
 
     m_pipelineLayout = m_toolBox.device.createPipelineLayout(pipelineLayoutInfo);
 
@@ -131,53 +159,63 @@ namespace dg
 
   void Renderer::createDescriptorSetLayout()
   {
-    addDescriptorSet();
-
-    m_descriptorSets[0]
+    // index 0
+    m_descriptorSetManager.addLayout()
       .addBinding(vk::DescriptorType::eSampler,
         vk::ShaderStageFlagBits::eFragment)
       .addBinding(vk::DescriptorType::eSampledImage,
         vk::ShaderStageFlagBits::eFragment, MAX_TEXTURE_NUMBER,
         vk::DescriptorBindingFlagBits::ePartiallyBound)
-      .createLayout();
+      .create();
+
+    // index 1
+    m_descriptorSetManager.addLayout()
+      .addBinding(vk::DescriptorType::eUniformBuffer,
+          vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment)
+      .create();
   }
 
   void Renderer::createDescriptorPool()
   {
-    std::array<vk::DescriptorPoolSize, 3> poolSizes = {
+    std::array<vk::DescriptorPoolSize, 4> poolSizes = {
       // For ImGui font
       vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 1),
 
       vk::DescriptorPoolSize(vk::DescriptorType::eSampler, 1),
-      vk::DescriptorPoolSize(vk::DescriptorType::eSampledImage, MAX_TEXTURE_NUMBER)
+      vk::DescriptorPoolSize(vk::DescriptorType::eSampledImage, MAX_TEXTURE_NUMBER),
+      vk::DescriptorPoolSize(vk::DescriptorType::eUniformBuffer, 1)
     };
 
     // One descriptor set is used by ImGui
     vk::DescriptorPoolCreateInfo poolInfo(
-        vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, 2, poolSizes
-        );
+        vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, 3, poolSizes);
 
     m_descriptorPool = m_toolBox.device.createDescriptorPool(poolInfo);
   }
 
   void Renderer::createDescriptorSets()
   {
-    DescriptorSet::allocate(m_descriptorSets, m_descriptorPool, m_toolBox);
+    // TODO : one descriptor by frame or something like that
+    m_descriptorSetManager.addDescriptor(0); // textures
+    m_descriptorSetManager.addDescriptor(1); // uniform buffer
+
+    m_descriptorSetManager.allocate(m_descriptorPool);
 
     vk::DescriptorImageInfo samplerInfo(m_imageSampler, {},
         vk::ImageLayout::eShaderReadOnlyOptimal);
-    m_descriptorSets[0].write(0, samplerInfo);
+    m_descriptorSetManager.writeToDescriptor(0, 0, samplerInfo, {});
 
-    DescriptorSet::update(m_descriptorSets, m_toolBox);
+    vk::DescriptorBufferInfo uboInfo = m_uniformBuffer->descriptorInfo(sizeof(UniformBufferObject));
+    m_descriptorSetManager.writeToDescriptor(1, 0, {}, uboInfo);
+
+    m_descriptorSetManager.update();
   }
 
   void Renderer::updateTextures(AssetManager& assetManager)
   {
     auto texturesInfo = assetManager.textureInfos();
-
-    m_descriptorSets[0].write(1, texturesInfo);
-
-    DescriptorSet::update(m_descriptorSets, m_toolBox);
+    m_descriptorSetManager.writeToDescriptor(0, 1, texturesInfo, {});
+    m_descriptorSetManager.update();
   }
 
   void Renderer::createPipelines()
@@ -185,7 +223,6 @@ namespace dg
 
     assert(m_swapChain != nullptr && "Cannot create pipelines before swapchain");
     assert(m_pipelineLayout != nullptr && "Cannot create pipelines before pipeline layout");
-
 
     for (auto& pipelineInfo : pipelinesInfo)
     {
@@ -201,7 +238,7 @@ namespace dg
     LOG_INFO << "Pipelines created";
   }
 
-  void Renderer::recreateSwapChain()
+  void Renderer::recreateSwapChain(bool pipelinesCreation)
   {
     vk::Extent2D extent = window.getVkExtent();
     while (extent.width == 0 || extent.height == 0)
@@ -227,13 +264,14 @@ namespace dg
       {
         freeCommandBuffers();
         createCommandBuffers();
+        // createUniformBuffer();
 
-      LOG_INFO << "Swapchain recreated";
+        LOG_INFO << "Swapchain recreated";
       }
     }
 
     // TODO: Don't recreate the pipeline if compatible with the new swapChain & renderPass
-    createPipelines();
+    if (pipelinesCreation) createPipelines();
   }
 
   void Renderer::createCommandBuffers()
@@ -258,6 +296,19 @@ namespace dg
     m_commandBuffers.clear();
 
     LOG_INFO << "Command buffers freed";
+  }
+
+  void Renderer::updateUniformBuffer()
+  {
+    // vk::Extent2D extent = window.getVkExtent();
+    // Transform2d transform;
+    // transform.ratio = float(extent.width) / float(extent.height);
+
+    UniformBufferObject ubo;
+    // ubo.screenTransform = glm::mat2(1.0f);
+    // ubo.color = {1.0f, 0, 0};
+
+    m_uniformBuffer->write(&ubo, sizeof(UniformBufferObject));
   }
 
   void Renderer::recordCommandBuffer(int imageIndex)
@@ -288,6 +339,9 @@ namespace dg
     pCurrentCommandBuffer->setViewport(0, viewport);
     pCurrentCommandBuffer->setScissor(0, scissor);
 
+    pCurrentCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
+       m_pipelineLayout, 0, m_descriptorSetManager.descriptorSets, {});
+
     externalRendering();
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *pCurrentCommandBuffer);
 
@@ -297,7 +351,6 @@ namespace dg
 
   void Renderer::draw()
   {
-
     // ImGui rendering
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();

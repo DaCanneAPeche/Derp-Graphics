@@ -1,5 +1,6 @@
 #define VMA_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
+#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES 
 #include <iostream>
 #include "vulkan_renderer/renderer.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
@@ -196,15 +197,12 @@ class Game : public dg::Application
 
 int main(void)
 {
-  std::cout << sizeof(dg::PipelineConfigInfo) << std::endl;
+  std::cout << sizeof(glm::mat2) << std::endl;
+  std::cout << sizeof(glm::vec4) << std::endl;
+
   dg::WindowInfo windowInfo {1000, 1000, "Hello, world !"};
   dg::ApplicationInfo appInfo {"Hello, world program !", {1, 0, 0}};
 
-  const std::string json_windowInfo = rfl::json::write(windowInfo);
-  const std::string json_appInfo = rfl::json::write(appInfo);
-
-  std::cout << json_windowInfo << std::endl << json_appInfo << std::endl;
-  
   Game game(windowInfo, appInfo);
   game.run();
 }

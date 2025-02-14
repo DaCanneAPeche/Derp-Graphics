@@ -52,8 +52,7 @@ namespace dg
   std::vector<vk::DescriptorImageInfo> AssetManager::textureInfos() const
   {
     uint32_t maxId = 0;
-    for (const auto& [id, _] : textureMap)
-      if (maxId < id) maxId = id;
+    for (const auto& [id, _] : textureMap) if (maxId < id) maxId = id;
 
     std::vector<vk::DescriptorImageInfo> infos(maxId + 1);
 

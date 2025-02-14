@@ -8,8 +8,9 @@
 #include "_vulkan/vulkan_tool_box.hpp"
 #include "vulkan_renderer/asset_manager.hpp"
 #include "_vulkan/descriptor_set.hpp"
+#include "vulkan_renderer/uniform_buffer_object.hpp"
+#include "_vulkan/descriptor_set_manager.hpp"
 
-#include <vk_mem_alloc.hpp>
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
@@ -60,11 +61,11 @@ namespace dg
       pCurrentCommandBuffer->bindDescriptorSets(
           vk::PipelineBindPoint::eGraphics,
           m_pipelineLayout,
-          0, m_rawDescriptorSets, {}
+          0, m_descriptorSetManager.descriptorSets, {}
           );
     }
 		
-		void recreateSwapChain();
+		void recreateSwapChain(bool pipelinesCreation = true);
     void updateTextures(AssetManager& assetManager);
 		Window window;
     std::vector<PipelineInfo> pipelinesInfo;
@@ -94,11 +95,15 @@ namespace dg
     void createImageSampler();
     void setupImGui();
     void renderImGui(int imageIndex);
-    void addDescriptorSet()
+    void createUniformBuffer();
+    void updateUniformBuffer();
+
+    DescriptorSet& addDescriptorSet()
     {
-      m_rawDescriptorSets.push_back(vk::DescriptorSet());
-      m_descriptorSets.push_back(DescriptorSet(m_toolBox,
+      m_rawDescriptorSets.emplace_back();
+      m_descriptorSets.push_back(std::make_unique<DescriptorSet>(m_toolBox,
             m_rawDescriptorSets[m_rawDescriptorSets.size() - 1]));
+      return *m_descriptorSets[m_rawDescriptorSets.size() - 1];
     }
 
 		vk::PipelineLayout m_pipelineLayout;
@@ -106,11 +111,13 @@ namespace dg
     vk::DescriptorPool m_descriptorPool;
     // std::vector<vk::DescriptorSet> m_descriptorSets;
     std::vector<vk::DescriptorSet> m_rawDescriptorSets;
-    std::vector<DescriptorSet> m_descriptorSets;
+    std::vector<std::unique_ptr<DescriptorSet>> m_descriptorSets;
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
+    std::unique_ptr<Buffer> m_uniformBuffer;
     vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;
+    DescriptorSetManager m_descriptorSetManager;
 	};
 } /* dg */ 

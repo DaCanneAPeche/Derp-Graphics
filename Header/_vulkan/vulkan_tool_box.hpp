@@ -7,6 +7,7 @@
 #include "vulkan_renderer/window.hpp"
 #include "_vulkan/structs.hpp"
 
+// #define VMA_DEBUG_INITIALIZE_ALLOCATIONS 1
 #include "vk_mem_alloc.hpp"
 
 namespace dg

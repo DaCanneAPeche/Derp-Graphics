@@ -3,7 +3,7 @@
 namespace dg
 {
 
-  void DescriptorSet::allocate(std::vector<DescriptorSet>& descriptorSets,
+  void DescriptorSet::allocate(std::vector<std::unique_ptr<DescriptorSet>>& descriptorSets,
       vk::DescriptorPool& pool, VulkanToolBox& toolBox)
   {
     std::vector<vk::DescriptorSetLayout> layouts;
@@ -14,51 +14,48 @@ namespace dg
       toolBox.device.allocateDescriptorSets(allocInfo);
 
     for (size_t i = 0 ; i < descriptorSets.size() ; i++)
-      descriptorSets[i].m_descriptorSet = sets[i];
+      descriptorSets[i]->m_descriptorSet = sets[i];
   }
 
   // NOTE : maybe use reference_wrapper to avoid copies ??
-  void DescriptorSet::fetchWrites(std::vector<DescriptorSet>& descriptorSets,
+  void DescriptorSet::fetchWrites(std::vector<std::unique_ptr<DescriptorSet>>& descriptorSets,
       std::vector<vk::WriteDescriptorSet>& writes)
   {
     assert(writes.size() == 0 && "Please give an empty vector");
     for (const auto& descriptorSet : descriptorSets)
-      writes.insert(writes.end(), descriptorSet.m_writes.begin(),
-          descriptorSet.m_writes.end());
+      writes.insert(writes.end(), descriptorSet->m_writes.begin(),
+          descriptorSet->m_writes.end());
   }
 
   // NOTE : maybe use reference_wrapper to avoid copies ??
-  void DescriptorSet::fetchLayouts(std::vector<DescriptorSet>& descriptorSets,
+  void DescriptorSet::fetchLayouts(std::vector<std::unique_ptr<DescriptorSet>>& descriptorSets,
       std::vector<vk::DescriptorSetLayout>& layouts)
   {
     assert(layouts.size() == 0 && "Please give an empty vector");
     layouts.resize(descriptorSets.size());
     for (size_t i = 0 ; i < layouts.size() ; i++)
-      layouts[i] = descriptorSets[i].m_layout;
+      layouts[i] = descriptorSets[i]->m_layout;
   }
 
   // TODO : add support to copy sets
-  void DescriptorSet::update(std::vector<DescriptorSet>& descriptorSets,
+  void DescriptorSet::update(std::vector<std::unique_ptr<DescriptorSet>>& descriptorSets,
       VulkanToolBox& toolBox)
   {
     std::vector<vk::WriteDescriptorSet> writes;
     fetchWrites(descriptorSets, writes);
     toolBox.device.updateDescriptorSets(writes, {});
-
-    for (auto& instance : descriptorSets)
-      instance.m_writes.clear();
   }
 
   // NOTE : copying all descriptor sets EVERY frame kinda sucks
   // Maybe making that as a conversion operator would be nice
-  void DescriptorSet::fetchRawSets(std::vector<DescriptorSet>& descriptorSets,
+  void DescriptorSet::fetchRawSets(std::vector<std::unique_ptr<DescriptorSet>>& descriptorSets,
       std::vector<vk::DescriptorSet>& rawSets)
   {
     assert(rawSets.size() == 0 && "Please give an empty vector");
     rawSets.resize(descriptorSets.size());
 
     for (size_t i = 0 ; i < descriptorSets.size() ; i++)
-      rawSets[i] = descriptorSets[i].m_descriptorSet;
+      rawSets[i] = descriptorSets[i]->m_descriptorSet;
   }
 
   DescriptorSet::DescriptorSet(VulkanToolBox& toolBox,

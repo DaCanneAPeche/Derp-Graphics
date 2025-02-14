@@ -26,7 +26,7 @@ namespace dg
         m_window = glfwCreateWindow(info.width, info.height, info.name.c_str(), nullptr, nullptr);
         glfwSetWindowUserPointer(m_window, this);
 
-        glfwSetFramebufferSizeCallback(m_window, frameBufferResizeCallback);
+        glfwSetFramebufferSizeCallback(m_window, _frameBufferResizeCallback);
         glfwSetKeyCallback(m_window, _keyInputCallback);
         glfwSetCursorPosCallback(m_window, _mouseMoveCallback);
         glfwSetMouseButtonCallback(m_window, _mouseButtonCallback);
@@ -56,12 +56,14 @@ namespace dg
         };
     }
 
-    void Window::frameBufferResizeCallback(GLFWwindow* pGLFWWindow, int width, int height)
+    void Window::_frameBufferResizeCallback(GLFWwindow* pGLFWWindow, int width, int height)
     {
         Window* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(pGLFWWindow));
         window->isResized = true;
         window->info.width = width;
         window->info.height = height;
+
+        window->resizeCallback(pGLFWWindow, width, height);
     }
 
     void Window::_keyInputCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods)

@@ -10,6 +10,7 @@ namespace dg
 	class Buffer
 	{
 	public:
+
 		Buffer(
         VulkanToolBox& vulkanToolBox,
 				vk::DeviceSize instanceSize,
