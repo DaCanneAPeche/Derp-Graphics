@@ -6,17 +6,28 @@
 - [x] Main class
 - [x] Scene system
 - [x] ECS
-- [ ] TOML implementation
 - [x] Pipeline control
-- [ ] Descriptor sets abstraction ??
 - [x] Multi texturing
-- [ ] Betterippeline abstraction
 - [x] Time control
-- [ ] Game loop
-- [ ] Input control 
-- [ ] Error handling
-- [ ] DescriptorPool abstraction class
 
-## Urgent
-- [ ] DescriptorSet abstraction class : find a way to avoid copies
+## Technical
+- [ ] Buffer abstraction specialization with templates
+- [ ] rewrite the fucking swap chain
+- [ ] Understand what the hell is a renderpass and maybe make an abstraciton around
+- [ ] Renderer refactoring
+
+### Can wait a looonnnnnng timmmme...
+- [ ] Descriptor Pool abstraction
+- [ ] Push constant abstraction
+- [ ] Spine support for multiple renderer with templates
+- [ ] Error handling
+- [ ] Better ippeline abstraction
+
+## Features
+- [ ] TOML support for config
+- [ ] 2D camera
+- [ ] Input library
+- [ ] Audio
+- [ ] Game loop
+
 

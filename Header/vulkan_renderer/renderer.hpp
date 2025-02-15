@@ -7,7 +7,6 @@
 #include "vulkan_renderer/texture.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
 #include "vulkan_renderer/asset_manager.hpp"
-#include "_vulkan/descriptor_set.hpp"
 #include "vulkan_renderer/uniform_buffer_object.hpp"
 #include "_vulkan/descriptor_set_manager.hpp"
 
@@ -98,20 +97,11 @@ namespace dg
     void createUniformBuffer();
     void updateUniformBuffer();
 
-    DescriptorSet& addDescriptorSet()
-    {
-      m_rawDescriptorSets.emplace_back();
-      m_descriptorSets.push_back(std::make_unique<DescriptorSet>(m_toolBox,
-            m_rawDescriptorSets[m_rawDescriptorSets.size() - 1]));
-      return *m_descriptorSets[m_rawDescriptorSets.size() - 1];
-    }
-
 		vk::PipelineLayout m_pipelineLayout;
     // vk::DescriptorSetLayout m_descriptorSetLayout;
     vk::DescriptorPool m_descriptorPool;
     // std::vector<vk::DescriptorSet> m_descriptorSets;
     std::vector<vk::DescriptorSet> m_rawDescriptorSets;
-    std::vector<std::unique_ptr<DescriptorSet>> m_descriptorSets;
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
