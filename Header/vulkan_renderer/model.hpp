@@ -63,8 +63,8 @@ namespace dg
 
 		uint32_t m_vertexCount;
 		uint32_t m_indicesCount;
-		std::unique_ptr<Buffer> m_vertexBuffer;
-		std::unique_ptr<Buffer> m_indexBuffer;
+		std::unique_ptr<SpecialisedBuffer<Vertex>> m_vertexBuffer;
+		std::unique_ptr<SpecialisedBuffer<uint16_t>> m_indexBuffer;
 		bool m_hasIndices = false;
     VulkanToolBox& m_toolBox;
 	};

@@ -11,7 +11,7 @@
 - [x] Time control
 
 ## Technical
-- [ ] Buffer abstraction specialization with templates
+- [x] Buffer abstraction specialization with templates
 - [ ] rewrite the fucking swap chain
 - [ ] Understand what the hell is a renderpass and maybe make an abstraciton around
 - [ ] Renderer refactoring

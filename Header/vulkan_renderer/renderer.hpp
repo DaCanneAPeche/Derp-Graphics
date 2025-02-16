@@ -105,7 +105,7 @@ namespace dg
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
-    std::unique_ptr<Buffer> m_uniformBuffer;
+    std::unique_ptr<SpecialisedBuffer<UniformBufferObject>> m_uniformBuffer;
     vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;
     DescriptorSetManager m_descriptorSetManager;

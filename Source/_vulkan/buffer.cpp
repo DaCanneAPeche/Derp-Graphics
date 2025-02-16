@@ -1,4 +1,5 @@
 #include "_vulkan/buffer.hpp"
+#include "_vulkan/vulkan_tool_box.hpp"
 #include <iostream>
 #include <plog/Log.h>
 
@@ -6,7 +7,7 @@ namespace dg
 {
 	Buffer::Buffer(
       VulkanToolBox& vulkanToolBox,
-			vk::DeviceSize instanceSize,
+      vk::DeviceSize instanceSize,
 			uint32_t instanceCount,
 			vk::BufferUsageFlags bufferUsageFlags,
 			vma::AllocationCreateFlags allocFlag,
@@ -17,7 +18,7 @@ namespace dg
 					m_memoryUsage(memoryUsage), m_instanceSize(instanceSize),
           m_allocFlag(allocFlag), m_toolBox(vulkanToolBox)
 	{
-		m_alignementSize = getAlignment(instanceSize, minOffsetAlignement);
+		m_alignementSize = getAlignment(m_instanceSize, minOffsetAlignement);
 		m_bufferSize = m_alignementSize * instanceCount;
 		createBuffer();
 	}
@@ -26,7 +27,7 @@ namespace dg
 	{
 		m_toolBox.allocator.destroyBuffer(buffer, allocation);
 	}
-
+  
 	void Buffer::createBuffer()
 	{
 		vk::BufferCreateInfo bufferInfo({}, m_bufferSize, m_bufferUsageFlags, m_sharingMode);
@@ -34,40 +35,6 @@ namespace dg
 		auto handle = m_toolBox.allocator.createBuffer(bufferInfo, allocInfo);
 		buffer = handle.first;
 		allocation = handle.second;
-	}
-
-	void Buffer::write(void* data, vk::DeviceSize size, vk::DeviceSize offset)
-	{
-		assert(buffer && "Buffer can't be written to before creation");
-		// m_toolBox.allocator.copyMemoryToAllocation(data, allocation, offset, size);
-
-    void* _data;
-    auto result = m_toolBox.allocator.mapMemory(allocation, &_data);
-    memcpy(_data, data, size);
-    m_toolBox.allocator.unmapMemory(allocation);
-	}
-
-	vk::DescriptorBufferInfo Buffer::descriptorInfo(vk::DeviceSize size, vk::DeviceSize offset) const
-	{
-		return vk::DescriptorBufferInfo(buffer, offset, size);
-	}
-
-	void Buffer::writeToIndex(void* data, int index)
-	{
-		write(data, m_instanceSize, index * m_alignementSize);
-	}
-
-	vk::DescriptorBufferInfo Buffer::descriptorInfoForIndex(int index) const
-	{
-		return descriptorInfo(m_alignementSize, m_alignementSize * index);
-	}
-
-	vk::DeviceSize Buffer::getAlignment(vk::DeviceSize instanceSize, vk::DeviceSize minOffsetAlignment) const
-	{
-		if (minOffsetAlignment > 0)
-			return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
-		
-		return instanceSize;
 	}
 
   void Buffer::copyToBuffer(Buffer& otherBuffer, vk::DeviceSize size)
@@ -79,7 +46,7 @@ namespace dg
 
 		m_toolBox.endSingleTimeCommands(commandBuffer);
   }
-
+  
   void Buffer::copyToImage(vk::Image& image, uint32_t width, uint32_t height)
   {
 		vk::CommandBuffer commandBuffer = m_toolBox.beginSingleTimeCommands();
@@ -90,5 +57,23 @@ namespace dg
 
 		m_toolBox.endSingleTimeCommands(commandBuffer);
   }
+  
+  void Buffer::write(void* pData, vk::DeviceSize size)
+  {
+		assert(buffer && "Buffer can't be written to before creation");
 
+    void* _pData;
+    auto result = m_toolBox.allocator.mapMemory(allocation, &_pData);
+    memcpy(_pData, pData, m_bufferSize);
+    m_toolBox.allocator.unmapMemory(allocation);
+  }
+  
+	vk::DeviceSize Buffer::getAlignment(vk::DeviceSize instanceSize, vk::DeviceSize minOffsetAlignment) const
+	{
+		if (minOffsetAlignment > 0)
+			return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
+		
+		return instanceSize;
+	}
+  
 }

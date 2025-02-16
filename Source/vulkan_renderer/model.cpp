@@ -24,17 +24,17 @@ namespace dg
 		vk::DeviceSize vertexSize = sizeof(vertices[0]);
 		vk::DeviceSize bufferSize = vertexSize * m_vertexCount;  
 
-    Buffer stagingBuffer(
-        m_toolBox, vertexSize, m_vertexCount,
+    SpecialisedBuffer<Vertex> stagingBuffer(
+        m_toolBox, m_vertexCount,
         vk::BufferUsageFlagBits::eTransferSrc,
         vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
 				vma::MemoryUsage::eAuto
         );
 
-		stagingBuffer.write((void*)vertices.data(), bufferSize);
+		stagingBuffer.write(vertices);
 
-		m_vertexBuffer = std::make_unique<Buffer>(
-        m_toolBox, vertexSize, m_vertexCount,
+		m_vertexBuffer = std::make_unique<SpecialisedBuffer<Vertex>>(
+        m_toolBox, m_vertexCount,
         vk::BufferUsageFlagBits::eVertexBuffer |
 				vk::BufferUsageFlagBits::eTransferDst,
         vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
@@ -54,17 +54,17 @@ namespace dg
 		vk::DeviceSize indexSize = sizeof(indices[0]);
 		vk::DeviceSize bufferSize = indexSize * m_indicesCount;
 
-    Buffer stagingBuffer(
-        m_toolBox, indexSize, m_indicesCount,
+    SpecialisedBuffer<uint16_t> stagingBuffer(
+        m_toolBox, m_indicesCount,
         vk::BufferUsageFlagBits::eTransferSrc,
         vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,
 				vma::MemoryUsage::eAuto
         );
 
-    stagingBuffer.write((void*)indices.data(), bufferSize);
+    stagingBuffer.write(indices);
 
-		m_indexBuffer = std::make_unique<Buffer>(
-        m_toolBox, indexSize, m_indicesCount,
+		m_indexBuffer = std::make_unique<SpecialisedBuffer<uint16_t>>(
+        m_toolBox, m_indicesCount,
         vk::BufferUsageFlagBits::eIndexBuffer |
 				vk::BufferUsageFlagBits::eTransferDst,
         vma::AllocationCreateFlagBits::eHostAccessSequentialWrite,

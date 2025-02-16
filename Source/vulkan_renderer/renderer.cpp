@@ -102,10 +102,8 @@ namespace dg
 
   void Renderer::createUniformBuffer()
   {
-    vk::DeviceSize bufferSize = sizeof(UniformBufferObject);
-
-    m_uniformBuffer = std::make_unique<Buffer>(m_toolBox, bufferSize, 1,
-        vk::BufferUsageFlagBits::eUniformBuffer,
+    m_uniformBuffer = std::make_unique<SpecialisedBuffer<UniformBufferObject>>(m_toolBox,
+        1, vk::BufferUsageFlagBits::eUniformBuffer,
         vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
 
     Transform2d transform {};
@@ -114,7 +112,7 @@ namespace dg
     UniformBufferObject ubo {};
     ubo.screenTransform = transform.getMatrix();
 
-    m_uniformBuffer->write(&ubo, sizeof(UniformBufferObject));
+    m_uniformBuffer->write(ubo);
   }
 
   void Renderer::createPipelineLayout()
@@ -205,7 +203,7 @@ namespace dg
         vk::ImageLayout::eShaderReadOnlyOptimal);
     m_descriptorSetManager.writeToDescriptor(0, 0, samplerInfo, {});
 
-    vk::DescriptorBufferInfo uboInfo = m_uniformBuffer->descriptorInfo(sizeof(UniformBufferObject));
+    vk::DescriptorBufferInfo uboInfo = m_uniformBuffer->descriptorInfo();
     m_descriptorSetManager.writeToDescriptor(1, 0, {}, uboInfo);
 
     m_descriptorSetManager.update();
@@ -298,18 +296,7 @@ namespace dg
     LOG_INFO << "Command buffers freed";
   }
 
-  void Renderer::updateUniformBuffer()
-  {
-    // vk::Extent2D extent = window.getVkExtent();
-    // Transform2d transform;
-    // transform.ratio = float(extent.width) / float(extent.height);
-
-    UniformBufferObject ubo;
-    // ubo.screenTransform = glm::mat2(1.0f);
-    // ubo.color = {1.0f, 0, 0};
-
-    m_uniformBuffer->write(&ubo, sizeof(UniformBufferObject));
-  }
+  void Renderer::updateUniformBuffer() { }
 
   void Renderer::recordCommandBuffer(int imageIndex)
   {
