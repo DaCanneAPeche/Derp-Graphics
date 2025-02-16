@@ -30,17 +30,18 @@ namespace comp
       entt::meta<Sprite>().func<&Sprite::inspect>("Inspector"_hs);
     }
 
-    void draw(dg::Renderer& renderer)
+    void draw(dg::Frame& frame)
     {
       dg::PushConstant push {
         .transform = transform.getMatrix(),
           .offset = transform.translation,
-          .textureId = textureId};
+          .textureId = textureId
+      };
 
-      renderer.pushConstant(push);
+      frame.pushConstant(push);
 
-      model->bind(*renderer.pCurrentCommandBuffer);
-      model->draw(*renderer.pCurrentCommandBuffer);
+      model->bind(frame.commandBuffer);
+      model->draw(frame.commandBuffer);
     }
 
     static void inspect(void* instance)

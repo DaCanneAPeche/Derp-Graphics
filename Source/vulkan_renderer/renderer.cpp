@@ -3,6 +3,7 @@
 #include "vulkan_renderer/push_constant.hpp"
 #include "core/transform2d.hpp"
 #include "core/timer.hpp"
+#include "vulkan_renderer/frame.hpp"
 
 // vulkan
 #include "vulkan/vulkan.hpp"
@@ -298,13 +299,23 @@ namespace dg
 
   void Renderer::updateUniformBuffer() { }
 
-  void Renderer::recordCommandBuffer(int imageIndex)
+  Frame Renderer::startFrame()
   {
-    pCurrentCommandBuffer = &m_commandBuffers[imageIndex];
+    uint32_t imageIndex;
+    vk::Result result = m_swapChain->acquireNextImage(imageIndex);
+    if (result == vk::Result::eErrorOutOfDateKHR)
+    {
+      recreateSwapChain();
+      return startFrame(); // TODO : handle that shit
+    }
+
+    if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR)
+      throw std::runtime_error("Failed to acquire swap chain image");
+
     vk::Extent2D swapchainExtent = m_swapChain->getSwapChainExtent();
 
     vk::CommandBufferBeginInfo beginInfo;
-    pCurrentCommandBuffer->begin(beginInfo);
+    m_commandBuffers[imageIndex].begin(beginInfo);
 
     std::array<vk::ClearValue, 2> clearValues = {
       vk::ClearColorValue(0.01f, 0.01f, 0.01f, 0.01f),
@@ -318,47 +329,29 @@ namespace dg
         clearValues
         );
 
-    pCurrentCommandBuffer->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+    m_commandBuffers[imageIndex].beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
     vk::Viewport viewport(0.0f, 0.0f, swapchainExtent.width, swapchainExtent.height, 0.0f, 1.0f);
     vk::Rect2D scissor({0, 0}, swapchainExtent);
 
-    pCurrentCommandBuffer->setViewport(0, viewport);
-    pCurrentCommandBuffer->setScissor(0, scissor);
+    m_commandBuffers[imageIndex].setViewport(0, viewport);
+    m_commandBuffers[imageIndex].setScissor(0, scissor);
 
-    pCurrentCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
+    m_commandBuffers[imageIndex].bindDescriptorSets(vk::PipelineBindPoint::eGraphics,
        m_pipelineLayout, 0, m_descriptorSetManager.descriptorSets, {});
 
-    externalRendering();
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), *pCurrentCommandBuffer);
-
-    pCurrentCommandBuffer->endRenderPass();
-    pCurrentCommandBuffer->end();
+    return Frame(*this, m_commandBuffers[imageIndex], imageIndex);
   }
 
-  void Renderer::draw()
+  void Renderer::endFrame(Frame& frame)
   {
-    // ImGui rendering
-    ImGui_ImplVulkan_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    imguiRendering();
-    ImGui::Render();
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), frame.commandBuffer);
 
-    uint32_t imageIndex;
-    vk::Result result = m_swapChain->acquireNextImage(imageIndex);
-    if (result == vk::Result::eErrorOutOfDateKHR)
-    {
-      recreateSwapChain();
-      return;
-    }
+    frame.commandBuffer.endRenderPass();
+    frame.commandBuffer.end();
 
-    if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR)
-      throw std::runtime_error("Failed to acquire swap chain image");
-
-    recordCommandBuffer(imageIndex);
-
-    result = m_swapChain->submitCommandBuffers(m_commandBuffers[imageIndex], imageIndex);
+    vk::Result result = m_swapChain->submitCommandBuffers(frame.commandBuffer,
+        frame.imageIndex);
 
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR
         || window.isResized)

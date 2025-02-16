@@ -22,6 +22,7 @@
 
 namespace dg
 {
+  struct Frame;
 
 	class Renderer
 	{
@@ -35,29 +36,26 @@ namespace dg
     void init();
     void clean();
 
-    std::function<void()> externalRendering;
-    std::function<void()> imguiRendering;
+    Frame startFrame();
+    void endFrame(Frame& frame);
 
-		void draw();
 		void pollEvents() const { glfwPollEvents(); };
 		[[nodiscard]] bool shouldWindowClose() const { return window.shouldClose(); };
 		void waitIdle() const { m_toolBox.device.waitIdle(); }
     
     template <class T>
-    void pushConstant(const T& pushData)
+    void pushConstant(vk::CommandBuffer& commandBuffer, const T& pushData)
     {
-      assert(pCurrentCommandBuffer != nullptr);
-      pCurrentCommandBuffer->pushConstants(m_pipelineLayout,
+      commandBuffer.pushConstants(m_pipelineLayout,
           vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
           0, sizeof(T), &pushData);
     }
 
-    void bindPipeline(Pl pipelineId)
+    void bindPipeline(vk::CommandBuffer& commandBuffer, Pl pipelineId)
     {
-      assert(pCurrentCommandBuffer != nullptr);
-      m_pipelines[static_cast<uint32_t>(pipelineId)]->bind(*pCurrentCommandBuffer); 
+      m_pipelines[static_cast<uint32_t>(pipelineId)]->bind(commandBuffer); 
 
-      pCurrentCommandBuffer->bindDescriptorSets(
+      commandBuffer.bindDescriptorSets(
           vk::PipelineBindPoint::eGraphics,
           m_pipelineLayout,
           0, m_descriptorSetManager.descriptorSets, {}
@@ -68,7 +66,6 @@ namespace dg
     void updateTextures(AssetManager& assetManager);
 		Window window;
     std::vector<PipelineInfo> pipelinesInfo;
-    vk::CommandBuffer* pCurrentCommandBuffer = nullptr;
 
     static const int MAX_TEXTURE_NUMBER = 1000;
 
@@ -85,7 +82,6 @@ namespace dg
 				);
 		void createCommandBuffers();
 		void freeCommandBuffers();
-		void recordCommandBuffer(int imageIndex);
 		void loadModels();
 		[[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
     void createDescriptorSetLayout();
@@ -98,10 +94,7 @@ namespace dg
     void updateUniformBuffer();
 
 		vk::PipelineLayout m_pipelineLayout;
-    // vk::DescriptorSetLayout m_descriptorSetLayout;
     vk::DescriptorPool m_descriptorPool;
-    // std::vector<vk::DescriptorSet> m_descriptorSets;
-    std::vector<vk::DescriptorSet> m_rawDescriptorSets;
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;

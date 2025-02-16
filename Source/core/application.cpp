@@ -21,8 +21,6 @@ namespace dg
 
     vulkanToolBox.init(appInfo, renderer.window);
     renderer.init();
-    renderer.externalRendering = [this]() { render(); }; // embedding cause static func
-    renderer.imguiRendering = [this]() { imguiRender(); };
 
     setupSignalHandler();
 
@@ -56,7 +54,17 @@ namespace dg
       update();
       currentScene->lateUpdate();
 
-      renderer.draw();
+      Frame frame = renderer.startFrame();
+      render(frame);
+
+      ImGui_ImplVulkan_NewFrame();
+      ImGui_ImplGlfw_NewFrame();
+
+      ImGui::NewFrame();
+      imguiRender();
+      ImGui::Render();
+
+      frame.submit();
 
       deltaTime = m_timer.getElapsedTime().count();
     }

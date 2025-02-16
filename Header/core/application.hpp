@@ -13,6 +13,7 @@
 #include "core/timer.hpp"
 #include "vulkan_renderer/renderer.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
+#include "vulkan_renderer/frame.hpp"
 
 #include <plog/Log.h>
 #include "plog/Init.h"
@@ -58,7 +59,7 @@ namespace dg
       std::unique_ptr<Scene> currentScene;
 
       virtual void update() {};
-      virtual void render() {};
+      virtual void render(Frame& frame) {};
       virtual void imguiRender() {};
     private:
       void setupSignalHandler();

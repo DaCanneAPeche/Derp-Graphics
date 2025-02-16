@@ -124,19 +124,19 @@ class Game : public dg::Application
       return configInfo;
     }
     
-    void render() override
+    void render(dg::Frame& frame) override
     {
       if (showOnlyOutlines)
-        renderer.bindPipeline(dg::Pl::outline);
+        frame.bindPipeline(dg::Pl::outline);
       else
-        renderer.bindPipeline(dg::Pl::sprites);
+        frame.bindPipeline(dg::Pl::sprites);
 
       auto renderView = registry.view<comp::Sprite>();
 
       for (auto entity : renderView)
       {
         auto [sprite] = renderView.get(entity);
-        sprite.draw(renderer);
+        sprite.draw(frame);
       }
 
     }
