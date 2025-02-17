@@ -28,7 +28,7 @@ namespace dg {
         m_toolBox, desiredChannels, pixelsCount,
 				vk::BufferUsageFlagBits::eTransferSrc,
         vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
-		stagingBuffer.write(pixels, desiredChannels * pixelsCount);
+		stagingBuffer.write(pixels, 0, desiredChannels * pixelsCount);
 		stbi_image_free(pixels);
 
 		vk::ImageCreateInfo imageInfo({}, vk::ImageType::e2D, c_format, vk::Extent3D(width, height, 1),

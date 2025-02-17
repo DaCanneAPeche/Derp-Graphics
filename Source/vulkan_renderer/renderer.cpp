@@ -52,7 +52,7 @@ namespace dg
 
     window.resizeCallback = [this](GLFWwindow*, int, int)
     {
-      // updateUniformBuffer();
+      updateUniformBuffer();
     };
   }
 
@@ -107,13 +107,7 @@ namespace dg
         1, vk::BufferUsageFlagBits::eUniformBuffer,
         vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
 
-    Transform2d transform {};
-    transform.rotation = 1.5;
-
-    UniformBufferObject ubo {};
-    ubo.screenTransform = transform.getMatrix();
-
-    m_uniformBuffer->write(ubo);
+    updateUniformBuffer();
   }
 
   void Renderer::createPipelineLayout()
@@ -297,7 +291,16 @@ namespace dg
     LOG_INFO << "Command buffers freed";
   }
 
-  void Renderer::updateUniformBuffer() { }
+  void Renderer::updateUniformBuffer()
+  {
+    vk::Extent2D extent = window.getVkExtent();
+
+    static Transform2d transform;
+    transform.ratio = float(extent.height) / float(extent.width);
+    UniformBufferObject ubo {transform.getMatrix()};
+
+    m_uniformBuffer->write(ubo);
+  }
 
   Frame Renderer::startFrame()
   {

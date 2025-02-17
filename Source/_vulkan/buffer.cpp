@@ -58,14 +58,10 @@ namespace dg
 		m_toolBox.endSingleTimeCommands(commandBuffer);
   }
   
-  void Buffer::write(void* pData, vk::DeviceSize size)
+  void Buffer::write(void* pData, vk::DeviceSize offset, vk::DeviceSize size)
   {
 		assert(buffer && "Buffer can't be written to before creation");
-
-    void* _pData;
-    auto result = m_toolBox.allocator.mapMemory(allocation, &_pData);
-    memcpy(_pData, pData, m_bufferSize);
-    m_toolBox.allocator.unmapMemory(allocation);
+    m_toolBox.allocator.copyMemoryToAllocation(pData, allocation, offset, size);
   }
   
 	vk::DeviceSize Buffer::getAlignment(vk::DeviceSize instanceSize, vk::DeviceSize minOffsetAlignment) const

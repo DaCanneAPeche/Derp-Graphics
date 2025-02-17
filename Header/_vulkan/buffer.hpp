@@ -26,7 +26,7 @@ namespace dg
       void copyToBuffer(Buffer& otherBuffer, vk::DeviceSize size);
       void copyToImage(vk::Image& image, uint32_t width, uint32_t height);
 
-      void write(void* data, vk::DeviceSize size);
+      void write(void* data, vk::DeviceSize offset = 0, vk::DeviceSize = vk::WholeSize);
 
       vk::Buffer buffer;
       vma::Allocation allocation;
@@ -65,21 +65,14 @@ namespace dg
       void write(T& data)
       {
         assert(buffer && "Buffer can't be written to before creation");
-
-        void* pData;
-        auto result = m_toolBox.allocator.mapMemory(allocation, &pData);
-        memcpy(pData, &data, m_instanceSize);
-        m_toolBox.allocator.unmapMemory(allocation);
+        m_toolBox.allocator.copyMemoryToAllocation(&data, allocation, 0, m_instanceSize);
       }
 
       void write(const std::vector<T>& data)
       {
         assert(buffer && "Buffer can't be written to before creation");
-
-        void* pData;
-        auto result = m_toolBox.allocator.mapMemory(allocation, &pData);
-        memcpy(pData, data.data(), m_instanceSize * data.size());
-        m_toolBox.allocator.unmapMemory(allocation);
+        m_toolBox.allocator.copyMemoryToAllocation(data.data(), allocation, 0,
+            m_instanceSize * data.size());
       }
       
       vk::DescriptorBufferInfo descriptorInfo() const
