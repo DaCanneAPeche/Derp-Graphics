@@ -293,9 +293,12 @@ namespace dg
 
   void Renderer::updateUniformBuffer()
   {
+    // TODO : Handle synchronization 
+    LOG_WARNING << "Synchronization is not taken care of !";
+
     vk::Extent2D extent = window.getVkExtent();
 
-    static Transform2d transform;
+    Transform2d transform;
     transform.ratio = float(extent.height) / float(extent.width);
     UniformBufferObject ubo {transform.getMatrix()};
 

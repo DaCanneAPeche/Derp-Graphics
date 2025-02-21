@@ -14,14 +14,14 @@
 - [x] Buffer abstraction specialization with templates
 - [ ] rewrite the fucking swap chain
 - [ ] Understand what the hell is a renderpass and maybe make an abstraciton around
-- [ ] Renderer refactoring
+- [x] Renderer refactoring
+- [ ] Render graph
 
 ### Can wait a looonnnnnng timmmme...
 - [ ] Descriptor Pool abstraction
-- [ ] Push constant abstraction
 - [ ] Spine support for multiple renderer with templates
 - [ ] Error handling
-- [ ] Better ippeline abstraction
+- [ ] Better pipeline abstraction
 
 ## Features
 - [ ] TOML support for config
@@ -29,5 +29,5 @@
 - [ ] Input library
 - [ ] Audio
 - [ ] Game loop
-
+- [ ] *Entity systems*
 
