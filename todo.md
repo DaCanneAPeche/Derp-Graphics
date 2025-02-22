@@ -16,6 +16,7 @@
 - [ ] Understand what the hell is a renderpass and maybe make an abstraciton around
 - [x] Renderer refactoring
 - [ ] Render graph
+- [ ] Template update for descriptor and better ressource mananger
 
 ### Can wait a looonnnnnng timmmme...
 - [ ] Descriptor Pool abstraction
@@ -29,5 +30,5 @@
 - [ ] Input library
 - [ ] Audio
 - [ ] Game loop
-- [ ] *Entity systems*
-
+- [ ] **Entity systems**
+- [ ] Signal handler able to have multiple callbacks
