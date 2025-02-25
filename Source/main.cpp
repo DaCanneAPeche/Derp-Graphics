@@ -76,6 +76,15 @@ class MainScene : public dg::Scene
         auto& sprite = app->registry.get<comp::Sprite>(rick);
         sprite.transform.rotation += glm::pi<float>()/4;
       });
+
+      bindInput(dg::Key::space, dg::config::Signals::RICK_ROTATE,
+          dg::KeyboardMods::shift, dg::KeyboardMods::control);
+
+      signalHandler.on(dg::config::Signals::RICK_ROTATE, [this](){
+        auto& sprite = app->registry.get<comp::Sprite>(rick);
+        sprite.transform.rotation += glm::pi<float>()/4;
+      });
+
     }
 
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GLFW/glfw3.h"
+#include "utils/enum_class_flags.hpp"
 
 namespace dg
 {
@@ -142,13 +143,17 @@ namespace dg
 
   enum class KeyboardMods : uint8_t
   {
+    none = 0,
     shift = GLFW_MOD_SHIFT,
     control = GLFW_MOD_CONTROL,
     alt = GLFW_MOD_ALT,
     super = GLFW_MOD_SUPER,
     capsLock = GLFW_MOD_CAPS_LOCK,
     numLock = GLFW_MOD_NUM_LOCK,
+    all = shift | control | alt | super | capsLock | numLock 
   };
+
+  DG_ALLOW_ENUM_CLASS_BITWISE_OPERATOR(KeyboardMods, uint8_t)
 
   enum class MouseButton : uint8_t
   {
@@ -221,3 +226,4 @@ namespace dg
   };
 
 } // dg
+

@@ -27,8 +27,8 @@
 ## Features
 - [ ] TOML support for config
 - [ ] 2D camera
-- [ ] Input library
+- [X] Input library
 - [ ] Audio
 - [ ] Game loop
 - [ ] **Entity systems**
-- [ ] Signal handler able to have multiple callbacks
+- [X] Signal handler able to have multiple callbacks

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "core/signal_handler.hpp"
+#include "core/inputs.hpp"
 #include "vulkan_renderer/asset_manager.hpp"
 
 namespace dg
@@ -22,6 +23,14 @@ namespace dg
       std::unique_ptr<AssetManager> assetManager = nullptr;
 
       void init(Application* application);
+
+      void bindInput(std::vector<Key>& keys, dg::config::Signals signal,
+          KeyboardMods necessaryMods = KeyboardMods::none,
+          KeyboardMods forbiddenMods = KeyboardMods::none);
+
+      void bindInput(Key key, dg::config::Signals signal,
+          KeyboardMods necessaryMods = KeyboardMods::none,
+          KeyboardMods forbiddenMods = KeyboardMods::none);
 
     protected:
 

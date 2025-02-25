@@ -15,7 +15,9 @@ namespace dg
 
       MOUSE_MOVE,
       MOUSE_PRESS,
-      MOUSE_RELEASE
+      MOUSE_RELEASE,
+
+      RICK_ROTATE,
     };
   }
 }
