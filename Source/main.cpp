@@ -5,6 +5,7 @@
 #include "vulkan_renderer/renderer.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
 #include "core/application.hpp"
+#include "core/inputs.hpp"
 #include "components/sprite.hpp"
 #include "components/position.hpp"
 #include <glm/gtc/constants.hpp>
@@ -47,30 +48,30 @@ class MainScene : public dg::Scene
       sprite.textureId = 1;
       sprite.transform.ratio = assetManager->getTexture(sprite.textureId).getRatio();
 
-      signalHandler.on(dg::config::Signals::KEY_PRESS, [this](int key, int scancode,
-            int mods)
+      signalHandler.on(dg::config::Signals::KEY_PRESS, [this](dg::Key key,
+            dg::KeyboardMods mods)
       {
         auto& sprite = app->registry.get<comp::Sprite>(rick);
 
-        if (key == GLFW_KEY_W)
+        if (key == dg::Key::w)
           sprite.transform.translation.y -= 0.1;
-        else if (key == GLFW_KEY_S)
+        else if (key == dg::Key::s)
           sprite.transform.translation.y += 0.1;
-        else if (key == GLFW_KEY_A)
+        else if (key == dg::Key::a)
           sprite.transform.translation.x -= 0.1;
-        else if (key == GLFW_KEY_D)
+        else if (key == dg::Key::d)
           sprite.transform.translation.x += 0.1;
-        else if (key == GLFW_KEY_UP)
+        else if (key == dg::Key::up)
           sprite.textureId++;
-        else if (key == GLFW_KEY_DOWN)
+        else if (key == dg::Key::down)
           sprite.textureId--;
 
       });
 
-      signalHandler.on(dg::config::Signals::MOUSE_PRESS, [this](int button,
-            int mods)
+      signalHandler.on(dg::config::Signals::MOUSE_PRESS, [this](dg::MouseButton button,
+            dg::KeyboardMods mods)
       {
-        if (button != GLFW_MOUSE_BUTTON_LEFT) return;
+        if (button != dg::MouseButton::left) return;
 
         auto& sprite = app->registry.get<comp::Sprite>(rick);
         sprite.transform.rotation += glm::pi<float>()/4;

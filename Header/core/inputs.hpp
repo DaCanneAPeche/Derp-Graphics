@@ -5,9 +5,9 @@
 namespace dg
 {
 
-  enum class Keys
+  enum class Key : uint16_t
   {
-    unknown = GLFW_KEY_UNKNOWN,
+    unknown = 0,
 
     /* Printable keys */
     space = GLFW_KEY_SPACE,
@@ -58,13 +58,13 @@ namespace dg
     y = GLFW_KEY_Y,
     z = GLFW_KEY_Z,
 
-    left_bracket = GLFW_KEY_LEFT_BRACKET, /* [ */
+    leftBracket = GLFW_KEY_LEFT_BRACKET, /* [ */
     backslash = GLFW_KEY_BACKSLASH, /* \ */
-    right_bracket = GLFW_KEY_RIGHT_BRACKET, /* ] */
-    grave_accent = GLFW_KEY_GRAVE_ACCENT, /* ` */
+    rightBracket = GLFW_KEY_RIGHT_BRACKET, /* ] */
+    graveAccent = GLFW_KEY_GRAVE_ACCENT, /* ` */
 
-    world_1 = GLFW_KEY_WORLD_1, /* non-US #1 */
-    world_2 = GLFW_KEY_WORLD_2, /* non-US #2 */
+    world1 = GLFW_KEY_WORLD_1, /* non-US #1 */
+    world2 = GLFW_KEY_WORLD_2, /* non-US #2 */
 
     escape = GLFW_KEY_ESCAPE,
     enter = GLFW_KEY_ENTER,
@@ -76,14 +76,14 @@ namespace dg
     left = GLFW_KEY_LEFT,
     down = GLFW_KEY_DOWN,
     up = GLFW_KEY_UP,
-    page_up = GLFW_KEY_PAGE_UP,
-    page_down = GLFW_KEY_PAGE_DOWN,
+    pageUp = GLFW_KEY_PAGE_UP,
+    pageDown = GLFW_KEY_PAGE_DOWN,
     home = GLFW_KEY_HOME,
     end = GLFW_KEY_END,
     lock = GLFW_KEY_CAPS_LOCK,
-    scroll_lock = GLFW_KEY_SCROLL_LOCK,
-    num_lock = GLFW_KEY_NUM_LOCK,
-    print_screen = GLFW_KEY_PRINT_SCREEN,
+    scrollLock = GLFW_KEY_SCROLL_LOCK,
+    numLock = GLFW_KEY_NUM_LOCK,
+    printScreen = GLFW_KEY_PRINT_SCREEN,
     pause = GLFW_KEY_PAUSE,
 
     f1 = GLFW_KEY_F1,
@@ -112,60 +112,60 @@ namespace dg
     f24 = GLFW_KEY_F24,
     f25 = GLFW_KEY_F25,
 
-    kp_0 = GLFW_KEY_KP_0,
-    kp_1 = GLFW_KEY_KP_1,
-    kp_2 = GLFW_KEY_KP_2,
-    kp_3 = GLFW_KEY_KP_3,
-    kp_4 = GLFW_KEY_KP_4,
-    kp_5 = GLFW_KEY_KP_5,
-    kp_6 = GLFW_KEY_KP_6,
-    kp_7 = GLFW_KEY_KP_7,
-    kp_8 = GLFW_KEY_KP_8,
-    kp_9 = GLFW_KEY_KP_9,
-    kp_decimal = GLFW_KEY_KP_DECIMAL,
-    kp_divide = GLFW_KEY_KP_DIVIDE,
-    kp_multiply = GLFW_KEY_KP_MULTIPLY,
-    kp_subtract = GLFW_KEY_KP_SUBTRACT,
-    kp_add = GLFW_KEY_KP_ADD,
-    kp_enter = GLFW_KEY_KP_ENTER,
-    kp_equal = GLFW_KEY_KP_EQUAL,
-    left_shift = GLFW_KEY_LEFT_SHIFT,
-    left_control = GLFW_KEY_LEFT_CONTROL,
-    left_alt = GLFW_KEY_LEFT_ALT,
-    left_super = GLFW_KEY_LEFT_SUPER,
-    right_shift = GLFW_KEY_RIGHT_SHIFT,
-    right_control = GLFW_KEY_RIGHT_CONTROL,
-    right_alt = GLFW_KEY_RIGHT_ALT,
-    right_super = GLFW_KEY_RIGHT_SUPER,
+    kp0 = GLFW_KEY_KP_0,
+    kp1 = GLFW_KEY_KP_1,
+    kp2 = GLFW_KEY_KP_2,
+    kp3 = GLFW_KEY_KP_3,
+    kp4 = GLFW_KEY_KP_4,
+    kp5 = GLFW_KEY_KP_5,
+    kp6 = GLFW_KEY_KP_6,
+    kp7 = GLFW_KEY_KP_7,
+    kp8 = GLFW_KEY_KP_8,
+    kp9 = GLFW_KEY_KP_9,
+    kpDecimal = GLFW_KEY_KP_DECIMAL,
+    kpDivide = GLFW_KEY_KP_DIVIDE,
+    kpMultiply = GLFW_KEY_KP_MULTIPLY,
+    kpSubtract = GLFW_KEY_KP_SUBTRACT,
+    kpAdd = GLFW_KEY_KP_ADD,
+    kpEnter = GLFW_KEY_KP_ENTER,
+    kpEqual = GLFW_KEY_KP_EQUAL,
+    leftShift = GLFW_KEY_LEFT_SHIFT,
+    leftControl = GLFW_KEY_LEFT_CONTROL,
+    leftAlt = GLFW_KEY_LEFT_ALT,
+    leftSuper = GLFW_KEY_LEFT_SUPER,
+    rightShift = GLFW_KEY_RIGHT_SHIFT,
+    rightControl = GLFW_KEY_RIGHT_CONTROL,
+    rightAlt = GLFW_KEY_RIGHT_ALT,
+    rightSuper = GLFW_KEY_RIGHT_SUPER,
     menu = GLFW_KEY_MENU,
   };
 
-  enum class KeyboardMods
+  enum class KeyboardMods : uint8_t
   {
     shift = GLFW_MOD_SHIFT,
     control = GLFW_MOD_CONTROL,
     alt = GLFW_MOD_ALT,
     super = GLFW_MOD_SUPER,
-    caps_lock = GLFW_MOD_CAPS_LOCK,
-    num_lock = GLFW_MOD_NUM_LOCK,
+    capsLock = GLFW_MOD_CAPS_LOCK,
+    numLock = GLFW_MOD_NUM_LOCK,
   };
 
-  enum class Mouse
+  enum class MouseButton : uint8_t
   {
-    button_1 = GLFW_MOUSE_BUTTON_1,
-    button_2 = GLFW_MOUSE_BUTTON_2,
-    button_3 = GLFW_MOUSE_BUTTON_3,
-    button_4 = GLFW_MOUSE_BUTTON_4,
-    button_5 = GLFW_MOUSE_BUTTON_5,
-    button_6 = GLFW_MOUSE_BUTTON_6,
-    button_7 = GLFW_MOUSE_BUTTON_7,
-    button_8 = GLFW_MOUSE_BUTTON_8,
-    button_left = GLFW_MOUSE_BUTTON_LEFT,
-    button_right = GLFW_MOUSE_BUTTON_RIGHT,
-    button_middle = GLFW_MOUSE_BUTTON_MIDDLE,
+    one = GLFW_MOUSE_BUTTON_1,
+    two = GLFW_MOUSE_BUTTON_2,
+    three = GLFW_MOUSE_BUTTON_3,
+    four = GLFW_MOUSE_BUTTON_4,
+    five = GLFW_MOUSE_BUTTON_5,
+    six = GLFW_MOUSE_BUTTON_6,
+    seven = GLFW_MOUSE_BUTTON_7,
+    height = GLFW_MOUSE_BUTTON_8,
+    left = GLFW_MOUSE_BUTTON_LEFT,
+    right = GLFW_MOUSE_BUTTON_RIGHT,
+    middle = GLFW_MOUSE_BUTTON_MIDDLE,
   };
 
-  enum class Joystick
+  enum class Joystick : uint8_t
   {
     one = GLFW_JOYSTICK_1,
     two = GLFW_JOYSTICK_2,
@@ -185,36 +185,39 @@ namespace dg
     sixteen = GLFW_JOYSTICK_16,
   };
 
-  enum class GamePad
+  enum class GamePadButton : uint8_t
   {
-    button_a = GLFW_GAMEPAD_BUTTON_A,
-    button_b = GLFW_GAMEPAD_BUTTON_B,
-    button_x = GLFW_GAMEPAD_BUTTON_X,
-    button_y = GLFW_GAMEPAD_BUTTON_Y,
+    a = GLFW_GAMEPAD_BUTTON_A,
+    b = GLFW_GAMEPAD_BUTTON_B,
+    x = GLFW_GAMEPAD_BUTTON_X,
+    y = GLFW_GAMEPAD_BUTTON_Y,
 
-    button_left_bumper = GLFW_GAMEPAD_BUTTON_LEFT_BUMPER,
-    button_right_bumper = GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER,
-    button_back = GLFW_GAMEPAD_BUTTON_BACK,
-    button_start = GLFW_GAMEPAD_BUTTON_START,
-    button_guide = GLFW_GAMEPAD_BUTTON_GUIDE,
-    button_left_thumb = GLFW_GAMEPAD_BUTTON_LEFT_THUMB,
-    button_right_thumb = GLFW_GAMEPAD_BUTTON_RIGHT_THUMB,
-    button_dpad_up = GLFW_GAMEPAD_BUTTON_DPAD_UP,
-    button_dpad_right = GLFW_GAMEPAD_BUTTON_DPAD_RIGHT,
-    button_dpad_down = GLFW_GAMEPAD_BUTTON_DPAD_DOWN,
-    button_dpad_left = GLFW_GAMEPAD_BUTTON_DPAD_LEFT,
+    leftBumper = GLFW_GAMEPAD_BUTTON_LEFT_BUMPER,
+    rightBumper = GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER,
+    back = GLFW_GAMEPAD_BUTTON_BACK,
+    start = GLFW_GAMEPAD_BUTTON_START,
+    guide = GLFW_GAMEPAD_BUTTON_GUIDE,
+    leftThumb = GLFW_GAMEPAD_BUTTON_LEFT_THUMB,
+    rightThumb = GLFW_GAMEPAD_BUTTON_RIGHT_THUMB,
+    dpadUp = GLFW_GAMEPAD_BUTTON_DPAD_UP,
+    dpadRight = GLFW_GAMEPAD_BUTTON_DPAD_RIGHT,
+    dpadDown = GLFW_GAMEPAD_BUTTON_DPAD_DOWN,
+    dpadLeft = GLFW_GAMEPAD_BUTTON_DPAD_LEFT,
 
-    button_cross = GLFW_GAMEPAD_BUTTON_CROSS,
-    button_circle = GLFW_GAMEPAD_BUTTON_CIRCLE,
-    button_square = GLFW_GAMEPAD_BUTTON_SQUARE,
-    button_triangle = GLFW_GAMEPAD_BUTTON_TRIANGLE,
+    cross = GLFW_GAMEPAD_BUTTON_CROSS,
+    circle = GLFW_GAMEPAD_BUTTON_CIRCLE,
+    square = GLFW_GAMEPAD_BUTTON_SQUARE,
+    triangle = GLFW_GAMEPAD_BUTTON_TRIANGLE,
+  };
 
-    axis_left_x = GLFW_GAMEPAD_AXIS_LEFT_X,
-    axis_left_y = GLFW_GAMEPAD_AXIS_LEFT_Y,
-    axis_right_x = GLFW_GAMEPAD_AXIS_RIGHT_X,
-    axis_right_y = GLFW_GAMEPAD_AXIS_RIGHT_Y,
-    axis_left_trigger = GLFW_GAMEPAD_AXIS_LEFT_TRIGGER,
-    axis_right_trigger = GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER,
+  enum class GamePadAxis : uint8_t
+  {
+    leftX = GLFW_GAMEPAD_AXIS_LEFT_X,
+    leftY = GLFW_GAMEPAD_AXIS_LEFT_Y,
+    rightX = GLFW_GAMEPAD_AXIS_RIGHT_X,
+    rightY = GLFW_GAMEPAD_AXIS_RIGHT_Y,
+    leftTrigger = GLFW_GAMEPAD_AXIS_LEFT_TRIGGER,
+    rightTrigger = GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER,
   };
 
 } // dg

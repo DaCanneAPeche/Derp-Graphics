@@ -1,4 +1,5 @@
 #include "core/application.hpp"
+#include "core/inputs.hpp"
 
 namespace dg
 {
@@ -73,7 +74,6 @@ namespace dg
 
   void Application::setupSignalHandler()
   {
-    
     renderer.window.keyInputCallback = [this](GLFWwindow* window, int key, int scancode,
         int action, int mods)
     {
@@ -86,7 +86,11 @@ namespace dg
         {GLFW_RELEASE, config::Signals::KEY_RELEASE}
       };
 
-      currentScene->signalHandler.send(actionMap[action], key, scancode, mods);
+      Key _key = Key::unknown;
+      if (key != GLFW_KEY_UNKNOWN) _key = static_cast<Key>(key);
+
+      currentScene->signalHandler.send(actionMap[action], _key,
+          static_cast<KeyboardMods>(mods));
     };
 
     renderer.window.mouseMoveCallback = [this](GLFWwindow* window, double xPos,
@@ -109,7 +113,8 @@ namespace dg
         {GLFW_RELEASE, config::Signals::MOUSE_RELEASE}
       };
 
-      currentScene->signalHandler.send(actionMap[action], button, mods);
+      currentScene->signalHandler.send(actionMap[action],
+          static_cast<MouseButton>(button), static_cast<KeyboardMods>(mods));
     };
 
   }
