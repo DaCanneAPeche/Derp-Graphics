@@ -1,6 +1,7 @@
 #include "core/system.hpp"
 #include "components/sprite.hpp"
 #include "components/position.hpp"
+#include "core/application.hpp"
 
 class SpritePosSystem : public dg::System<comp::Sprite, comp::Position>
 {
@@ -14,7 +15,15 @@ class SpritePosSystem : public dg::System<comp::Sprite, comp::Position>
 
 };
 
-class SpriteSystem : public dg::System<comp::Sprite> {};
+class SpriteSystem : public dg::System<comp::Sprite>
+{
+  public:
+
+    void update(dg::Scene& scene, entt::entity entity, comp::Sprite& sprite) override
+    {
+      sprite.transform.rotation += 0.01 * scene.app->deltaTime;
+    }
+};
 
 DG_REGISTER_SYSTEM(SpritePosSystem)
 DG_REGISTER_SYSTEM(SpriteSystem)

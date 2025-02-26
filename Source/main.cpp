@@ -157,7 +157,7 @@ class Game : public dg::Application
 
       if (ImGui::TreeNode("Timing"))
       {
-        ImGui::Text("Frame duration : %f ms", deltaTime);
+        ImGui::Text("Frame duration : %f ms", deltaTime * 1000);
         ImGui::Text("FPS : %d", static_cast<int>(1000 / deltaTime));
         ImGui::TreePop();
       }

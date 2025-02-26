@@ -11,7 +11,11 @@
 
 namespace dg
 {
-  class ISystem { };
+  struct ISystem
+  {
+    virtual void IUpdate(Scene& scene) {}
+    entt::registry* pRegistry = nullptr;
+  };
 
   template <typename... Components>
   class System : public ISystem
@@ -23,11 +27,24 @@ namespace dg
       virtual void onDestruct(Scene& scene, entt::entity entity, Components&...) {}
       virtual void update(Scene& scene, entt::entity entity, Components&...) {}
 
+      void IUpdate(Scene& scene) override
+      {
+        assert(pRegistry != nullptr && "pRegistry was not assigned");
+
+        auto view = pRegistry->view<Components...>();
+        for (auto entity : view)
+        {
+          std::apply([&scene, entity, this](auto &&... args) {
+            update(scene, entity, args...);
+              }, view.get(entity));
+        }
+      }
+
       void foo();
 
       bool active = true;
 
-    private:
+    protected:
 
   };
 

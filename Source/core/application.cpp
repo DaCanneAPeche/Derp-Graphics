@@ -29,6 +29,8 @@ namespace dg
     PLOG_INFO << "Init finished";
 
     PLOG_INFO << "Found " << _systems::allSystems.size() << " systems";
+
+    initSystems();
   }
 
   Application::~Application()
@@ -54,9 +56,15 @@ namespace dg
 
       renderer.pollEvents();
 
-      currentScene->update();
       update();
+
+      currentScene->update();
+
+      for (auto& system : _systems::allSystems) system->IUpdate(*currentScene);
+
       currentScene->lateUpdate();
+
+      lateUpdate();
 
       Frame frame = renderer.startFrame();
       render(frame);
@@ -70,7 +78,7 @@ namespace dg
 
       frame.submit();
 
-      deltaTime = m_timer.getElapsedTime().count(); // As ms. Make it seconds ?
+      deltaTime = m_timer.getElapsedTime().count() / 1000; // As seconds
     }
     renderer.waitIdle();
   }
@@ -121,4 +129,11 @@ namespace dg
     };
 
   }
+
+  void Application::initSystems()
+  {
+    for (auto& system : _systems::allSystems)
+      system->pRegistry = &registry;
+  }
+
 }

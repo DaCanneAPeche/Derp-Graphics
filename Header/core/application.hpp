@@ -35,6 +35,7 @@ namespace dg
       dg::VulkanToolBox vulkanToolBox;
       dg::Renderer renderer;
       entt::registry registry;
+      float deltaTime;
 
     protected:
       template <class T>
@@ -54,15 +55,16 @@ namespace dg
       }
 
       void changeScene(config::Scenes sceneId);
-      float deltaTime;
 
       std::unique_ptr<Scene> currentScene;
 
       virtual void update() {};
+      virtual void lateUpdate() {};
       virtual void render(Frame& frame) {};
       virtual void imguiRender() {};
     private:
       void setupSignalHandler();
+      void initSystems();
 
       std::vector<std::function<std::unique_ptr<Scene>()>> m_scenes;
       Timer m_timer;
