@@ -1,5 +1,6 @@
 #include "core/application.hpp"
 #include "core/inputs.hpp"
+#include "core/system.hpp"
 
 namespace dg
 {
@@ -26,6 +27,8 @@ namespace dg
     setupSignalHandler();
 
     PLOG_INFO << "Init finished";
+
+    PLOG_INFO << "Found " << _systems::allSystems.size() << " systems";
   }
 
   Application::~Application()
@@ -67,7 +70,7 @@ namespace dg
 
       frame.submit();
 
-      deltaTime = m_timer.getElapsedTime().count();
+      deltaTime = m_timer.getElapsedTime().count(); // As ms. Make it seconds ?
     }
     renderer.waitIdle();
   }

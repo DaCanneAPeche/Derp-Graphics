@@ -2,7 +2,7 @@
 
 #include "vulkan_renderer/model.hpp"
 #include "vulkan_renderer/texture.hpp"
-#include "vulkan_renderer/renderer.hpp"
+#include "vulkan_renderer/frame.hpp"
 #include "core/transform2d.hpp"
 #include "vulkan_renderer/push_constant.hpp"
 
