@@ -32,8 +32,19 @@ namespace dg
           KeyboardMods necessaryMods = KeyboardMods::none,
           KeyboardMods forbiddenMods = KeyboardMods::none);
 
+      bool isActionTakingPlace(dg::config::Signals signal)
+      {
+        return inputMap[signal];
+      }
+
+      std::unordered_map<config::Signals, bool> inputMap = {};
+
     protected:
 
     private:
+      
+      bool isInputRespected(const std::vector<Key>& possibleKeys, KeyboardMods usedMods,
+          Key pressedKey, KeyboardMods necessaryMods, KeyboardMods forbiddenMods);
+
   };
 }

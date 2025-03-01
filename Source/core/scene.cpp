@@ -22,11 +22,18 @@ namespace dg
     signalHandler.on(dg::config::Signals::KEY_PRESS, [keys,
         signal, necessaryMods, forbiddenMods, this](Key key, KeyboardMods mods)
         {
-          if ((std::find(keys.begin(), keys.end(), key) == keys.end()) || // key not inside vector
-              ((necessaryMods & mods) != necessaryMods) || // check for necessary mods
-              ((forbiddenMods & mods) != KeyboardMods::none)) return; // check for forbidden mods
+          if (!isInputRespected(keys, mods, key, necessaryMods, forbiddenMods))
+            return;
 
           signalHandler.send(signal);
+          inputMap[signal] = true;
+        });
+
+    signalHandler.on(dg::config::Signals::KEY_RELEASE, [keys,
+        signal, necessaryMods, forbiddenMods, this](Key key, KeyboardMods mods)
+        {
+          if (isInputRespected(keys, mods, key, necessaryMods, forbiddenMods))
+            inputMap[signal] = false;
         });
   }
 
@@ -35,5 +42,14 @@ namespace dg
   {
     std::vector<Key> keys = {key};
     bindInput(keys, signal, necessaryMods, forbiddenMods);
+  }
+  
+  bool Scene::isInputRespected(const std::vector<Key>& possibleKeys, KeyboardMods usedMods,
+      Key pressedKey, KeyboardMods necessaryMods, KeyboardMods forbiddenMods)
+  { 
+    return // pressedKey not inside vector
+        (std::find(possibleKeys.begin(), possibleKeys.end(), pressedKey) != possibleKeys.end()) && 
+        ((necessaryMods & usedMods) == necessaryMods) && // check for necessary mods
+        ((forbiddenMods & usedMods) == KeyboardMods::none); // check for forbidden mods
   }
 }

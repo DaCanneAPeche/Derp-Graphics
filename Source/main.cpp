@@ -85,8 +85,19 @@ class MainScene : public dg::Scene
         sprite.transform.rotation += glm::pi<float>()/4;
       });
 
+      bindInput(dg::Key::m, dg::config::Signals::RICK_MOVE);
+
+      signalHandler.on(dg::config::Signals::RICK_MOVE, [](){
+        LOGD << "MOVE";  
+      });
+
     }
 
+    void update() override
+    {
+      if (isActionTakingPlace(dg::config::Signals::RICK_MOVE))
+        app->registry.get<comp::Sprite>(rick).transform.translation.x += 1 * app->deltaTime;
+    }
 };
 
 class Game : public dg::Application

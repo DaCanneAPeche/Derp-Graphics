@@ -13,40 +13,99 @@ namespace dg
 {
   struct ISystem
   {
-    virtual void IUpdate(Scene& scene) {}
+    // Calls update function for all entity concerned
+    virtual void IUpdate() {}
+    virtual void init() {}
+
     entt::registry* pRegistry = nullptr;
+    Scene* pScene = nullptr;
+    bool active = true;
   };
 
   template <typename... Components>
-  class System : public ISystem
+  class MultiComponentsSystem : public ISystem
   {
     public:
 
-      virtual void onCreation(Scene& scene, entt::entity entity, Components&...) {}
-      virtual void onReplace(Scene& scene, entt::entity entity, Components&...) {}
-      virtual void onDestruct(Scene& scene, entt::entity entity, Components&...) {}
-      virtual void update(Scene& scene, entt::entity entity, Components&...) {}
-
-      void IUpdate(Scene& scene) override
+      void IUpdate() override
       {
         assert(pRegistry != nullptr && "pRegistry was not assigned");
+        assert(pScene != nullptr && "pScene was not assigned");
 
-        auto view = pRegistry->view<Components...>();
-        for (auto entity : view)
+        auto group = pRegistry->group<Components...>();
+        for (auto entity : group)
         {
-          std::apply([&scene, entity, this](auto &&... args) {
-            update(scene, entity, args...);
-              }, view.get(entity));
+          std::apply([entity, this](auto &&... args) {
+            update(*pScene, entity, args...);
+              }, group.get(entity));
         }
       }
 
-      void foo();
+    protected:
 
-      bool active = true;
+      virtual void update(Scene& scene, entt::entity entity, Components&...) {}
+  };
+
+  template <typename Component>
+  class SingleComponentSystem : public ISystem
+  {
+    public:
+
+      void IUpdate() override
+      {
+        assert(pRegistry != nullptr && "pRegistry was not assigned");
+        assert(pScene != nullptr && "pScene was not assigned");
+
+        auto view = pRegistry->view<Component>();
+        for (auto entity : view)
+        {
+          auto [component] = view.get(entity);
+          update(*pScene, entity, component);
+        }
+      }
+
+      void init() override
+      {
+        assert(pRegistry != nullptr && "pRegistry was not assigned");
+
+        pRegistry->on_construct<Component>()
+          .template connect<&SingleComponentSystem<Component>::_onCreation>(*this);
+
+        pRegistry->on_construct<Component>()
+          .template connect<&SingleComponentSystem<Component>::_onReplace>(*this);
+
+        pRegistry->on_construct<Component>()
+          .template connect<&SingleComponentSystem<Component>::_onDestruct>(*this);
+      }
 
     protected:
 
+      virtual void onCreation(Scene& scene, entt::entity entity, Component&) {}
+      virtual void onReplace(Scene& scene, entt::entity entity, Component&) {}
+      virtual void onDestruct(Scene& scene, entt::entity entity, Component&) {}
+      virtual void update(Scene& scene, entt::entity entity, Component&) {}
+
+    private: 
+
+      virtual void _onCreation(entt::registry&, entt::entity entity)
+      {
+        assert(pScene != nullptr && "pScene was not assigned");
+        onCreation(*pScene, entity, pRegistry->get<Component>(entity));
+      }
+
+      virtual void _onReplace(entt::registry&, entt::entity entity)
+      {
+        assert(pScene != nullptr && "pScene was not assigned");
+        onReplace(*pScene, entity, pRegistry->get<Component>(entity));
+      }
+
+      virtual void _onDestruct(entt::registry&, entt::entity entity)
+      {
+        assert(pScene != nullptr && "pScene was not assigned");
+        onDestruct(*pScene, entity, pRegistry->get<Component>(entity));
+      }
   };
+
 
   namespace _systems
   {

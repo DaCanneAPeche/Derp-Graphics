@@ -18,6 +18,7 @@ namespace dg
       MOUSE_RELEASE,
 
       RICK_ROTATE,
+      RICK_MOVE,
     };
   }
 }

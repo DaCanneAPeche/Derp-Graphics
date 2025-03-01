@@ -43,6 +43,7 @@ namespace dg
     if (currentScene != nullptr) currentScene->end();
     currentScene = m_scenes[static_cast<uint32_t>(sceneId)]();
     currentScene->init(this);
+    for (auto& system : _systems::allSystems) system->pScene = currentScene.get();
     currentScene->start();
   }
 
@@ -60,7 +61,7 @@ namespace dg
 
       currentScene->update();
 
-      for (auto& system : _systems::allSystems) system->IUpdate(*currentScene);
+      for (auto& system : _systems::allSystems) system->IUpdate();
 
       currentScene->lateUpdate();
 
@@ -133,7 +134,10 @@ namespace dg
   void Application::initSystems()
   {
     for (auto& system : _systems::allSystems)
+    {
       system->pRegistry = &registry;
+      system->init();
+    }
   }
 
 }
