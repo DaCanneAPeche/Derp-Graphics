@@ -41,9 +41,61 @@ namespace dg
         }
       }
 
+      void init() override
+      {
+        assert(pRegistry != nullptr && "pRegistry was not assigned");
+        (initSignals<Components>(), ...);
+      }
+
     protected:
 
+      virtual void onCreation(Scene& scene, entt::entity entity, Components&...) {}
+      virtual void onReplace(Scene& scene, entt::entity entity, Components&...) {}
+      virtual void onDestruct(Scene& scene, entt::entity entity, Components&...) {}
       virtual void update(Scene& scene, entt::entity entity, Components&...) {}
+
+    private:
+
+      template <class T>
+      void initSignals()
+      {
+        pRegistry->on_construct<T>()
+          .template connect<&MultiComponentsSystem<Components...>::_onCreation>(*this);
+
+        pRegistry->on_construct<T>()
+          .template connect<&MultiComponentsSystem<Components...>::_onReplace>(*this);
+
+        pRegistry->on_construct<T>()
+          .template connect<&MultiComponentsSystem<Components...>::_onDestruct>(*this);
+      }
+
+      virtual void _onCreation(entt::registry&, entt::entity entity)
+      {
+        assert(pScene != nullptr && "pScene was not assigned");
+        if (pRegistry->all_of<Components...>(entity))
+          std::apply([entity, this](auto &&... args) {
+            onCreation(*pScene, entity, args...);
+              }, pRegistry->get<Components...>());
+      }
+
+      virtual void _onReplace(entt::registry&, entt::entity entity)
+      {
+        assert(pScene != nullptr && "pScene was not assigned");
+        if (pRegistry->all_of<Components...>(entity))
+          std::apply([entity, this](auto &&... args) {
+            onReplace(*pScene, entity, args...);
+              }, pRegistry->get<Components...>());
+      }
+
+      virtual void _onDestruct(entt::registry&, entt::entity entity)
+      {
+        assert(pScene != nullptr && "pScene was not assigned");
+        if (pRegistry->all_of<Components...>(entity))
+          std::apply([entity, this](auto &&... args) {
+            onDestruct(*pScene, entity, args...);
+              }, pRegistry->get<Components...>());
+      }
+
   };
 
   template <typename Component>
@@ -125,4 +177,4 @@ namespace dg
 
 } // dg
 
-#define DG_REGISTER_SYSTEM(X) static int _##X = dg::_systems::addSystem<X>();
+#define DG_REGISTER_SYSTEM(X) static int8_t _##X = dg::_systems::addSystem<X>();
