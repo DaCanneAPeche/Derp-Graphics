@@ -25,6 +25,8 @@ namespace dg
   template <typename... Components>
   class System : public ISystem
   {
+    using FirstComponent = std::tuple_element_t<0, std::tuple<Components...>>;
+
     public:
 
       void IUpdate() override
@@ -32,7 +34,7 @@ namespace dg
         assert(pRegistry != nullptr && "pRegistry was not assigned");
         assert(pScene != nullptr && "pScene was not assigned");
 
-        auto group = pRegistry->group<Components...>();
+        auto group = pRegistry->view<Components...>();
         for (auto entity : group)
         {
           std::apply([entity, this](auto &&... args) {
@@ -44,22 +46,23 @@ namespace dg
       void init() override
       {
         assert(pRegistry != nullptr && "pRegistry was not assigned");
-        if (sizeof...(Components) == 0)
+        if constexpr(sizeof...(Components) == 0)
         {
           LOG_WARNING << "System without any components was created";
         }
 
-        if (sizeof...(Components) == 1)
+        else if constexpr(sizeof...(Components) == 1)
         {
-          pRegistry->on_construct<Components...>()
+          pRegistry->on_construct<FirstComponent>()
             .template connect<&System<Components...>::_singleComponentOnCreation>(*this);
 
-          pRegistry->on_construct<Components...>()
+          pRegistry->on_construct<FirstComponent>()
             .template connect<&System<Components...>::_singleComponentOnReplace>(*this);
 
-          pRegistry->on_construct<Components...>()
+          pRegistry->on_construct<FirstComponent>()
             .template connect<&System<Components...>::_singleComponentOnDestruct>(*this);
         }
+
         else (initSignals<Components>(), ...);
       }
 
@@ -92,7 +95,7 @@ namespace dg
         if (pRegistry->all_of<Components...>(entity))
           std::apply([entity, this](auto &&... args) {
             onCreation(*pScene, entity, args...);
-              }, pRegistry->get<Components...>());
+              }, pRegistry->get<Components...>(entity));
       }
 
       void _onReplace(entt::registry&, entt::entity entity)
@@ -101,7 +104,7 @@ namespace dg
         if (pRegistry->all_of<Components...>(entity))
           std::apply([entity, this](auto &&... args) {
             onReplace(*pScene, entity, args...);
-              }, pRegistry->get<Components...>());
+              }, pRegistry->get<Components...>(entity));
       }
 
       void _onDestruct(entt::registry&, entt::entity entity)
@@ -110,25 +113,25 @@ namespace dg
         if (pRegistry->all_of<Components...>(entity))
           std::apply([entity, this](auto &&... args) {
             onDestruct(*pScene, entity, args...);
-              }, pRegistry->get<Components...>());
+              }, pRegistry->get<Components...>(entity));
       }
 
       void _singleComponentOnCreation(entt::registry&, entt::entity entity)
       {
         assert(pScene != nullptr && "pScene was not assigned");
-        onCreation(*pScene, entity, pRegistry->get<Components...>(entity));
+        onCreation(*pScene, entity, pRegistry->get<FirstComponent>(entity));
       }
 
       void _singleComponentOnReplace(entt::registry&, entt::entity entity)
       {
         assert(pScene != nullptr && "pScene was not assigned");
-        onReplace(*pScene, entity, pRegistry->get<Components...>(entity));
+        onReplace(*pScene, entity, pRegistry->get<FirstComponent>(entity));
       }
 
       void _singleComponentOnDestruct(entt::registry&, entt::entity entity)
       {
         assert(pScene != nullptr && "pScene was not assigned");
-        onDestruct(*pScene, entity, pRegistry->get<Components...>(entity));
+        onDestruct(*pScene, entity, pRegistry->get<FirstComponent>(entity));
       }
 
   };
