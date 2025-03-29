@@ -23,7 +23,7 @@ namespace dg
   };
 
   template <typename... Components>
-  class MultiComponentsSystem : public ISystem
+  class System : public ISystem
   {
     public:
 
@@ -44,7 +44,23 @@ namespace dg
       void init() override
       {
         assert(pRegistry != nullptr && "pRegistry was not assigned");
-        (initSignals<Components>(), ...);
+        if (sizeof...(Components) == 0)
+        {
+          LOG_WARNING << "System without any components was created";
+        }
+
+        if (sizeof...(Components) == 1)
+        {
+          pRegistry->on_construct<Components...>()
+            .template connect<&System<Components...>::_singleComponentOnCreation>(*this);
+
+          pRegistry->on_construct<Components...>()
+            .template connect<&System<Components...>::_singleComponentOnReplace>(*this);
+
+          pRegistry->on_construct<Components...>()
+            .template connect<&System<Components...>::_singleComponentOnDestruct>(*this);
+        }
+        else (initSignals<Components>(), ...);
       }
 
     protected:
@@ -59,17 +75,18 @@ namespace dg
       template <class T>
       void initSignals()
       {
-        pRegistry->on_construct<T>()
-          .template connect<&MultiComponentsSystem<Components...>::_onCreation>(*this);
+        
+          pRegistry->on_construct<T>()
+            .template connect<&System<Components...>::_onCreation>(*this);
 
-        pRegistry->on_construct<T>()
-          .template connect<&MultiComponentsSystem<Components...>::_onReplace>(*this);
+          pRegistry->on_construct<T>()
+            .template connect<&System<Components...>::_onReplace>(*this);
 
-        pRegistry->on_construct<T>()
-          .template connect<&MultiComponentsSystem<Components...>::_onDestruct>(*this);
+          pRegistry->on_construct<T>()
+            .template connect<&System<Components...>::_onDestruct>(*this);
       }
 
-      virtual void _onCreation(entt::registry&, entt::entity entity)
+      void _onCreation(entt::registry&, entt::entity entity)
       {
         assert(pScene != nullptr && "pScene was not assigned");
         if (pRegistry->all_of<Components...>(entity))
@@ -78,7 +95,7 @@ namespace dg
               }, pRegistry->get<Components...>());
       }
 
-      virtual void _onReplace(entt::registry&, entt::entity entity)
+      void _onReplace(entt::registry&, entt::entity entity)
       {
         assert(pScene != nullptr && "pScene was not assigned");
         if (pRegistry->all_of<Components...>(entity))
@@ -87,7 +104,7 @@ namespace dg
               }, pRegistry->get<Components...>());
       }
 
-      virtual void _onDestruct(entt::registry&, entt::entity entity)
+      void _onDestruct(entt::registry&, entt::entity entity)
       {
         assert(pScene != nullptr && "pScene was not assigned");
         if (pRegistry->all_of<Components...>(entity))
@@ -96,68 +113,25 @@ namespace dg
               }, pRegistry->get<Components...>());
       }
 
+      void _singleComponentOnCreation(entt::registry&, entt::entity entity)
+      {
+        assert(pScene != nullptr && "pScene was not assigned");
+        onCreation(*pScene, entity, pRegistry->get<Components...>(entity));
+      }
+
+      void _singleComponentOnReplace(entt::registry&, entt::entity entity)
+      {
+        assert(pScene != nullptr && "pScene was not assigned");
+        onReplace(*pScene, entity, pRegistry->get<Components...>(entity));
+      }
+
+      void _singleComponentOnDestruct(entt::registry&, entt::entity entity)
+      {
+        assert(pScene != nullptr && "pScene was not assigned");
+        onDestruct(*pScene, entity, pRegistry->get<Components...>(entity));
+      }
+
   };
-
-  template <typename Component>
-  class SingleComponentSystem : public ISystem
-  {
-    public:
-
-      void IUpdate() override
-      {
-        assert(pRegistry != nullptr && "pRegistry was not assigned");
-        assert(pScene != nullptr && "pScene was not assigned");
-
-        auto view = pRegistry->view<Component>();
-        for (auto entity : view)
-        {
-          auto [component] = view.get(entity);
-          update(*pScene, entity, component);
-        }
-      }
-
-      void init() override
-      {
-        assert(pRegistry != nullptr && "pRegistry was not assigned");
-
-        pRegistry->on_construct<Component>()
-          .template connect<&SingleComponentSystem<Component>::_onCreation>(*this);
-
-        pRegistry->on_construct<Component>()
-          .template connect<&SingleComponentSystem<Component>::_onReplace>(*this);
-
-        pRegistry->on_construct<Component>()
-          .template connect<&SingleComponentSystem<Component>::_onDestruct>(*this);
-      }
-
-    protected:
-
-      virtual void onCreation(Scene& scene, entt::entity entity, Component&) {}
-      virtual void onReplace(Scene& scene, entt::entity entity, Component&) {}
-      virtual void onDestruct(Scene& scene, entt::entity entity, Component&) {}
-      virtual void update(Scene& scene, entt::entity entity, Component&) {}
-
-    private: 
-
-      virtual void _onCreation(entt::registry&, entt::entity entity)
-      {
-        assert(pScene != nullptr && "pScene was not assigned");
-        onCreation(*pScene, entity, pRegistry->get<Component>(entity));
-      }
-
-      virtual void _onReplace(entt::registry&, entt::entity entity)
-      {
-        assert(pScene != nullptr && "pScene was not assigned");
-        onReplace(*pScene, entity, pRegistry->get<Component>(entity));
-      }
-
-      virtual void _onDestruct(entt::registry&, entt::entity entity)
-      {
-        assert(pScene != nullptr && "pScene was not assigned");
-        onDestruct(*pScene, entity, pRegistry->get<Component>(entity));
-      }
-  };
-
 
   namespace _systems
   {
