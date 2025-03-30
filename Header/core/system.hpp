@@ -47,11 +47,11 @@ namespace dg
 
     // Specialization because views are better for one component and groups for
     // multiple components
-    using Factory = typename std::conditional<
+    using Factory = typename std::conditional_t<
       sizeof...(Components) == 1,
       ViewFactory<FirstComponent>,
       GroupFactory<Components...>
-        >::type;
+        >;
 
     public:
 

@@ -18,7 +18,7 @@ layout(std430, set = 1, binding = 0) uniform UniformBufferObject {
 
 void main()
 {
-	gl_Position = vec4(ubo.screenTransform * push.transform * position + push.offset, 0.0f, 1.0);
+	gl_Position = vec4(ubo.screenTransform * push.transform * (position + push.offset), 0.0f, 1.0);
   fragTextureCoordinates = textureCoordinates;
 }
 
