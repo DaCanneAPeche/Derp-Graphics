@@ -21,16 +21,16 @@ namespace dg
 
     static void inspectFields(void* _pInspected)
     {
+      ImGui::Separator();
+
       T* pInspected = static_cast<T*>(_pInspected);
       
-      ImGui::Text("Position component");
+      std::string text = std::string(entt::type_name<T>()) + " component :";
+      ImGui::Text(text.c_str());
 
       field_reflection::for_each_field(*pInspected, [](std::string_view field, auto& value) {
           inspect(field, value);
           });
-
-      ImGui::Separator();
-
     }
 
   };

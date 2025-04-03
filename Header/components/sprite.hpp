@@ -5,6 +5,7 @@
 #include "vulkan_renderer/frame.hpp"
 #include "core/transform2d.hpp"
 #include "vulkan_renderer/push_constant.hpp"
+#include "core/inspector.hpp"
 
 #include <memory>
 #include "vulkan/vulkan.hpp"
@@ -25,10 +26,7 @@ namespace comp
     uint32_t textureId = 0;
     float ratio;
 
-   /* Sprite()
-    {
-      entt::meta<Sprite>().func<&Sprite::inspect>("Inspector"_hs);
-    }*/
+    dg::Inspector<Sprite> inspector;
 
     void draw(dg::Frame& frame)
     {
@@ -42,21 +40,6 @@ namespace comp
 
       model->bind(frame.commandBuffer);
       model->draw(frame.commandBuffer);
-    }
-
-    static void inspect(void* instance)
-    {
-      Sprite* self = static_cast<Sprite*>(instance);
-      
-      ImGui::Text("Sprite component");
-
-      ImGui::SliderFloat2("Position", reinterpret_cast<float*>(&self->transform.translation), -1, 1);
-      ImGui::SliderFloat("Rotation", &self->transform.rotation, 0, 2 * glm::pi<float>());
-      ImGui::SliderFloat2("Scale", reinterpret_cast<float*>(&self->transform.scaling), -10, 10);
-      ImGui::Text("Texture id : %i", self->textureId);
-
-      ImGui::Separator();
-
     }
 
 	private:
