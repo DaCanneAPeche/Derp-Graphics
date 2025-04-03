@@ -7,7 +7,7 @@ target("Derp_Graphics")
 
     set_kind("binary")
     add_files("Source/**.cpp")
-    add_includedirs("Header")
+    add_includedirs("Header", "external")
     set_languages("c++23")
     set_symbols("debug")
 

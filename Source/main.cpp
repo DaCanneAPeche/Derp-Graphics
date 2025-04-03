@@ -12,6 +12,8 @@
 #include <rfl.hpp>
 #include <rfl/json.hpp>
 
+using namespace entt::literals;
+
 class MainScene : public dg::Scene
 {
   private:
@@ -29,7 +31,10 @@ class MainScene : public dg::Scene
 
     void start() override
     {
+      // entt::meta<comp::Position>().func<&comp::Position::inspect>("Inspector"_hs);
       rick = app->registry.create();
+      auto& pos = app->registry.emplace<comp::Position>(rick);
+      pos.x = 10;
       comp::Sprite& sprite = app->registry.emplace<comp::Sprite>(rick);
 
       std::vector<dg::Vertex> vertices 
@@ -203,6 +208,7 @@ class Game : public dg::Application
               if (auto func = type.func(entt::hashed_string("Inspector"));
                   storage.contains(entity) && func) {
                 void* comp = storage.value(entity);
+
                 func.invoke(type.from_void(comp), comp);
               }
             }

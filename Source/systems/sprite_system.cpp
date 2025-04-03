@@ -3,7 +3,7 @@
 #include "components/position.hpp"
 #include "core/application.hpp"
 
-class SpritePosSystem : public dg::System<comp::Sprite, comp::Position>
+/*class SpritePosSystem : public dg::System<comp::Sprite, comp::Position>
 {
   public:
 
@@ -13,7 +13,7 @@ class SpritePosSystem : public dg::System<comp::Sprite, comp::Position>
 
     }
 
-};
+};*/
 
 class SpriteSystem : public dg::System<comp::Sprite>
 {
@@ -29,5 +29,5 @@ class SpriteSystem : public dg::System<comp::Sprite>
     }
 };
 
-DG_REGISTER_SYSTEM(SpritePosSystem)
+// DG_REGISTER_SYSTEM(SpritePosSystem)
 DG_REGISTER_SYSTEM(SpriteSystem)

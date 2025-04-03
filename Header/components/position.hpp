@@ -1,24 +1,14 @@
 #pragma once
 
-#include "entt/entt.hpp"
-#include "imgui.h"
+#include "core/inspector.hpp"
 
 namespace comp
 {
-  using namespace entt::literals;
-
   struct Position
   {
     float x = 0, y = 0;
+    int z = 10;
 
-    Position()
-    {
-      // entt::meta<Position>().func<&Position::inspect>("Inspector"_hs);
-    }
-
-    static void draw()
-    {
-
-    }
+    dg::Inspector<Position> inspector;
   };
 }

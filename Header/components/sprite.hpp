@@ -25,10 +25,10 @@ namespace comp
     uint32_t textureId = 0;
     float ratio;
 
-    Sprite()
+   /* Sprite()
     {
       entt::meta<Sprite>().func<&Sprite::inspect>("Inspector"_hs);
-    }
+    }*/
 
     void draw(dg::Frame& frame)
     {
@@ -56,6 +56,7 @@ namespace comp
       ImGui::Text("Texture id : %i", self->textureId);
 
       ImGui::Separator();
+
     }
 
 	private:
