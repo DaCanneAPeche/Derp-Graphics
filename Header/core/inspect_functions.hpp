@@ -9,11 +9,17 @@
 namespace dg
 {
   template <class T>
+    class Inspector;
+
+  template <class T>
     void inspect(std::string_view name, T& var)
     {
       std::string text = std::string(entt::type_name<T>().value()) + ' ' + std::string(name) + ';';
       ImGui::Text(text.c_str());
     }
+
+  template <class T>
+    void inspect(std::string_view name, Inspector<T>& var) {}
 
   template <>
     inline void inspect<>(std::string_view name, int& var)

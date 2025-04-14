@@ -29,5 +29,5 @@ class SpriteSystem : public dg::System<comp::Sprite>
     }
 };
 
-// DG_REGISTER_SYSTEM(SpritePosSystem)
+DG_REGISTER_SYSTEM(SpritePosSystem) // TODO : change that as a template class
 DG_REGISTER_SYSTEM(SpriteSystem)

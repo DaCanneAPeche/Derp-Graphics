@@ -11,6 +11,21 @@
 
 namespace dg
 {
+
+  template <class Base, class Derived>
+    struct CheckIfFunctionsAreOverriden
+    {
+      using DerivedType = std::remove_reference_t<Derived>;
+
+      bool onCreation = !std::is_same_v<decltype(&DerivedType::onCreation),
+           decltype(&Base::onCreation)>;
+      bool onReplace = !std::is_same_v<decltype(&DerivedType::onReplace),
+           decltype(&Base::onReplace)>;
+      bool onDestruct = !std::is_same_v<decltype(&DerivedType::onDestruct),
+           decltype(&Base::onDestruct)>;
+      // bool update = &Parent::update == &Derived::update;
+    };
+
   struct ISystem
   {
     // Calls update function for all entity concerned
@@ -55,6 +70,8 @@ namespace dg
 
     public:
 
+      int id = 0;
+
       void IUpdate() override
       {
         assert(pRegistry != nullptr && "pRegistry was not assigned");
@@ -79,38 +96,51 @@ namespace dg
 
         else if constexpr(sizeof...(Components) == 1)
         {
-          pRegistry->on_construct<FirstComponent>()
-            .template connect<&System<Components...>::_singleComponentOnCreation>(*this);
+          CheckIfFunctionsAreOverriden<System<Components...>, decltype(*this)>
+            areFuncOverriden;
 
-          pRegistry->on_construct<FirstComponent>()
-            .template connect<&System<Components...>::_singleComponentOnReplace>(*this);
+          if (areFuncOverriden.onCreation)
+            pRegistry->on_construct<FirstComponent>()
+              .template connect<&System<Components...>::_singleComponentOnCreation>(*this);
 
-          pRegistry->on_construct<FirstComponent>()
-            .template connect<&System<Components...>::_singleComponentOnDestruct>(*this);
+          if (areFuncOverriden.onReplace)
+            pRegistry->on_construct<FirstComponent>()
+              .template connect<&System<Components...>::_singleComponentOnReplace>(*this);
+
+          if (areFuncOverriden.onDestruct)
+            pRegistry->on_construct<FirstComponent>()
+              .template connect<&System<Components...>::_singleComponentOnDestruct>(*this);
         }
 
         else (initSignals<Components>(), ...);
       }
 
-    protected:
 
       virtual void onCreation(Scene& scene, entt::entity entity, Components&...) {}
       virtual void onReplace(Scene& scene, entt::entity entity, Components&...) {}
       virtual void onDestruct(Scene& scene, entt::entity entity, Components&...) {}
       virtual void update(Scene& scene, entt::entity entity, Components&...) {}
 
+    protected:
+
     private:
+
 
       template <class T>
       void initSignals()
       {
-        
+        CheckIfFunctionsAreOverriden<System<Components...>, decltype(*this)>
+          areFuncOverriden;
+
+        if (areFuncOverriden.onCreation)
           pRegistry->on_construct<T>()
             .template connect<&System<Components...>::_onCreation>(*this);
 
+        if (areFuncOverriden.onReplace)
           pRegistry->on_construct<T>()
             .template connect<&System<Components...>::_onReplace>(*this);
 
+        if (areFuncOverriden.onDestruct)
           pRegistry->on_construct<T>()
             .template connect<&System<Components...>::_onDestruct>(*this);
       }
