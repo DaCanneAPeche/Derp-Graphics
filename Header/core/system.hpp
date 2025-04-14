@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <iostream>
 
 #include "entt/entt.hpp"
 
@@ -200,6 +201,7 @@ namespace dg
       template <class T>
       int addSystem()
       {
+        std::cout << "Registering system : " << typeid(T).name();
         std::shared_ptr<ISystem> newSystem = std::make_shared<T>();
         _systems::allSystems.push_back(newSystem);
 
@@ -208,6 +210,14 @@ namespace dg
 
   } // _systems 
 
+  template <class System>
+  struct RegisterSystem
+  {
+    RegisterSystem()
+    {
+      _systems::addSystem<System>();
+    }
+  };
+
 } // dg
 
-#define DG_REGISTER_SYSTEM(X) static int8_t _##X = dg::_systems::addSystem<X>();
