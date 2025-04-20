@@ -36,6 +36,7 @@ namespace dg
     entt::registry* pRegistry = nullptr;
     Scene* pScene = nullptr;
     bool active = true;
+    std::string_view name = "Unknown";
   };
 
   template <class ...Components>
@@ -75,6 +76,7 @@ namespace dg
 
       void IUpdate() override
       {
+        if (!active) return;
         assert(pRegistry != nullptr && "pRegistry was not assigned");
         assert(pScene != nullptr && "pScene was not assigned");
 
@@ -89,6 +91,8 @@ namespace dg
 
       void init() override
       {
+        setName();
+
         assert(pRegistry != nullptr && "pRegistry was not assigned");
         if constexpr(sizeof...(Components) == 0)
         {
@@ -97,6 +101,7 @@ namespace dg
 
         else if constexpr(sizeof...(Components) == 1)
         {
+          // TODO: test if it actually works
           CheckIfFunctionsAreOverriden<System<Components...>, decltype(*this)>
             areFuncOverriden;
 
@@ -125,7 +130,10 @@ namespace dg
     protected:
 
     private:
-
+      void setName()
+      {
+        name = entt::type_name<std::remove_reference_t<decltype(*this)>()>().value();
+      }
 
       template <class T>
       void initSignals()
@@ -201,7 +209,6 @@ namespace dg
       template <class T>
       int addSystem()
       {
-        std::cout << "Registering system : " << typeid(T).name();
         std::shared_ptr<ISystem> newSystem = std::make_shared<T>();
         _systems::allSystems.push_back(newSystem);
 

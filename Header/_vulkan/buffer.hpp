@@ -30,6 +30,7 @@ namespace dg
 
       vk::Buffer buffer;
       vma::Allocation allocation;
+      vk::DeviceSize size;
 
     protected:
 
@@ -37,7 +38,6 @@ namespace dg
       vma::AllocationCreateFlags m_allocFlag;
       vk::SharingMode m_sharingMode;
       vma::MemoryUsage m_memoryUsage;
-      vk::DeviceSize m_bufferSize;
       vk::DeviceSize m_instanceSize;
       vk::DeviceSize m_alignementSize;
       VulkanToolBox& m_toolBox;

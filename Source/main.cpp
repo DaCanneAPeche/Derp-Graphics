@@ -8,6 +8,8 @@
 #include "core/inputs.hpp"
 #include "components/sprite.hpp"
 #include "components/position.hpp"
+#include "core/system.hpp"
+
 #include <glm/gtc/constants.hpp>
 #include <rfl.hpp>
 #include <rfl/json.hpp>
@@ -178,8 +180,6 @@ class Game : public dg::Application
         ImGui::TreePop();
       }
 
-      ImGui::Spacing();
-
       if (ImGui::TreeNode("Rendering"))
       {
         ImGui::Checkbox("Show only outlines", &showOnlyOutlines);
@@ -189,8 +189,6 @@ class Game : public dg::Application
             sizeof(dg::PushConstant), maxPushConstantSize);
         ImGui::TreePop();
       }
-
-      ImGui::Spacing();
 
       if (ImGui::TreeNode("Entities"))
       {
@@ -218,15 +216,25 @@ class Game : public dg::Application
 
         ImGui::TreePop();
       }
+
+      if(ImGui::TreeNode("Systems"))
+      {
+        ImGui::Text("Number of systems : %lu", dg::_systems::allSystems.size());
+
+        for (const auto& system : dg::_systems::allSystems)
+        {
+          ImGui::Checkbox(std::string(system->name).c_str(), &system->active);
+        }
+
+        ImGui::TreePop();
+      }
+
       ImGui::End();
     }
 };
 
 int main(void)
 {
-  std::cout << sizeof(glm::mat2) << std::endl;
-  std::cout << sizeof(glm::vec4) << std::endl;
-
   dg::WindowInfo windowInfo {1000, 1000, "Hello, world !"};
   dg::ApplicationInfo appInfo {"Hello, world program !", {1, 0, 0}};
 

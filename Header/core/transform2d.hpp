@@ -8,7 +8,7 @@ namespace dg
 	{
 		glm::vec2 translation = {0.0f, 0.0f};
 		glm::vec2 scaling = {1.0f, 1.0f};
-		float rotation;
+		float rotation = 0;
     float ratio = 1;
 
 		[[nodiscard]] glm::mat2 getMatrix() const

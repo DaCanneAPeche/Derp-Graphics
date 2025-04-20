@@ -19,7 +19,7 @@ namespace dg
           m_allocFlag(allocFlag), m_toolBox(vulkanToolBox)
 	{
 		m_alignementSize = getAlignment(m_instanceSize, minOffsetAlignement);
-		m_bufferSize = m_alignementSize * instanceCount;
+		size = m_alignementSize * instanceCount;
 		createBuffer();
 	}
 
@@ -30,7 +30,7 @@ namespace dg
   
 	void Buffer::createBuffer()
 	{
-		vk::BufferCreateInfo bufferInfo({}, m_bufferSize, m_bufferUsageFlags, m_sharingMode);
+		vk::BufferCreateInfo bufferInfo({}, size, m_bufferUsageFlags, m_sharingMode);
 		vma::AllocationCreateInfo allocInfo(m_allocFlag, m_memoryUsage);
 		auto handle = m_toolBox.allocator.createBuffer(bufferInfo, allocInfo);
 		buffer = handle.first;
