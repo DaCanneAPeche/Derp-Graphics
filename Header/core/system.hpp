@@ -13,6 +13,7 @@
 namespace dg
 {
 
+  // TODO: change it so it is manually called from the system
   template <class Base, class Derived>
     struct CheckIfFunctionsAreOverriden
     {
@@ -104,6 +105,10 @@ namespace dg
           // TODO: test if it actually works
           CheckIfFunctionsAreOverriden<System<Components...>, decltype(*this)>
             areFuncOverriden;
+
+          LOGD << areFuncOverriden.onCreation;
+          LOGD << test_areFuncOverriden();
+          LOGD << areFuncOverriden.onReplace;
 
           if (areFuncOverriden.onCreation)
             pRegistry->on_construct<FirstComponent>()
