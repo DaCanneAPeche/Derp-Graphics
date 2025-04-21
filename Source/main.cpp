@@ -182,11 +182,27 @@ class Game : public dg::Application
 
       if (ImGui::TreeNode("Rendering"))
       {
-        ImGui::Checkbox("Show only outlines", &showOnlyOutlines);
+        vk::PhysicalDeviceProperties physicalDeviceProperties =
+          vulkanToolBox.physicalDevice.getProperties();
+
+        ImGui::Checkbox("Wireframe", &showOnlyOutlines);
+
         unsigned long maxPushConstantSize =
-          vulkanToolBox.physicalDevice.getProperties().limits.maxPushConstantsSize;
+          physicalDeviceProperties.limits.maxPushConstantsSize;
         ImGui::Text("Push constant size : %lu bits out of %lu",
             sizeof(dg::PushConstant), maxPushConstantSize);
+
+        uint32_t rawApiVersion = physicalDeviceProperties.apiVersion;
+        unsigned long apiVersion[4] = {
+          vk::apiVersionVariant(rawApiVersion),
+          vk::apiVersionMajor(rawApiVersion),
+          vk::apiVersionMinor(rawApiVersion),
+          vk::apiVersionPatch(rawApiVersion)
+        };
+
+        ImGui::Text("Hardware max API version : %lu.%lu.%lu.%lu", apiVersion[0],
+            apiVersion[1], apiVersion[2], apiVersion[3]);
+
         ImGui::TreePop();
       }
 

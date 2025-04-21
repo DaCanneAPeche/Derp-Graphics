@@ -17,6 +17,7 @@
 - [x] Renderer refactoring
 - [ ] Render graph
 - [ ] Template update for descriptor and better ressource mananger
+- [ ] Buffer syncronization
 
 ### Can wait a looonnnnnng timmmme...
 - [ ] Descriptor Pool abstraction
@@ -30,5 +31,5 @@
 - [X] Input library
 - [ ] Audio
 - [ ] Game loop
-- [ ] **Entity systems**
+- [x] **Entity systems**
 - [X] Signal handler able to have multiple callbacks

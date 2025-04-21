@@ -14,6 +14,7 @@ namespace dg
 {
 
   // TODO: change it so it is manually called from the system
+  // Can work with this deduction but updating g++ is annoying
   template <class Base, class Derived>
     struct CheckIfFunctionsAreOverriden
     {
@@ -102,12 +103,11 @@ namespace dg
 
         else if constexpr(sizeof...(Components) == 1)
         {
-          // TODO: test if it actually works
+          // TODO: that does not work
           CheckIfFunctionsAreOverriden<System<Components...>, decltype(*this)>
             areFuncOverriden;
 
           LOGD << areFuncOverriden.onCreation;
-          LOGD << test_areFuncOverriden();
           LOGD << areFuncOverriden.onReplace;
 
           if (areFuncOverriden.onCreation)
@@ -135,6 +135,8 @@ namespace dg
     protected:
 
     private:
+      // template <class Self> => When g++ will be supported on debian
+      // void setName(this Self&& self)
       void setName()
       {
         name = entt::type_name<std::remove_reference_t<decltype(*this)>()>().value();
