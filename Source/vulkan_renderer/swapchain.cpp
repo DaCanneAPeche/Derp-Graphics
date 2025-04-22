@@ -13,14 +13,13 @@
 namespace dg
 {
 	SwapChain::SwapChain(VulkanToolBox& toolBox, vk::Extent2D extent)
-			: m_toolBox(toolBox), m_windowExtent {extent}
+			: m_toolBox(toolBox), m_windowExtent {extent}, m_renderPass(toolBox)
 	{
-		
 		init();
 	}
 
 	SwapChain::SwapChain(VulkanToolBox& toolBox, vk::Extent2D extent, std::shared_ptr<SwapChain> previous)
-			: m_toolBox(toolBox), m_windowExtent {extent}, m_oldSwapChain {previous}
+			: m_toolBox(toolBox), m_windowExtent {extent}, m_oldSwapChain {previous},  m_renderPass(toolBox)
 	{
 		init();
 
@@ -57,8 +56,6 @@ namespace dg
 
 		for (auto framebuffer : m_swapChainFramebuffers)
 			m_toolBox.device.destroyFramebuffer(framebuffer);
-
-		m_toolBox.device.destroyRenderPass(m_renderPass);
 
 		// cleanup synchronization objects
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -195,22 +192,7 @@ namespace dg
 
 	void SwapChain::createRenderPass()
 	{
-		vk::AttachmentDescription depthAttachment(
-				{},
-				findDepthFormat(),
-				vk::SampleCountFlagBits::e1,
-				vk::AttachmentLoadOp::eClear,
-				vk::AttachmentStoreOp::eDontCare,
-				vk::AttachmentLoadOp::eDontCare,
-				vk::AttachmentStoreOp::eDontCare,
-				vk::ImageLayout::eUndefined,
-				vk::ImageLayout::eDepthStencilAttachmentOptimal
-				);
-
-		vk::AttachmentReference depthAttachmentRef(1, vk::ImageLayout::eDepthStencilAttachmentOptimal);
-
-		vk::AttachmentDescription colorAttachment(
-				{},
+		AttachmentReference colorAttachment = m_renderPass.addAttachment(
 				getSwapChainImageFormat(),
 				vk::SampleCountFlagBits::e1,
 				vk::AttachmentLoadOp::eClear,
@@ -221,19 +203,28 @@ namespace dg
 				vk::ImageLayout::ePresentSrcKHR
 				);
 
-		vk::AttachmentReference colorAttachmentRef(0, vk::ImageLayout::eColorAttachmentOptimal);
-
-		vk::SubpassDescription subpass(
-				{},
-				vk::PipelineBindPoint::eGraphics,
-				{},
-				colorAttachmentRef,
-				{},
-				&depthAttachmentRef,
-				{}
+		AttachmentReference depthAttachment = m_renderPass.addAttachment(
+				findDepthFormat(),
+				vk::SampleCountFlagBits::e1,
+				vk::AttachmentLoadOp::eClear,
+				vk::AttachmentStoreOp::eDontCare,
+				vk::AttachmentLoadOp::eDontCare,
+				vk::AttachmentStoreOp::eDontCare,
+				vk::ImageLayout::eUndefined,
+				vk::ImageLayout::eDepthStencilAttachmentOptimal
 				);
 
-		vk::SubpassDependency dependency(
+		vk::AttachmentReference colorAttachmentRef =
+      colorAttachment.get(vk::ImageLayout::eColorAttachmentOptimal);
+		vk::AttachmentReference depthAttachmentRef =
+      depthAttachment.get(vk::ImageLayout::eDepthStencilAttachmentOptimal);
+
+		m_renderPass.addSubpass(vk::SubpassDescription(
+				{}, vk::PipelineBindPoint::eGraphics, {}, colorAttachmentRef, {},
+				&depthAttachmentRef, {}
+				));
+
+		/*vk::SubpassDependency dependency(
 				vk::SubpassExternal,
 				0,
 				vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
@@ -251,7 +242,8 @@ namespace dg
 				dependency
 				);
 
-		m_renderPass = m_toolBox.device.createRenderPass(renderPassInfo);
+		m_renderPass = m_toolBox.device.createRenderPass(renderPassInfo);*/
+    m_renderPass.create();
 	}
 
 	void SwapChain::createFramebuffers()
@@ -264,7 +256,7 @@ namespace dg
 			vk::Extent2D swapChainExtent = getSwapChainExtent();
 			vk::FramebufferCreateInfo framebufferInfo(
 					{},
-					m_renderPass,
+					m_renderPass.renderPass,
 					attachments,
 					swapChainExtent.width,
 					swapChainExtent.height,

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "_vulkan/vulkan_tool_box.hpp"
+#include "vulkan_renderer/render_pass.hpp"
 
 // vulkan headers
 #include <vulkan/vulkan.hpp>
@@ -24,7 +25,7 @@ namespace dg
 		SwapChain& operator=(const SwapChain &) = delete;
 
 		vk::Framebuffer getFrameBuffer(int index) { return m_swapChainFramebuffers[index]; }
-		vk::RenderPass getRenderPass() { return m_renderPass; }
+		vk::RenderPass getRenderPass() { return m_renderPass.renderPass; }
 		vk::ImageView getImageView(int index) { return m_swapChainImageViews[index]; }
 		size_t imageCount() { return m_swapChainImages.size(); }
 		vk::Format getSwapChainImageFormat() { return m_swapChainImageFormat; }
@@ -60,7 +61,9 @@ namespace dg
 		vk::Extent2D m_swapChainExtent;
 
 		std::vector<vk::Framebuffer> m_swapChainFramebuffers;
-		vk::RenderPass m_renderPass;
+
+		// vk::RenderPass m_renderPass;
+    RenderPass m_renderPass;
 
 		std::vector<vk::Image> m_depthImages;
 		std::vector<vma::Allocation> m_depthImageAllocations;
