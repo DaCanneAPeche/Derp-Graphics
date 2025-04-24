@@ -107,8 +107,8 @@ namespace dg
           CheckIfFunctionsAreOverriden<System<Components...>, decltype(*this)>
             areFuncOverriden;
 
-          LOGD << areFuncOverriden.onCreation;
-          LOGD << areFuncOverriden.onReplace;
+          // LOGD << areFuncOverriden.onCreation;
+          // LOGD << areFuncOverriden.onReplace;
 
           if (areFuncOverriden.onCreation)
             pRegistry->on_construct<FirstComponent>()
