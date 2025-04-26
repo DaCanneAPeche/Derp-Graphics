@@ -5,12 +5,18 @@
 #include "_vulkan/vulkan_tool_box.hpp"
 
 #include <any>
-#include <unordered_map>
+#include <map>
 #include <memory>
 
 namespace dg
 {
   class ShaderVariableManager;
+
+  struct BufferWriteDescription
+  {
+    vk::DeviceSize offset, size;
+    void* data;
+  };
 
   /*
    * A class reperesenting a UBO variable. 
@@ -19,18 +25,14 @@ namespace dg
   {
     public:
       uint32_t size = 0;
+      uint32_t index = 0;
       std::any value = 0;
 
-      ShaderVariable(ShaderVariableManager& manager) : m_manager(manager) {}
-
       // Should be replaced by a operator= of some form ?
-      void setValue(const std::any& newValue)
-      {
-        value = newValue;
-      }
+      void setValue(const std::any& newValue);
 
     private:
-      const ShaderVariableManager& m_manager;
+      ShaderVariableManager* m_pManager = nullptr;
   };
 
   /* 
@@ -41,25 +43,10 @@ namespace dg
   {
     public:
 
-      ShaderVariableManager(VulkanToolBox& vulkanToolBox) : m_toolBox(vulkanToolBox)
-      {
-        vk::DeviceSize size = 0;
+      ShaderVariableManager(VulkanToolBox& vulkanToolBox);
 
-        throw std::runtime_error("A ShaderVariableManager was created but the class isn't implemented yet");
-
-        for (const auto& [key, variable] : m_variables)
-        {
-          if (variable.size == 0)
-          {
-            LOG_WARNING << "variable " << key << " has a null size";
-          }
-
-          size += variable.size;
-        }
-
-        m_uniformBuffer = std::make_unique<Buffer>(m_toolBox, size, 1, vk::BufferUsageFlagBits::eUniformBuffer,
-            vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
-      }
+      void updateVariable(size_t index, uint32_t size, void* data);
+      void processWrites();
 
       ShaderVariable& operator[](const std::string& name)
       {
@@ -68,22 +55,9 @@ namespace dg
 
     private:
       std::unique_ptr<Buffer> m_uniformBuffer;
-      std::unordered_map<std::string, ShaderVariable> m_variables;
+      std::map<std::string, ShaderVariable> m_variables;
+      std::vector<BufferWriteDescription> m_bufferWrites;
       VulkanToolBox& m_toolBox;
-
-      void updateVariable(size_t index, uint32_t size, void* data)
-      {
-        uint32_t offset = 0;
-
-        uint32_t _index = 0;
-        for (const auto& [key, variable] : m_variables)
-        {
-          if (_index >= index) break;
-          offset += variable.size;
-        }
-
-        m_uniformBuffer->write(data, offset, size);
-      }
 
   };
 }

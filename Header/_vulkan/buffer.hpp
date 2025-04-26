@@ -26,7 +26,7 @@ namespace dg
       void copyToBuffer(Buffer& otherBuffer, vk::DeviceSize size);
       void copyToImage(vk::Image& image, uint32_t width, uint32_t height);
 
-      void write(void* data, vk::DeviceSize offset = 0, vk::DeviceSize = vk::WholeSize);
+      void write(void* data, vk::DeviceSize offset = 0, vk::DeviceSize size = vk::WholeSize);
 
       vk::Buffer buffer;
       vma::Allocation allocation;
