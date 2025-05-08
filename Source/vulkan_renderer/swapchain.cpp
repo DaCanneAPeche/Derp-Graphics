@@ -228,15 +228,6 @@ namespace dg
 				{}
 				));
 
-		/*std::array<vk::AttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
-		vk::RenderPassCreateInfo renderPassInfo(
-				{},
-				attachments,
-				subpass,
-				dependency
-				);
-
-		m_renderPass = m_toolBox.device.createRenderPass(renderPassInfo);*/
     m_renderPass.create();
 	}
 
