@@ -34,10 +34,15 @@ namespace dg
           vk::AttachmentLoadOp stencilLoadOp, vk::AttachmentStoreOp stencilStoreOp,
           vk::ImageLayout initialLayout, vk::ImageLayout finalLayout);
 
-      RenderPass& addSubpass(const vk::SubpassDescription& subpass)
+      size_t addSubpass(const vk::SubpassDescription& subpass)
       {
         m_subpasses.push_back(subpass);
-        return *this;
+        return m_subpasses.size() - 1;
+      }
+
+      void addDependency(const vk::SubpassDependency& dependency)
+      {
+        m_dependencies.push_back(dependency);
       }
 
       void create();
@@ -47,6 +52,7 @@ namespace dg
       VulkanToolBox& m_toolBox;
       std::vector<vk::AttachmentDescription> m_attachments = {};
       std::vector<vk::SubpassDescription> m_subpasses = {};
+      std::vector<vk::SubpassDependency> m_dependencies = {};
 
   };
 }

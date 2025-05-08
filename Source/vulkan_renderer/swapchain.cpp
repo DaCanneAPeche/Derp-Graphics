@@ -192,7 +192,7 @@ namespace dg
 
 	void SwapChain::createRenderPass()
 	{
-		AttachmentReference colorAttachment = m_renderPass.addAttachment(
+    vk::AttachmentReference colorAttachmentReference = m_renderPass.addAttachment(
 				getSwapChainImageFormat(),
 				vk::SampleCountFlagBits::e1,
 				vk::AttachmentLoadOp::eClear,
@@ -201,9 +201,9 @@ namespace dg
 				vk::AttachmentStoreOp::eDontCare,
 				vk::ImageLayout::eUndefined,
 				vk::ImageLayout::ePresentSrcKHR
-				);
+				).get(vk::ImageLayout::eColorAttachmentOptimal);
 
-		AttachmentReference depthAttachment = m_renderPass.addAttachment(
+    vk::AttachmentReference depthAttachmentReference = m_renderPass.addAttachment(
 				findDepthFormat(),
 				vk::SampleCountFlagBits::e1,
 				vk::AttachmentLoadOp::eClear,
@@ -212,29 +212,23 @@ namespace dg
 				vk::AttachmentStoreOp::eDontCare,
 				vk::ImageLayout::eUndefined,
 				vk::ImageLayout::eDepthStencilAttachmentOptimal
-				);
-
-		vk::AttachmentReference colorAttachmentRef =
-      colorAttachment.get(vk::ImageLayout::eColorAttachmentOptimal);
-		vk::AttachmentReference depthAttachmentRef =
-      depthAttachment.get(vk::ImageLayout::eDepthStencilAttachmentOptimal);
+				).get(vk::ImageLayout::eDepthStencilAttachmentOptimal);
 
 		m_renderPass.addSubpass(vk::SubpassDescription(
-				{}, vk::PipelineBindPoint::eGraphics, {}, colorAttachmentRef, {},
-				&depthAttachmentRef, {}
+				{}, vk::PipelineBindPoint::eGraphics, {}, colorAttachmentReference, {},
+				&depthAttachmentReference, {}
 				));
 
-		/*vk::SubpassDependency dependency(
-				vk::SubpassExternal,
-				0,
+		m_renderPass.addDependency(vk::SubpassDependency(
+				vk::SubpassExternal, 0,
 				vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
 				vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
 				{},
 				vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eDepthStencilAttachmentWrite,
 				{}
-				);
+				));
 
-		std::array<vk::AttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
+		/*std::array<vk::AttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
 		vk::RenderPassCreateInfo renderPassInfo(
 				{},
 				attachments,

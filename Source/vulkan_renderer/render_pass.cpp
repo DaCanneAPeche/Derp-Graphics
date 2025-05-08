@@ -20,7 +20,7 @@ namespace dg
 
     void RenderPass::create()
     {
-      vk::RenderPassCreateInfo createInfo({}, m_attachments, m_subpasses);
+      vk::RenderPassCreateInfo createInfo({}, m_attachments, m_subpasses, m_dependencies);
       renderPass = m_toolBox.device.createRenderPass(createInfo);
     }
 
