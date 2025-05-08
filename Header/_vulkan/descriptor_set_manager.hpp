@@ -7,6 +7,9 @@
 
 namespace dg
 {
+
+  using DescriptorSetIndex = size_t;
+
   class DescriptorSetManager
   {
     public:
@@ -19,7 +22,7 @@ namespace dg
       }
 
       DescriptorSetLayout& addLayout();
-      void addDescriptor(size_t layoutIndex);
+      DescriptorSetIndex addDescriptor(DescriptorSetLayoutIndex layoutIndex);
 
       void writeToDescriptor(uint32_t descriptorSetIndex, uint32_t binding,
           const vk::ArrayProxyNoTemporaries<const vk::DescriptorImageInfo>& imageInfo = {},

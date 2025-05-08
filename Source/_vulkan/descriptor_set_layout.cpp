@@ -17,11 +17,12 @@ namespace dg
     return *this;
   }
 
-  void DescriptorSetLayout::create()
+  DescriptorSetLayoutIndex DescriptorSetLayout::create()
   {
     vk::DescriptorSetLayoutBindingFlagsCreateInfo bindingFlags(m_bindingFlags);
     vk::DescriptorSetLayoutCreateInfo layoutInfo({}, m_bindings, &bindingFlags);
     layout = m_toolBox.device.createDescriptorSetLayout(layoutInfo);
+    return m_index;
   }
 
   vk::DescriptorType& DescriptorSetLayout::getBindingType(size_t index)

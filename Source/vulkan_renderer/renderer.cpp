@@ -152,8 +152,7 @@ namespace dg
 
   void Renderer::createDescriptorSetLayout()
   {
-    // index 0
-    m_descriptorSetManager.addLayout()
+    m_descriptorLayouts.textures = m_descriptorSetManager.addLayout()
       .addBinding(vk::DescriptorType::eSampler,
         vk::ShaderStageFlagBits::eFragment)
       .addBinding(vk::DescriptorType::eSampledImage,
@@ -161,8 +160,7 @@ namespace dg
         vk::DescriptorBindingFlagBits::ePartiallyBound)
       .create();
 
-    // index 1
-    m_descriptorSetManager.addLayout()
+    m_descriptorLayouts.ubo = m_descriptorSetManager.addLayout()
       .addBinding(vk::DescriptorType::eUniformBuffer,
           vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment)
       .create();
@@ -189,17 +187,17 @@ namespace dg
   void Renderer::createDescriptorSets()
   {
     // TODO : one descriptor by frame or something like that
-    m_descriptorSetManager.addDescriptor(0); // textures
-    m_descriptorSetManager.addDescriptor(1); // uniform buffer
+    m_descriptorSets.textures = m_descriptorSetManager.addDescriptor(m_descriptorLayouts.textures);
+    m_descriptorSets.ubo = m_descriptorSetManager.addDescriptor(m_descriptorLayouts.ubo);
 
     m_descriptorSetManager.allocate(m_descriptorPool);
 
     vk::DescriptorImageInfo samplerInfo(m_imageSampler, {},
         vk::ImageLayout::eShaderReadOnlyOptimal);
-    m_descriptorSetManager.writeToDescriptor(0, 0, samplerInfo, {});
+    m_descriptorSetManager.writeToDescriptor(m_descriptorSets.textures, 0, samplerInfo, {});
 
     vk::DescriptorBufferInfo uboInfo = m_uniformBuffer->descriptorInfo();
-    m_descriptorSetManager.writeToDescriptor(1, 0, {}, uboInfo);
+    m_descriptorSetManager.writeToDescriptor(m_descriptorSets.ubo, 0, {}, uboInfo);
 
     m_descriptorSetManager.update();
   }
@@ -207,7 +205,7 @@ namespace dg
   void Renderer::updateTextures(AssetManager& assetManager)
   {
     auto texturesInfo = assetManager.textureInfos();
-    m_descriptorSetManager.writeToDescriptor(0, 1, texturesInfo, {});
+    m_descriptorSetManager.writeToDescriptor(m_descriptorSets.textures, 1, texturesInfo, {});
     m_descriptorSetManager.update();
   }
 

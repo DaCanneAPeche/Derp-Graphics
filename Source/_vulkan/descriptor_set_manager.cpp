@@ -6,14 +6,15 @@ namespace dg
 
   DescriptorSetLayout& DescriptorSetManager::addLayout()
   {
-    m_layouts.emplace_back(m_toolBox);
+    m_layouts.emplace_back(m_toolBox, m_layouts.size());
     return m_layouts.back();
   }
 
-  void DescriptorSetManager::addDescriptor(size_t layoutIndex)
+  DescriptorSetIndex DescriptorSetManager::addDescriptor(DescriptorSetLayoutIndex layoutIndex)
   {
     m_layoutIndexPerDescriptorSet.push_back(layoutIndex);
     layouts.push_back(m_layouts[layoutIndex].layout);
+    return layouts.size() - 1;
   }
 
   void DescriptorSetManager::writeToDescriptor(uint32_t descriptorSetIndex, uint32_t binding,

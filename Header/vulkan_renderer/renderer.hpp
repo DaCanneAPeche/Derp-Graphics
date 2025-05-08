@@ -102,5 +102,16 @@ namespace dg
     vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;
     DescriptorSetManager m_descriptorSetManager;
+
+    struct {
+      DescriptorSetLayoutIndex textures = 0;
+      DescriptorSetLayoutIndex ubo = 0;
+    } m_descriptorLayouts;
+
+    struct {
+      DescriptorSetIndex textures = 0;
+      DescriptorSetIndex ubo = 0;
+    } m_descriptorSets;
+
 	};
 } /* dg */ 
