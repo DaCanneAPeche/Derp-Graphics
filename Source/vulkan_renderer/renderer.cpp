@@ -126,8 +126,8 @@ namespace dg
   }
 
   std::unique_ptr<Pipeline> Renderer::createPipeline(
-      const std::string& vertShaderPath,
-      const std::string& fragShaderPath,
+      ShaderModule& vertShader,
+      ShaderModule& fragShader,
       const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
       const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions,
       std::shared_ptr<PipelineConfigInfo> pPipelineConfig
@@ -142,8 +142,8 @@ namespace dg
     pipelineConfig.pipelineLayout = m_pipelineLayout;
 
     return std::make_unique<Pipeline>(m_toolBox,
-        vertShaderPath,
-        fragShaderPath,
+        vertShader,
+        fragShader,
         pipelineConfig,
         bindingDescriptions,
         attributeDescriptions
@@ -218,8 +218,8 @@ namespace dg
     for (auto& pipelineInfo : pipelinesInfo)
     {
       m_pipelines[static_cast<uint32_t>(pipelineInfo.id)] = createPipeline(
-          pipelineInfo.vertexShaderPath,
-          pipelineInfo.fragmentShaderPath,
+          pipelineInfo.vertexShader,
+          pipelineInfo.fragmentShader,
           Vertex::getBindingDescriptions(),
           Vertex::getAttributeDescriptions(),
           pipelineInfo.config

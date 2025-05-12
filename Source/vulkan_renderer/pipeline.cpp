@@ -7,21 +7,22 @@ namespace dg
 
 	Pipeline::Pipeline(
 			VulkanToolBox& toolBox,
-			const std::string& vertShaderPath,
-			const std::string& fragShaderPath,
+			ShaderModule& vertShader,
+			ShaderModule& fragShader,
 			const PipelineConfigInfo& configInfo,
 			const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
 			const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions
 			) : m_toolBox(toolBox), m_bindingDescriptions(bindingDescriptions),
-  m_attributeDescriptions(attributeDescriptions)
+  m_attributeDescriptions(attributeDescriptions), m_fragShader(fragShader),
+  m_vertShader(vertShader)
 	{
-		createGraphicsPipeline(vertShaderPath, fragShaderPath, configInfo);
+		createGraphicsPipeline(configInfo);
 	}
 
 	Pipeline::~Pipeline()
 	{
-		m_toolBox.device.destroyShaderModule(m_vertShaderModule);
-		m_toolBox.device.destroyShaderModule(m_fragShaderModule);
+    m_toolBox.device.destroy(m_vertShaderModule);
+    m_toolBox.device.destroy(m_fragShaderModule);
 		m_toolBox.device.destroyPipeline(m_graphicsPipeline);
 	}
 	
@@ -96,8 +97,6 @@ namespace dg
 	}
 
 	void Pipeline::createGraphicsPipeline(
-			const std::string& vertShaderPath,
-			const std::string& fragShaderPath,
 			const PipelineConfigInfo& configInfo
 			)
 	{
@@ -107,11 +106,14 @@ namespace dg
     assert(configInfo.renderPass != VK_NULL_HANDLE && 
             "Cannot create graphics pipeline : no renderPass provided in configInfo");
 
-		std::vector<char> vertCode = file::read(vertShaderPath);
-		std::vector<char> fragCode = file::read(fragShaderPath);
+		// std::vector<char> vertCode = file::read<char>(vertShaderPath);
+		// std::vector<char> fragCode = file::read<char>(fragShaderPath);
 
-		m_vertShaderModule = createShaderModule(vertCode);
-		m_fragShaderModule = createShaderModule(fragCode);
+		// m_vertShaderModule = createShaderModule(vertCode);
+		// m_fragShaderModule = createShaderModule(fragCode);
+
+    m_vertShader.create(m_toolBox, m_vertShaderModule);
+    m_fragShader.create(m_toolBox, m_fragShaderModule);
 
 		std::array<vk::PipelineShaderStageCreateInfo, 2> shaderStages 
 		{
@@ -157,7 +159,7 @@ namespace dg
 		m_graphicsPipeline = m_toolBox.device.createGraphicsPipeline(VK_NULL_HANDLE, pipelineInfo).value;
 	}
 
-	vk::ShaderModule Pipeline::createShaderModule(const std::vector<char>& code)
+	/*vk::ShaderModule Pipeline::createShaderModule(const std::vector<char>& code)
 	{
 		// TODO : Fix the vector casting
 		// std::vector<uint32_t> iCode(code.begin(), code.end());
@@ -170,7 +172,7 @@ namespace dg
 				);
 
 		return m_toolBox.device.createShaderModule(createInfo);
-	}
+	}*/
 	
 	void Pipeline::bind(vk::CommandBuffer& commandBuffer)
 	{

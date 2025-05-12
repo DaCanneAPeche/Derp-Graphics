@@ -10,7 +10,7 @@ namespace dg
 	namespace file
 	{
 
-		std::vector<char> read(const std::string& filePath)
+		/*std::vector<char> read(const std::string& filePath)
 		{
 			std::ifstream file {filePath, std::ios::ate | std::ios::binary};
 
@@ -27,7 +27,7 @@ namespace dg
 			file.close();
 
 			return buffer;
-		}
+		}*/
 		
 	} /* file */ 
 	

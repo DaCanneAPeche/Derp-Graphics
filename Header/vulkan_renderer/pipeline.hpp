@@ -3,6 +3,7 @@
 #include "vulkan/vulkan.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
 #include <memory>
+#include "vulkan_renderer/shader_module.hpp"
 
 namespace dg
 {
@@ -35,8 +36,8 @@ namespace dg
   struct PipelineInfo
   {
     Pl id;
-    std::string vertexShaderPath;
-    std::string fragmentShaderPath;
+    ShaderModule vertexShader;
+    ShaderModule fragmentShader;
 
     std::shared_ptr<PipelineConfigInfo> config = nullptr;
   };
@@ -46,8 +47,8 @@ namespace dg
 
 	public:
 		Pipeline(VulkanToolBox& toolBox,
-				const std::string& vertShaderPath,
-				const std::string& fragShaderPath,
+				ShaderModule& vertShader,
+				ShaderModule& fragShader,
 				const PipelineConfigInfo& configInfo,
 				const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
 				const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions
@@ -62,16 +63,16 @@ namespace dg
 
 	private:
 
-		void createGraphicsPipeline(const std::string& vertShaderPath,
-				const std::string& fragShaderPath,
-				const PipelineConfigInfo& configInfo);
+		void createGraphicsPipeline(const PipelineConfigInfo& configInfo);
 
 		[[nodiscard]] vk::ShaderModule createShaderModule(const std::vector<char>& code);
 		
 		VulkanToolBox& m_toolBox;
 		VkPipeline m_graphicsPipeline;
-		vk::ShaderModule m_vertShaderModule;
-		vk::ShaderModule m_fragShaderModule;
+		ShaderModule& m_vertShader;
+		ShaderModule& m_fragShader;
+    vk::ShaderModule m_vertShaderModule;
+    vk::ShaderModule m_fragShaderModule;
 		std::vector<vk::VertexInputBindingDescription> m_bindingDescriptions;
 		std::vector<vk::VertexInputAttributeDescription> m_attributeDescriptions;
 	};

@@ -9,6 +9,7 @@
 #include "components/sprite.hpp"
 #include "components/position.hpp"
 #include "core/system.hpp"
+#include "vulkan_renderer/shader_module.hpp"
 
 #include <glm/gtc/constants.hpp>
 #include <rfl.hpp>
@@ -118,13 +119,13 @@ class Game : public dg::Application
       renderer.pipelinesInfo = {
         dg::PipelineInfo {
             dg::Pl::sprites,
-            "./assets/compiled_shaders/shape.vert.spv",
-            "./assets/compiled_shaders/shape.frag.spv",
+            dg::ShaderModule::fromSpirv("./assets/compiled_shaders/shape.vert.spv"),
+            dg::ShaderModule::fromSpirv("./assets/compiled_shaders/shape.frag.spv"),
         },
         dg::PipelineInfo {
             dg::Pl::outline,
-            "./assets/compiled_shaders/shape.vert.spv",
-            "./assets/compiled_shaders/shape.frag.spv",
+            dg::ShaderModule::fromSpirv("./assets/compiled_shaders/shape.vert.spv"),
+            dg::ShaderModule::fromSpirv("./assets/compiled_shaders/shape.frag.spv"),
             getOutlineConfig()
         },
       };

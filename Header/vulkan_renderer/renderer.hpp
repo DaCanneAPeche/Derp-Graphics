@@ -74,8 +74,8 @@ namespace dg
 		void createPipelineLayout();
 		void createPipelines();
 		[[nodiscard]] std::unique_ptr<Pipeline> createPipeline(
-				const std::string& vertShaderPath,
-				const std::string& fragShaderPath,
+				ShaderModule& vertShader,
+				ShaderModule& fragShader,
 				const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions,
 				const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions,
         std::shared_ptr<PipelineConfigInfo> pPipelineConfig
