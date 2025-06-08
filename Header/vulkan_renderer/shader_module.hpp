@@ -13,6 +13,7 @@ namespace dg
     std::vector<uint32_t> spirvCode = {};
 
     void create(VulkanToolBox& toolBox, vk::ShaderModule& shaderModule);
+    void reflect();
 
     static ShaderModule fromSpirv(const std::string& filePath);
     static ShaderModule fromGlsl(const std::string& filePath);

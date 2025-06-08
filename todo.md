@@ -18,6 +18,7 @@
 - [ ] Render graph
 - [ ] Template update for descriptor and better ressource mananger
 - [ ] Buffer syncronization
+- [ ] Rendering process as a layer between the app and the renderer
 
 ### Can wait a looonnnnnng timmmme...
 - [ ] Descriptor Pool abstraction

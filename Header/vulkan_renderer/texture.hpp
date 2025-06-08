@@ -27,8 +27,6 @@ namespace dg
 		private:
 			void createImage(const std::string& filepath);
 			void createImageView();
-			void createSampler(float maxAnistrophy, vk::Filter minifiedFilter, vk::Filter magnifiedFilter,
-					vk::SamplerAddressMode adressingMode);
 			void transitionImageLayout(vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
 
 			VulkanToolBox& m_toolBox;

@@ -10,7 +10,8 @@ namespace dg
     m_pManager->updateVariable(index, size, &value);
   }
 
-  ShaderVariableManager::ShaderVariableManager(VulkanToolBox& vulkanToolBox) : m_toolBox(vulkanToolBox)
+  ShaderVariableManager::ShaderVariableManager(VulkanToolBox& vulkanToolBox,
+      spirv_cross::Resource& uboDescription) : m_toolBox(vulkanToolBox)
   {
     vk::DeviceSize size = 0;
 
@@ -27,8 +28,8 @@ namespace dg
       size += variable.size;
     }
 
-    m_uniformBuffer = std::make_unique<Buffer>(m_toolBox, size, 1, vk::BufferUsageFlagBits::eUniformBuffer,
-        vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
+    /* m_uniformBuffer = std::make_unique<Buffer>(m_toolBox, size, 1, vk::BufferUsageFlagBits::eUniformBuffer, */
+    /*     vma::AllocationCreateFlagBits::eHostAccessSequentialWrite); */
   }
 
   void ShaderVariableManager::updateVariable(size_t index, uint32_t size, void* data)

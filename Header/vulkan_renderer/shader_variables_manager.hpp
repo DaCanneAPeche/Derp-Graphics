@@ -3,6 +3,7 @@
 #include "_vulkan/buffer.hpp"
 #include "plog/Log.h"
 #include "_vulkan/vulkan_tool_box.hpp"
+#include "spirv_cross/spirv_cross.hpp"
 
 #include <any>
 #include <map>
@@ -43,7 +44,7 @@ namespace dg
   {
     public:
 
-      ShaderVariableManager(VulkanToolBox& vulkanToolBox);
+      ShaderVariableManager(VulkanToolBox& vulkanToolBox, spirv_cross::Resource& uboDescription);
 
       void updateVariable(size_t index, uint32_t size, void* data);
       void processWrites();
