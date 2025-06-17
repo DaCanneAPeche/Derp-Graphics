@@ -9,6 +9,7 @@
 #include "vulkan_renderer/asset_manager.hpp"
 #include "vulkan_renderer/uniform_buffer_object.hpp"
 #include "_vulkan/descriptor_set_manager.hpp"
+#include "vulkan_renderer/render_pass.hpp"
 
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
@@ -66,6 +67,8 @@ namespace dg
     void updateTextures(AssetManager& assetManager);
 		Window window;
     std::vector<PipelineInfo> pipelinesInfo;
+    RenderPass renderPass;
+    std::shared_ptr<dg::SwapChain> swapChain;
 
     static const int MAX_TEXTURE_NUMBER = 1000;
 
@@ -96,7 +99,6 @@ namespace dg
 		vk::PipelineLayout m_pipelineLayout;
     vk::DescriptorPool m_descriptorPool;
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
-		std::unique_ptr<SwapChain> m_swapChain;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
     std::unique_ptr<SpecialisedBuffer<UniformBufferObject>> m_uniformBuffer;
     vk::Sampler m_imageSampler;

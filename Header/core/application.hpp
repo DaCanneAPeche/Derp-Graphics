@@ -62,6 +62,8 @@ namespace dg
       virtual void lateUpdate() {};
       virtual void render(Frame& frame) {};
       virtual void imguiRender() {};
+      virtual void createRenderPass() { throw std::runtime_error("No renderpass is created"); }
+
     private:
       void setupSignalHandler();
       void initSystems();

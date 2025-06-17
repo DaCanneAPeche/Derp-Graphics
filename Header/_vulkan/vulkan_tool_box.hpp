@@ -44,6 +44,11 @@ namespace dg
 				const std::vector<vk::Format>& candidates, vk::ImageTiling tiling,
         vk::FormatFeatureFlags features) const;
 
+      vk::Format findDepthFormat();
+      vk::SurfaceFormatKHR chooseSurfaceFormat(
+          const std::vector<vk::SurfaceFormatKHR>& availableFormats);
+      vk::SurfaceFormatKHR getSwapChainSurfaceFormat();
+
     private:
       [[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
       void initMemoryAllocator();

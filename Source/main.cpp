@@ -34,6 +34,7 @@ class MainScene : public dg::Scene
 
     void start() override
     {
+      LOGD << sizeof(vk::Framebuffer);
       // entt::meta<comp::Position>().func<&comp::Position::inspect>("Inspector"_hs);
       rick = app->registry.create();
       auto& pos = app->registry.emplace<comp::Position>(rick);
@@ -151,6 +152,47 @@ class Game : public dg::Application
           );
 
       return configInfo;
+    }
+
+    void createRenderPass() override
+    {
+      vk::AttachmentReference colorAttachmentReference = renderer.renderPass.addAttachment(
+          vulkanToolBox.getSwapChainSurfaceFormat().format,
+          vk::SampleCountFlagBits::e1,
+          vk::AttachmentLoadOp::eClear,
+          vk::AttachmentStoreOp::eStore,
+          vk::AttachmentLoadOp::eDontCare,
+          vk::AttachmentStoreOp::eDontCare,
+          vk::ImageLayout::eUndefined,
+          vk::ImageLayout::ePresentSrcKHR
+          ).get(vk::ImageLayout::eColorAttachmentOptimal);
+
+      vk::AttachmentReference depthAttachmentReference = renderer.renderPass.addAttachment(
+          vulkanToolBox.findDepthFormat(),
+          vk::SampleCountFlagBits::e1,
+          vk::AttachmentLoadOp::eClear,
+          vk::AttachmentStoreOp::eDontCare,
+          vk::AttachmentLoadOp::eDontCare,
+          vk::AttachmentStoreOp::eDontCare,
+          vk::ImageLayout::eUndefined,
+          vk::ImageLayout::eDepthStencilAttachmentOptimal
+          ).get(vk::ImageLayout::eDepthStencilAttachmentOptimal);
+
+      renderer.renderPass.addSubpass(vk::SubpassDescription(
+            {}, vk::PipelineBindPoint::eGraphics, {}, colorAttachmentReference, {},
+            &depthAttachmentReference, {}
+            ));
+
+      renderer.renderPass.addDependency(vk::SubpassDependency(
+            vk::SubpassExternal, 0,
+            vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
+            vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
+            {},
+            vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eDepthStencilAttachmentWrite,
+            {}
+            ));
+
+      renderer.renderPass.create();
     }
     
     void render(dg::Frame& frame) override

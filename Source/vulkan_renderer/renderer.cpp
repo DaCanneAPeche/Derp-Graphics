@@ -29,7 +29,7 @@ static void imgui_check_vk_result(VkResult err)
 namespace dg
 {
   Renderer::Renderer(const WindowInfo& windowInfo, VulkanToolBox& vulkanToolBox)
-    : window(windowInfo), m_toolBox(vulkanToolBox),
+    : window(windowInfo), m_toolBox(vulkanToolBox), renderPass(vulkanToolBox),
     m_descriptorSetManager(vulkanToolBox) { }
 
   void Renderer::init()
@@ -63,7 +63,7 @@ namespace dg
 
     for (auto& pipeline : m_pipelines)
       pipeline = nullptr;
-    m_swapChain = nullptr;
+    swapChain = nullptr;
 
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -138,7 +138,7 @@ namespace dg
       Pipeline::defaultPipelineConfigInfo(pipelineConfig);
     else pipelineConfig = *pPipelineConfig;
 
-    pipelineConfig.renderPass = m_swapChain->getRenderPass();
+    pipelineConfig.renderPass = renderPass.renderPass;
     pipelineConfig.pipelineLayout = m_pipelineLayout;
 
     return std::make_unique<Pipeline>(m_toolBox,
@@ -212,7 +212,7 @@ namespace dg
   void Renderer::createPipelines()
   {
 
-    assert(m_swapChain != nullptr && "Cannot create pipelines before swapchain");
+    assert(swapChain != nullptr && "Cannot create pipelines before swapchain");
     assert(m_pipelineLayout != nullptr && "Cannot create pipelines before pipeline layout");
 
     for (auto& pipelineInfo : pipelinesInfo)
@@ -242,16 +242,17 @@ namespace dg
 
     m_toolBox.device.waitIdle();
 
-    if (m_swapChain == nullptr)
+    if (swapChain == nullptr)
     {
-      m_swapChain = std::make_unique<SwapChain>(m_toolBox, extent);
+      swapChain = std::make_unique<SwapChain>(m_toolBox, extent, renderPass);
 
       LOG_INFO << "Swapchain created";
     }
     else
     {
-      m_swapChain = std::make_unique<SwapChain>(m_toolBox, extent, std::move(m_swapChain));
-      if (m_swapChain->imageCount() != m_commandBuffers.size())
+      swapChain = std::make_unique<SwapChain>(m_toolBox, extent, renderPass,
+          std::move(swapChain));
+      if (swapChain->imageCount != m_commandBuffers.size())
       {
         freeCommandBuffers();
         createCommandBuffers();
@@ -267,9 +268,9 @@ namespace dg
 
   void Renderer::createCommandBuffers()
   {
-    assert(m_swapChain != nullptr && "Renderer::createCommandBuffers : swapchain shall not be null");
+    assert(swapChain != nullptr && "Renderer::createCommandBuffers : swapchain shall not be null");
 
-    m_commandBuffers.resize(m_swapChain->imageCount());
+    m_commandBuffers.resize(swapChain->imageCount);
     vk::CommandBufferAllocateInfo allocateInfo(
         m_toolBox.commandPool,
         vk::CommandBufferLevel::ePrimary,
@@ -306,17 +307,17 @@ namespace dg
   Frame Renderer::startFrame()
   {
     uint32_t imageIndex;
-    vk::Result result = m_swapChain->acquireNextImage(imageIndex);
+    vk::Result result = swapChain->acquireNextImage(imageIndex);
     if (result == vk::Result::eErrorOutOfDateKHR)
     {
       recreateSwapChain();
-      return startFrame(); // TODO : handle that shit
+      return startFrame(); // TODO : handle that case
     }
 
     if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR)
       throw std::runtime_error("Failed to acquire swap chain image");
 
-    vk::Extent2D swapchainExtent = m_swapChain->getSwapChainExtent();
+    vk::Extent2D swapchainExtent = swapChain->extent;
 
     vk::CommandBufferBeginInfo beginInfo;
     m_commandBuffers[imageIndex].begin(beginInfo);
@@ -327,8 +328,8 @@ namespace dg
     };
 
     vk::RenderPassBeginInfo renderPassInfo(
-        m_swapChain->getRenderPass(),
-        m_swapChain->getFrameBuffer(imageIndex),
+        renderPass.renderPass,
+        swapChain->getFrameBuffer(imageIndex),
         vk::Rect2D({0, 0}, swapchainExtent),
         clearValues
         );
@@ -354,7 +355,7 @@ namespace dg
     frame.commandBuffer.endRenderPass();
     frame.commandBuffer.end();
 
-    vk::Result result = m_swapChain->submitCommandBuffers(frame.commandBuffer,
+    vk::Result result = swapChain->submitCommandBuffers(frame.commandBuffer,
         frame.imageIndex);
 
     if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR
@@ -392,10 +393,10 @@ namespace dg
     initInfo.Queue = m_toolBox.graphicsQueue;
     initInfo.PipelineCache = VK_NULL_HANDLE;
     initInfo.DescriptorPool = m_descriptorPool;
-    initInfo.RenderPass = m_swapChain->getRenderPass();
+    initInfo.RenderPass = renderPass.renderPass;
     initInfo.Subpass = 0;
     initInfo.MinImageCount = 2;
-    initInfo.ImageCount = m_swapChain->imageCount();
+    initInfo.ImageCount = swapChain->imageCount;
     initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     // initInfo.Allocator = g_Allocator;
     initInfo.CheckVkResultFn = imgui_check_vk_result;

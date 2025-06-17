@@ -22,6 +22,7 @@ namespace dg
     PLOG_INFO << "Program started : " << appInfo.name;
 
     vulkanToolBox.init(appInfo, renderer.window);
+    createRenderPass();
     renderer.init();
 
     setupSignalHandler();
@@ -49,8 +50,8 @@ namespace dg
 
   void Application::run()
   {
-    changeScene(static_cast<config::Scenes>(0));
     renderer.recreateSwapChain();
+    changeScene(static_cast<config::Scenes>(0));
     while (!renderer.shouldWindowClose())
     {
       m_timer.start();

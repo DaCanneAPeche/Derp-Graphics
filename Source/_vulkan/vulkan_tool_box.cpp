@@ -133,4 +133,33 @@ namespace dg
     allocator = vma::createAllocator(allocatorCreateInfo);
   }
 
+	vk::Format VulkanToolBox::findDepthFormat()
+  {
+		return findSupportedFormat(
+				{vk::Format::eD32Sfloat, vk::Format::eD32SfloatS8Uint, vk::Format::eD24UnormS8Uint},
+				vk::ImageTiling::eOptimal,
+				vk::FormatFeatureFlagBits::eDepthStencilAttachment);
+  }
+
+	vk::SurfaceFormatKHR VulkanToolBox::chooseSurfaceFormat(
+			const std::vector<vk::SurfaceFormatKHR>& availableFormats)
+	{
+		for (const auto &availableFormat : availableFormats)
+		{
+			if (availableFormat.format == vk::Format::eB8G8R8Unorm &&
+					availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear)
+				return availableFormat;
+		}
+
+		return availableFormats[0];
+	}
+
+  vk::SurfaceFormatKHR VulkanToolBox::getSwapChainSurfaceFormat()
+  {
+    SwapChainSupportDetails support = swapChainSupport();
+
+    return chooseSurfaceFormat(support.formats);
+  }
+
+
 }
