@@ -64,15 +64,15 @@ namespace dg
     vk::PresentModeKHR presentMode = choosePresentMode(swapChainSupport.presentModes);
     extent = chooseExtent(swapChainSupport.capabilities);
 
-    uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
+    uint32_t minImageCount = swapChainSupport.capabilities.minImageCount + 1;
     if (swapChainSupport.capabilities.maxImageCount > 0 &&
-        imageCount > swapChainSupport.capabilities.maxImageCount)
+        minImageCount > swapChainSupport.capabilities.maxImageCount)
     {
-      imageCount = swapChainSupport.capabilities.maxImageCount;
+      minImageCount = swapChainSupport.capabilities.maxImageCount;
     }
 
     vk::SwapchainCreateInfoKHR createInfo(
-        {}, m_toolBox.surface, imageCount, surfaceFormat.format,
+        {}, m_toolBox.surface, minImageCount, surfaceFormat.format,
         surfaceFormat.colorSpace, extent, 1,
         vk::ImageUsageFlagBits::eColorAttachment,
         {}, // assigned later

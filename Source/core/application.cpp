@@ -20,18 +20,8 @@ namespace dg
     plog::init(plog::verbose, &consoleAppender).addAppender(&rollingFileAppender);
 
     PLOG_INFO << "Program started : " << appInfo.name;
-
     vulkanToolBox.init(appInfo, renderer.window);
-    createRenderPass();
-    renderer.init();
 
-    setupSignalHandler();
-
-    PLOG_INFO << "Init finished";
-
-    PLOG_INFO << "Found " << _systems::allSystems.size() << " systems";
-
-    initSystems();
   }
 
   Application::~Application()
@@ -50,6 +40,16 @@ namespace dg
 
   void Application::run()
   {
+    createRenderPass();
+    renderer.init();
+
+    setupSignalHandler();
+
+    PLOG_INFO << "Init finished";
+
+    PLOG_INFO << "Found " << _systems::allSystems.size() << " systems";
+
+    initSystems();
     renderer.recreateSwapChain();
     changeScene(static_cast<config::Scenes>(0));
     while (!renderer.shouldWindowClose())
