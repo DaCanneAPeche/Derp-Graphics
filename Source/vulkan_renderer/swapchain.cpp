@@ -2,6 +2,32 @@
 
 namespace dg
 {
+
+  SwapChain::~SwapChain()
+  {
+    for (auto& imageView : m_imageViews) m_toolBox.device.destroyImageView(imageView);
+		m_imageViews.clear();
+
+    m_toolBox.device.destroySwapchainKHR(m_swapChain);
+
+    for (size_t i = 0; i < m_depthImages.size(); i++)
+		{
+			m_toolBox.device.destroyImageView(m_depthImageViews[i]);
+			m_toolBox.allocator.destroyImage(m_depthImages[i], m_depthImageAllocations[i]);
+		}
+
+    for (auto& framebuffer : m_framebuffers)
+			m_toolBox.device.destroyFramebuffer(framebuffer);
+
+    // cleanup synchronization objects
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			m_toolBox.device.destroySemaphore(m_renderFinishedSemaphores[i]);
+			m_toolBox.device.destroySemaphore(m_imageAvailableSemaphores[i]);
+			m_toolBox.device.destroyFence(m_inFlightFences[i]);
+		}
+  }
+
 	vk::Result SwapChain::acquireNextImage(uint32_t& imageIndex)
 	{
 		if (m_toolBox.device.waitForFences( m_inFlightFences[m_currentFrame],

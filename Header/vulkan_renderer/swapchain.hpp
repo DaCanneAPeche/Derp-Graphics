@@ -28,10 +28,12 @@ namespace dg
           RenderPass& renderPass, std::shared_ptr<SwapChain> previous)
         : m_toolBox(toolBox), m_windowExtent(windowExtent),
         m_oldSwapChain(previous)
-    {
-      create(renderPass);
-      m_oldSwapChain = nullptr;
-    }
+      {
+        create(renderPass);
+        m_oldSwapChain = nullptr;
+      }
+
+      ~SwapChain();
 
       void create(RenderPass& renderPass)
       {
