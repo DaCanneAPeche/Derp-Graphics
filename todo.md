@@ -12,13 +12,12 @@
 
 ## Technical
 - [x] Buffer abstraction specialization with templates
-- [ ] rewrite the fucking swap chain
-- [ ] Understand what the hell is a renderpass and maybe make an abstraciton around
+- [x] rewrite the fucking swap chain
+- [x] Understand what the hell is a renderpass and maybe make an abstraciton around
 - [x] Renderer refactoring
 - [ ] Render graph
 - [ ] Template update for descriptor and better ressource mananger
 - [ ] Buffer syncronization
-- [ ] Rendering process as a layer between the app and the renderer
 
 ### Can wait a looonnnnnng timmmme...
 - [ ] Descriptor Pool abstraction
@@ -31,6 +30,6 @@
 - [ ] 2D camera
 - [X] Input library
 - [ ] Audio
-- [ ] Game loop
+- [x] Game loop
 - [x] **Entity systems**
 - [X] Signal handler able to have multiple callbacks

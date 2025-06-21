@@ -30,6 +30,7 @@ namespace dg
           const dg::ApplicationInfo& appInfo);
       ~Application();
 
+      void init(); // An init function meant to be called after the child constructor
       void run();
 
       dg::VulkanToolBox vulkanToolBox;
@@ -57,12 +58,13 @@ namespace dg
       void changeScene(config::Scenes sceneId);
 
       std::unique_ptr<Scene> currentScene;
+      ApplicationInfo m_appInfo;
 
+      virtual void start() {}; // Called after the renderer is initialized
       virtual void update() {};
       virtual void lateUpdate() {};
       virtual void render(Frame& frame) {};
       virtual void imguiRender() {};
-      virtual void createRenderPass() { throw std::runtime_error("No renderpass is created"); }
 
     private:
       void setupSignalHandler();
@@ -70,5 +72,6 @@ namespace dg
 
       std::vector<std::function<std::unique_ptr<Scene>()>> m_scenes;
       Timer m_timer;
+      bool wasInitialized = false;
   };
 }

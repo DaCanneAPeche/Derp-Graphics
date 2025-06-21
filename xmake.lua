@@ -4,7 +4,7 @@ add_requires("glm", "glfw", "vulkan-memory-allocator-hpp", "vulkan-hpp",
     "spirv-cross")
 add_requires("imgui docking", {configs = {glfw = true, vulkan = true}})
 
-add_rules("plugin.compile_commands.autoupdate")
+add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
 target("Derp_Graphics")
 
     set_kind("binary")

@@ -132,30 +132,7 @@ class Game : public dg::Application
       };
 
       addScene<MainScene>(dg::config::Scenes::MAIN);
-    }
 
-    ~Game()
-    {
-
-    }
-
-    std::shared_ptr<dg::PipelineConfigInfo> getOutlineConfig()
-    {
-      std::shared_ptr<dg::PipelineConfigInfo> configInfo =
-        std::make_shared<dg::PipelineConfigInfo>();
-      dg::Pipeline::defaultPipelineConfigInfo(*configInfo);
-
-      configInfo->rasterizationInfo = vk::PipelineRasterizationStateCreateInfo(
-				{}, vk::False, vk::False, vk::PolygonMode::eLine,
-				vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise, vk::False,
-				0.0f, 0.0f, 0.0f, 1.0f
-          );
-
-      return configInfo;
-    }
-
-    void createRenderPass() override
-    {
       vk::AttachmentReference colorAttachmentReference = renderer.renderPass.addAttachment(
           vulkanToolBox.getSwapChainSurfaceFormat().format,
           vk::SampleCountFlagBits::e1,
@@ -194,7 +171,27 @@ class Game : public dg::Application
 
       renderer.renderPass.create();
     }
-    
+
+    ~Game()
+    {
+
+    }
+
+    std::shared_ptr<dg::PipelineConfigInfo> getOutlineConfig()
+    {
+      std::shared_ptr<dg::PipelineConfigInfo> configInfo =
+        std::make_shared<dg::PipelineConfigInfo>();
+      dg::Pipeline::defaultPipelineConfigInfo(*configInfo);
+
+      configInfo->rasterizationInfo = vk::PipelineRasterizationStateCreateInfo(
+				{}, vk::False, vk::False, vk::PolygonMode::eLine,
+				vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise, vk::False,
+				0.0f, 0.0f, 0.0f, 1.0f
+          );
+
+      return configInfo;
+    }
+
     void render(dg::Frame& frame) override
     {
       if (showOnlyOutlines)
@@ -298,5 +295,6 @@ int main(void)
   dg::ApplicationInfo appInfo {"Hello, world program !", {1, 0, 0}};
 
   Game game(windowInfo, appInfo);
+  game.init();
   game.run();
 }

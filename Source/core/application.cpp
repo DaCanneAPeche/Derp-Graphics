@@ -11,8 +11,9 @@ namespace dg
     return io.WantCaptureMouse || io.WantCaptureKeyboard;
   }
 
-  Application::Application(const dg::WindowInfo& windowInfo,
-      const dg::ApplicationInfo& appInfo) : renderer(windowInfo, vulkanToolBox)
+  Application::Application(const WindowInfo& windowInfo,
+      const ApplicationInfo& appInfo) : renderer(windowInfo, vulkanToolBox),
+      m_appInfo(appInfo)
   {
     static plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
     static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender("log.txt",
@@ -20,8 +21,7 @@ namespace dg
     plog::init(plog::verbose, &consoleAppender).addAppender(&rollingFileAppender);
 
     PLOG_INFO << "Program started : " << appInfo.name;
-    vulkanToolBox.init(appInfo, renderer.window);
-
+    vulkanToolBox.init(m_appInfo, renderer.window);
   }
 
   Application::~Application()
@@ -38,9 +38,8 @@ namespace dg
     currentScene->start();
   }
 
-  void Application::run()
+  void Application::init()
   {
-    createRenderPass();
     renderer.init();
 
     setupSignalHandler();
@@ -52,6 +51,14 @@ namespace dg
     initSystems();
     renderer.recreateSwapChain();
     changeScene(static_cast<config::Scenes>(0));
+    wasInitialized = true;
+  }
+
+  void Application::run()
+  {
+    assert(wasInitialized == true && "You need to call app.init() before app.run()");
+
+    start();
     while (!renderer.shouldWindowClose())
     {
       m_timer.start();
