@@ -4,6 +4,10 @@ namespace dg
 {
   struct UniformBufferObject
   {
-    alignas(16) glm::mat2x2 screenTransform;
+    // alignas(16) glm::mat2 screenTransform;
+    struct {
+      alignas(16) glm::vec2 firstColumn;
+      alignas(16) glm::vec2 secondColumn;
+    } screenTransform;
   };
 }

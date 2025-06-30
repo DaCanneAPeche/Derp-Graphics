@@ -12,7 +12,7 @@ layout(push_constant) uniform Push
 	vec2 offset;
 } push;
 
-layout(std430, set = 1, binding = 0) uniform UniformBufferObject {
+layout(set = 1, binding = 0) uniform UniformBufferObject {
   mat2 screenTransform;
 } ubo;
 

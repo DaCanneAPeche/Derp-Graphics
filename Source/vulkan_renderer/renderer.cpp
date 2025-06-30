@@ -154,10 +154,10 @@ namespace dg
   {
     m_descriptorLayouts.textures = m_descriptorSetManager.addLayout()
       .addBinding(vk::DescriptorType::eSampler,
-        vk::ShaderStageFlagBits::eFragment)
+        vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eVertex)
       .addBinding(vk::DescriptorType::eSampledImage,
-        vk::ShaderStageFlagBits::eFragment, MAX_TEXTURE_NUMBER,
-        vk::DescriptorBindingFlagBits::ePartiallyBound)
+        vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eVertex,
+        MAX_TEXTURE_NUMBER, vk::DescriptorBindingFlagBits::ePartiallyBound)
       .create();
 
     m_descriptorLayouts.ubo = m_descriptorSetManager.addLayout()
@@ -299,7 +299,11 @@ namespace dg
 
     Transform2d transform;
     transform.ratio = float(extent.height) / float(extent.width);
-    UniformBufferObject ubo {transform.getMatrix()};
+    glm::mat2 transformMatrix = transform.getMatrix();
+    UniformBufferObject ubo {
+      glm::vec2(transformMatrix[0][0], transformMatrix[1][0]),
+      glm::vec2(transformMatrix[0][1], transformMatrix[1][1])
+    };
 
     m_uniformBuffer->write(ubo);
   }

@@ -9,8 +9,23 @@ namespace dg
 
   void ShaderModule::create(VulkanToolBox& toolBox, vk::ShaderModule& shaderModule)
   {
-    vk::ShaderModuleCreateInfo createInfo({}, spirvCode);
-    shaderModule = toolBox.device.createShaderModule(createInfo);
+    if (source == ShaderSource::spirv)
+    {
+      vk::ShaderModuleCreateInfo createInfo({}, spirvCode);
+      shaderModule = toolBox.device.createShaderModule(createInfo);
+    }
+
+    else if (source == ShaderSource::slang)
+    {
+      const void* pCode = slangSpirvCode->getBufferPointer();
+      size_t codeSize = slangSpirvCode->getBufferSize();
+
+      vk::ShaderModuleCreateInfo createInfo({}, codeSize,
+          static_cast<const uint32_t*>(pCode));
+      shaderModule = toolBox.device.createShaderModule(createInfo);
+    }
+
+    else throw std::runtime_error("Unknown shader source");
   }
 
   void ShaderModule::reflect()
@@ -34,6 +49,7 @@ namespace dg
   {
     ShaderModule shaderModule;
     shaderModule.spirvCode = file::read<uint32_t>(filePath);
+    shaderModule.source = ShaderSource::spirv;
     shaderModule.reflect();
     return shaderModule;
   }

@@ -10,6 +10,7 @@
 #include "components/position.hpp"
 #include "core/system.hpp"
 #include "vulkan_renderer/shader_module.hpp"
+#include "_vulkan/slang_compiler.hpp"
 
 #include <glm/gtc/constants.hpp>
 #include <rfl.hpp>
@@ -34,7 +35,6 @@ class MainScene : public dg::Scene
 
     void start() override
     {
-      LOGD << sizeof(vk::Framebuffer);
       // entt::meta<comp::Position>().func<&comp::Position::inspect>("Inspector"_hs);
       rick = app->registry.create();
       auto& pos = app->registry.emplace<comp::Position>(rick);
@@ -117,16 +117,18 @@ class Game : public dg::Application
     Game(const dg::WindowInfo& windowInfo, const dg::ApplicationInfo& appInfo)
       : dg::Application(windowInfo, appInfo)
     {
+      dg::SlangCompiler spriteShader("./assets/shaders/slang/sprite.slang");
+
       renderer.pipelinesInfo = {
         dg::PipelineInfo {
             dg::Pl::sprites,
-            dg::ShaderModule::fromSpirv("./assets/compiled_shaders/shape.vert.spv"),
-            dg::ShaderModule::fromSpirv("./assets/compiled_shaders/shape.frag.spv"),
+            spriteShader.get("vertexMain"),
+            spriteShader.get("fragmentMain")
         },
         dg::PipelineInfo {
             dg::Pl::outline,
-            dg::ShaderModule::fromSpirv("./assets/compiled_shaders/shape.vert.spv"),
-            dg::ShaderModule::fromSpirv("./assets/compiled_shaders/shape.frag.spv"),
+            spriteShader.get("vertexMain"),
+            spriteShader.get("fragmentMain"),
             getOutlineConfig()
         },
       };
