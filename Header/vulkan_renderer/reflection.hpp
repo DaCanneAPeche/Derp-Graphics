@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include "vulkan/vulkan.hpp"
 #include "slang.h"
+#include "rfl.hpp"
 
 namespace dg
 {
@@ -28,7 +29,7 @@ namespace dg
       {
         std::cout << slot.name << '('
           << "Set = " << slot.set << " ; Binding = " << slot.binding
-          << " ; Type = " << static_cast<uint32_t>(slot.type);
+          << " ; Type = " << rfl::enum_to_string(slot.type);
 
         if (slot.arrayCount) std::cout << " ; Array size = " << slot.arrayCount;
 
