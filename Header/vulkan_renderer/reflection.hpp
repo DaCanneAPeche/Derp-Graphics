@@ -44,18 +44,18 @@ namespace dg
     }
 
     void addDescriptorSlotFromSlang(const std::string& name, uint32_t set,
-        uint32_t binding, slang::TypeReflection::Kind kind, uint32_t arrayCount = 0)
+        uint32_t binding, slang::BindingType type, uint32_t arrayCount = 0)
     {
-      using SK = slang::TypeReflection::Kind;
-      vk::DescriptorType type;
+      std::unordered_map<slang::BindingType, vk::DescriptorType> conversionMap = {
+        {slang::BindingType::Sampler, vk::DescriptorType::eSampler},
+        {slang::BindingType::Texture, vk::DescriptorType::eSampledImage},
+        {slang::BindingType::ConstantBuffer, vk::DescriptorType::eUniformBuffer}
+      };
 
-      if (kind == SK::ConstantBuffer) type = vk::DescriptorType::eUniformBuffer;
-      else if (kind == SK::SamplerState) type = vk::DescriptorType::eSampler;
-      else if (kind == SK::Resource) type = vk::DescriptorType::eSampledImage;
-      else if (kind == SK::Array) throw std::runtime_error("addDSFSlanName() does not take arrays");
-      else throw std::runtime_error("Unsupported slang descriptor type while reflecting");
+      if (!conversionMap.contains(type))
+        throw std::runtime_error("Unsupported descritor type during reflection");
 
-      addDescriptorSlot(name, set, binding, type, arrayCount);
+      addDescriptorSlot(name, set, binding, conversionMap[type], arrayCount);
     }
   };
 

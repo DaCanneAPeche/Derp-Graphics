@@ -24,9 +24,6 @@ namespace dg
       Slang::ComPtr<slang::IModule> m_module;
       Slang::ComPtr<slang::ISession> m_session;
       Slang::ComPtr<slang::IComponentType> m_program;
-
-      void addDescriptor(ShaderDescription& description,
-          slang::VariableLayoutReflection* param);
   };
 
 }

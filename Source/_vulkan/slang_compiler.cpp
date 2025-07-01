@@ -101,30 +101,21 @@ namespace dg
     auto typeLayout = varLayout->getTypeLayout();
     
     int paramCount = typeLayout->getFieldCount();
-    LOGD << paramCount;
     for (unsigned int i = 0 ; i < paramCount ; i++)
     {
       slang::VariableLayoutReflection* param = typeLayout->getFieldByIndex(i);
+      int set = param->getBindingSpace();
+      int binding = param->getBindingIndex();
+      std::string name = std::string(param->getName());
+      slang::BindingType type = typeLayout->getBindingRangeType(i);
+      size_t arraySize = param->getType()->getElementCount();
+
       if (param->getCategory() == slang::ParameterCategory::DescriptorTableSlot)
-        addDescriptor(description, param);
+      {
+        description.addDescriptorSlotFromSlang(name, set, binding, type, arraySize);
+      }
     }
-  }
 
-  void SlangCompiler::addDescriptor(ShaderDescription& description,
-          slang::VariableLayoutReflection* param)
-  {
-        slang::TypeReflection::Kind kind = param->getType()->getKind();
-        int set = param->getBindingSpace();
-        int binding = param->getBindingIndex();
-        std::string name = std::string(param->getName());
-
-        if (kind == slang::TypeReflection::Kind::Array)
-        {
-          description.addDescriptorSlotFromSlang(name, set, binding,
-              param->getType()->getElementType()->getKind(),
-              param->getType()->getElementCount());
-        }
-        else description.addDescriptorSlotFromSlang(name, set, binding, kind);
   }
 
 }
