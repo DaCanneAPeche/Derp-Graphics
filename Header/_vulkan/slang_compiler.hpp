@@ -19,6 +19,8 @@ namespace dg
 
       ShaderModule get(const std::string& entryPoint);
       void reflect(ShaderDescription& description);
+      size_t addUBO(ShaderDescription& description,
+          slang::TypeLayoutReflection* typeLayout);
 
     private:
       Slang::ComPtr<slang::IModule> m_module;

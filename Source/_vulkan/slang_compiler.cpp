@@ -100,7 +100,7 @@ namespace dg
     auto varLayout = programLayout->getGlobalParamsVarLayout();
     auto typeLayout = varLayout->getTypeLayout();
     
-    int paramCount = typeLayout->getFieldCount();
+    unsigned int paramCount = typeLayout->getFieldCount();
     for (unsigned int i = 0 ; i < paramCount ; i++)
     {
       slang::VariableLayoutReflection* param = typeLayout->getFieldByIndex(i);
@@ -112,10 +112,42 @@ namespace dg
 
       if (param->getCategory() == slang::ParameterCategory::DescriptorTableSlot)
       {
-        description.addDescriptorSlotFromSlang(name, set, binding, type, arraySize);
+        size_t uboIndex = 0;
+        if (param->getType()->getKind() == slang::TypeReflection::Kind::ConstantBuffer)
+        {
+          uboIndex = addUBO(description,
+              param->getTypeLayout()->getElementTypeLayout());
+        }
+
+        description.addDescriptorSlotFromSlang(name, set, binding, type,
+            arraySize, uboIndex);
       }
     }
 
+  }
+
+  size_t SlangCompiler::addUBO(ShaderDescription& description,
+      slang::TypeLayoutReflection* typeLayout)
+  {
+    unsigned int paramCount = typeLayout->getFieldCount();
+    UniformBuffer ubo(paramCount);
+
+    for (unsigned int i = 0 ; i < paramCount ; i++)
+    {
+      slang::VariableLayoutReflection* param = typeLayout->getFieldByIndex(i);
+      std::string name = std::string(param->getName());
+      size_t size = typeLayout->getSize(param->getCategory());
+      size_t offset = param->getOffset();
+
+      LOGD << "UBO field : " << name << " (" << offset << " bytes of offset, "
+        << size << " bytes of size)";
+
+      ShaderVariableDescription variable {std::string(name),
+        static_cast<uint32_t>(size), static_cast<uint32_t>(offset)};
+      ubo[i] = std::move(variable);
+    }
+
+    return description.addUBO(ubo);
   }
 
 }

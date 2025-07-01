@@ -157,7 +157,7 @@ namespace dg
         vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eVertex)
       .addBinding(vk::DescriptorType::eSampledImage,
         vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eVertex,
-        MAX_TEXTURE_NUMBER, vk::DescriptorBindingFlagBits::ePartiallyBound)
+        MAX_TEXTURE_NUMBER)
       .create();
 
     m_descriptorLayouts.ubo = m_descriptorSetManager.addLayout()
