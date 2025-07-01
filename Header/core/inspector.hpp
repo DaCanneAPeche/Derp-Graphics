@@ -1,9 +1,10 @@
 #pragma once
 
 #include "entt/entt.hpp"
-#include "field_reflection.hpp"
 #include "imgui.h"
 #include "core/inspect_functions.hpp"
+
+#include "rfl.hpp"
 
 namespace dg
 {
@@ -28,9 +29,10 @@ namespace dg
       std::string text = std::string(entt::type_name<T>()) + " component :";
       ImGui::Text(text.c_str());
 
-      field_reflection::for_each_field(*pInspected, [](std::string_view field, auto& value) {
-          inspect(field, value);
-          });
+      auto view = rfl::to_view(*pInspected);
+      view.apply([](const auto& field) {
+        inspect(field.name(), *field.value());
+      });
     }
 
   };
