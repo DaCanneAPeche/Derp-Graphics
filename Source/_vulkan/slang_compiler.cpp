@@ -4,6 +4,8 @@
 
 #include "plog/Log.h"
 
+#include <iostream>
+
 namespace dg
 {
 
@@ -67,12 +69,11 @@ namespace dg
       if (result != SLANG_OK) throw std::runtime_error("Error composing slang shader");
     }
 
-    Slang::ComPtr<slang::IComponentType> linkedProgram;
     {
 
       Slang::ComPtr<slang::IBlob> diagnosticsBlob;
       SlangResult result = composedProgram->link(
-          linkedProgram.writeRef(),
+          m_program.writeRef(),
           diagnosticsBlob.writeRef());
       if (result != SLANG_OK) throw std::runtime_error("Error linking slang shader");
      }
@@ -80,7 +81,7 @@ namespace dg
     ShaderModule shaderModule;
     {
       Slang::ComPtr<slang::IBlob> diagnosticsBlob;
-      SlangResult result = linkedProgram->getEntryPointCode(
+      SlangResult result = m_program->getEntryPointCode(
           0, // entryPointIndex
           0, // targetIndex
           shaderModule.slangSpirvCode.writeRef(),
@@ -90,6 +91,40 @@ namespace dg
 
     shaderModule.source = ShaderSource::slang;
     return shaderModule;
+  }
+
+  void SlangCompiler::reflect(ShaderDescription& description)
+  {
+    slang::ProgramLayout* programLayout = m_program->getLayout();
+
+    auto varLayout = programLayout->getGlobalParamsVarLayout();
+    auto typeLayout = varLayout->getTypeLayout();
+    
+    int paramCount = typeLayout->getFieldCount();
+    LOGD << paramCount;
+    for (unsigned int i = 0 ; i < paramCount ; i++)
+    {
+      slang::VariableLayoutReflection* param = typeLayout->getFieldByIndex(i);
+      if (param->getCategory() == slang::ParameterCategory::DescriptorTableSlot)
+        addDescriptor(description, param);
+    }
+  }
+
+  void SlangCompiler::addDescriptor(ShaderDescription& description,
+          slang::VariableLayoutReflection* param)
+  {
+        slang::TypeReflection::Kind kind = param->getType()->getKind();
+        int set = param->getBindingSpace();
+        int binding = param->getBindingIndex();
+        std::string name = std::string(param->getName());
+
+        if (kind == slang::TypeReflection::Kind::Array)
+        {
+          description.addDescriptorSlotFromSlang(name, set, binding,
+              param->getType()->getElementType()->getKind(),
+              param->getType()->getElementCount());
+        }
+        else description.addDescriptorSlotFromSlang(name, set, binding, kind);
   }
 
 }

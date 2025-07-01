@@ -10,6 +10,7 @@
 #include "components/position.hpp"
 #include "core/system.hpp"
 #include "vulkan_renderer/shader_module.hpp"
+#include "vulkan_renderer/reflection.hpp"
 #include "_vulkan/slang_compiler.hpp"
 
 #include <glm/gtc/constants.hpp>
@@ -132,6 +133,9 @@ class Game : public dg::Application
             getOutlineConfig()
         },
       };
+      dg::ShaderDescription description;
+      spriteShader.reflect(description);
+      description.print();
 
       addScene<MainScene>(dg::config::Scenes::MAIN);
 
