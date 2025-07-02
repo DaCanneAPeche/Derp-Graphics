@@ -100,7 +100,7 @@ namespace dg
     void updateUniformBuffer();
 
 		vk::PipelineLayout m_pipelineLayout;
-    vk::DescriptorPool m_descriptorPool;
+    DescriptorPool m_descriptorPool;
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
     std::unique_ptr<SpecialisedBuffer<UniformBufferObject>> m_uniformBuffer;

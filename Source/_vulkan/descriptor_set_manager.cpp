@@ -3,6 +3,24 @@
 
 namespace dg
 {
+  void DescriptorPool::addToPool(vk::DescriptorType type, uint32_t amount)
+  {
+    if (!m_descriptorCount.contains(type)) m_descriptorCount[type] = amount;
+    else m_descriptorCount[type] += amount;
+  }
+
+  void DescriptorPool::create(VulkanToolBox& toolBox,
+      vk::DescriptorPoolCreateFlagBits flags)
+  {
+    std::vector<vk::DescriptorPoolSize> sizes;
+    sizes.reserve(m_descriptorCount.size());
+
+    for (const auto& [type, size] : m_descriptorCount)
+      sizes.emplace_back(type, size);
+
+    vk::DescriptorPoolCreateInfo createInfo(flags, numberOfSets, sizes);
+    descriptorPool = toolBox.device.createDescriptorPool(createInfo);
+  }
 
   DescriptorSetLayout& DescriptorSetManager::addLayout()
   {

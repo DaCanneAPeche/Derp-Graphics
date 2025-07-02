@@ -4,9 +4,23 @@
 #include "_vulkan/vulkan_tool_box.hpp"
 
 #include <vector>
+#include <unordered_map>
 
 namespace dg
 {
+
+  class DescriptorPool
+  {
+    public:
+      void addToPool(vk::DescriptorType type, uint32_t amount); 
+      void create(VulkanToolBox& toolBox, vk::DescriptorPoolCreateFlagBits flags = {});
+
+      vk::DescriptorPool descriptorPool;
+      uint32_t numberOfSets = 0;
+
+    private:
+      std::unordered_map<vk::DescriptorType, uint32_t> m_descriptorCount;
+  };
 
   using DescriptorSetIndex = size_t;
 

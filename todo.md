@@ -20,7 +20,7 @@
 - [ ] Buffer syncronization
 
 ### Can wait a looonnnnnng timmmme...
-- [ ] Descriptor Pool abstraction
+- [x] Descriptor Pool abstraction
 - [ ] Spine support for multiple renderer with templates
 - [ ] Error handling
 - [ ] Better pipeline abstraction

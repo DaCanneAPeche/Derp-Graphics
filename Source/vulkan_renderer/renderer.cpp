@@ -71,7 +71,7 @@ namespace dg
     ImGui::DestroyContext();
 
     m_toolBox.device.destroy(m_imageSampler);
-    m_toolBox.device.destroyDescriptorPool(m_descriptorPool);
+    m_toolBox.device.destroyDescriptorPool(m_descriptorPool.descriptorPool);
     m_toolBox.device.destroyPipelineLayout(m_pipelineLayout);
   }
 
@@ -184,25 +184,25 @@ namespace dg
       }
       setLayout.create();
     }
-
   }
 
   void Renderer::createDescriptorPool()
   {
-    std::array<vk::DescriptorPoolSize, 4> poolSizes = {
-      // For ImGui font
-      vk::DescriptorPoolSize(vk::DescriptorType::eCombinedImageSampler, 1),
+    // For imgui
+    m_descriptorPool.addToPool(vk::DescriptorType::eCombinedImageSampler, 1);
+    m_descriptorPool.numberOfSets += 1;
 
-      vk::DescriptorPoolSize(vk::DescriptorType::eSampler, 1),
-      vk::DescriptorPoolSize(vk::DescriptorType::eSampledImage, MAX_TEXTURE_NUMBER),
-      vk::DescriptorPoolSize(vk::DescriptorType::eUniformBuffer, 1)
-    };
+    for (const auto& set : m_sets)
+    {
+      m_descriptorPool.numberOfSets += 1;
+      for (const auto& slotRef : set)
+      {
+        const DescriptorSlot& slot = slotRef.get();
+        m_descriptorPool.addToPool(slot.type, slot.arrayCount);
+      }
+    }
 
-    // One descriptor set is used by ImGui
-    vk::DescriptorPoolCreateInfo poolInfo(
-        vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet, 3, poolSizes);
-
-    m_descriptorPool = m_toolBox.device.createDescriptorPool(poolInfo);
+    m_descriptorPool.create(m_toolBox, vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet);
   }
 
   void Renderer::createDescriptorSets()
@@ -211,7 +211,7 @@ namespace dg
     m_descriptorSets.textures = m_descriptorSetManager.addDescriptor(m_descriptorLayouts.textures);
     m_descriptorSets.ubo = m_descriptorSetManager.addDescriptor(m_descriptorLayouts.ubo);
 
-    m_descriptorSetManager.allocate(m_descriptorPool);
+    m_descriptorSetManager.allocate(m_descriptorPool.descriptorPool);
 
     vk::DescriptorImageInfo samplerInfo(m_imageSampler, {},
         vk::ImageLayout::eShaderReadOnlyOptimal);
@@ -417,7 +417,7 @@ namespace dg
     initInfo.QueueFamily = m_toolBox.queueFamilyIndices.graphicsFamily.value();
     initInfo.Queue = m_toolBox.graphicsQueue;
     initInfo.PipelineCache = VK_NULL_HANDLE;
-    initInfo.DescriptorPool = m_descriptorPool;
+    initInfo.DescriptorPool = m_descriptorPool.descriptorPool;
     initInfo.RenderPass = renderPass.renderPass;
     initInfo.Subpass = 0;
     initInfo.MinImageCount = 2;
