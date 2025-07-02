@@ -169,30 +169,22 @@ namespace dg
 
       m_sets[slot.set][slot.binding] = std::cref(slot); 
     }
-
-    for (const auto& vec : m_sets)
-    {
-      for (const auto& binding : vec)
-      {
-        LOGD << binding.get().set << ' ' << binding.get().binding;
-      }
-    }
   }
 
   void Renderer::createDescriptorSetLayout()
   {
-    m_descriptorLayouts.textures = m_descriptorSetManager.addLayout()
-      .addBinding(vk::DescriptorType::eSampler,
-        vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eVertex)
-      .addBinding(vk::DescriptorType::eSampledImage,
-        vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eVertex,
-        MAX_TEXTURE_NUMBER)
-      .create();
+    for (const auto& set : m_sets)
+    {
+      DescriptorSetLayout& setLayout = m_descriptorSetManager.addLayout();
 
-    m_descriptorLayouts.ubo = m_descriptorSetManager.addLayout()
-      .addBinding(vk::DescriptorType::eUniformBuffer,
-          vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment)
-      .create();
+      for (const auto& slotRef : set)
+      {
+        const DescriptorSlot& slot = slotRef.get();
+        setLayout.addBinding(slot.type, vk::ShaderStageFlagBits::eAll, slot.arrayCount);
+      }
+      setLayout.create();
+    }
+
   }
 
   void Renderer::createDescriptorPool()

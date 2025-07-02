@@ -11,7 +11,7 @@ namespace dg
         << "Set = " << slot.set << " ; Binding = " << slot.binding
         << " ; Type = " << rfl::enum_to_string(slot.type);
 
-      if (slot.arrayCount) std::cout << " ; Array size = " << slot.arrayCount;
+      if (slot.arrayCount > 1) std::cout << " ; Array size = " << slot.arrayCount;
       if (slot.type == vk::DescriptorType::eUniformBuffer)
       {
         std::cout << " ; UBO structure index = " << slot.uboIndex;

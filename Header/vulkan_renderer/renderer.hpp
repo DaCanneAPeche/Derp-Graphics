@@ -111,12 +111,12 @@ namespace dg
 
     struct {
       DescriptorSetLayoutIndex textures = 0;
-      DescriptorSetLayoutIndex ubo = 0;
+      DescriptorSetLayoutIndex ubo = 1;
     } m_descriptorLayouts;
 
     struct {
       DescriptorSetIndex textures = 0;
-      DescriptorSetIndex ubo = 0;
+      DescriptorSetIndex ubo = 1;
     } m_descriptorSets;
 
 	};

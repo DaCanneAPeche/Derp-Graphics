@@ -109,6 +109,7 @@ namespace dg
       std::string name = std::string(param->getName());
       slang::BindingType type = typeLayout->getBindingRangeType(i);
       size_t arraySize = param->getType()->getElementCount();
+      if (arraySize == 0) arraySize = 1;
 
       if (param->getCategory() == slang::ParameterCategory::DescriptorTableSlot)
       {
