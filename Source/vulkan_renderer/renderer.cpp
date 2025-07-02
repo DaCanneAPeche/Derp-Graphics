@@ -41,8 +41,7 @@ namespace dg
     createUniformBuffer();
 
     groupDescriptorSets();
-    createDescriptorSetLayout();
-    createDescriptorPool();
+    createDescriptorSetLayoutAndPool();
     createDescriptorSets();
 
     createPipelineLayout();
@@ -171,22 +170,7 @@ namespace dg
     }
   }
 
-  void Renderer::createDescriptorSetLayout()
-  {
-    for (const auto& set : m_sets)
-    {
-      DescriptorSetLayout& setLayout = m_descriptorSetManager.addLayout();
-
-      for (const auto& slotRef : set)
-      {
-        const DescriptorSlot& slot = slotRef.get();
-        setLayout.addBinding(slot.type, vk::ShaderStageFlagBits::eAll, slot.arrayCount);
-      }
-      setLayout.create();
-    }
-  }
-
-  void Renderer::createDescriptorPool()
+  void Renderer::createDescriptorSetLayoutAndPool()
   {
     // For imgui
     m_descriptorPool.addToPool(vk::DescriptorType::eCombinedImageSampler, 1);
@@ -194,12 +178,16 @@ namespace dg
 
     for (const auto& set : m_sets)
     {
+      DescriptorSetLayout& setLayout = m_descriptorSetManager.addLayout();
       m_descriptorPool.numberOfSets += 1;
+
       for (const auto& slotRef : set)
       {
         const DescriptorSlot& slot = slotRef.get();
+        setLayout.addBinding(slot.type, vk::ShaderStageFlagBits::eAll, slot.arrayCount);
         m_descriptorPool.addToPool(slot.type, slot.arrayCount);
       }
+      setLayout.create();
     }
 
     m_descriptorPool.create(m_toolBox, vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet);

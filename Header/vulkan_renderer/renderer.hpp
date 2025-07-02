@@ -90,8 +90,7 @@ namespace dg
 		void loadModels();
 		[[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
     void groupDescriptorSets();
-    void createDescriptorSetLayout();
-    void createDescriptorPool();
+    void createDescriptorSetLayoutAndPool();
     void createDescriptorSets();
     void createImageSampler();
     void setupImGui();
