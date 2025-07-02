@@ -10,6 +10,7 @@
 #include "vulkan_renderer/uniform_buffer_object.hpp"
 #include "_vulkan/descriptor_set_manager.hpp"
 #include "vulkan_renderer/render_pass.hpp"
+#include "vulkan_renderer/reflection.hpp"
 
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
@@ -69,6 +70,7 @@ namespace dg
     std::vector<PipelineInfo> pipelinesInfo;
     RenderPass renderPass;
     std::shared_ptr<dg::SwapChain> swapChain;
+    ShaderDescription shaderDescription;
 
     static const int MAX_TEXTURE_NUMBER = 1000;
 
@@ -87,6 +89,7 @@ namespace dg
 		void freeCommandBuffers();
 		void loadModels();
 		[[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
+    void groupDescriptorSets();
     void createDescriptorSetLayout();
     void createDescriptorPool();
     void createDescriptorSets();
@@ -104,6 +107,7 @@ namespace dg
     vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;
     DescriptorSetManager m_descriptorSetManager;
+    std::vector<std::vector<std::reference_wrapper<const DescriptorSlot>>> m_sets;
 
     struct {
       DescriptorSetLayoutIndex textures = 0;

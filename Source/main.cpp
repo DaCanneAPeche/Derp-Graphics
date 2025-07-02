@@ -133,9 +133,9 @@ class Game : public dg::Application
             getOutlineConfig()
         },
       };
-      dg::ShaderDescription description;
-      spriteShader.reflect(description);
-      description.print();
+
+      spriteShader.reflect(renderer.shaderDescription);
+      renderer.shaderDescription.print();
 
       addScene<MainScene>(dg::config::Scenes::MAIN);
 

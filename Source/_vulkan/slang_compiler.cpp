@@ -139,9 +139,6 @@ namespace dg
       size_t size = typeLayout->getSize(param->getCategory());
       size_t offset = param->getOffset();
 
-      LOGD << "UBO field : " << name << " (" << offset << " bytes of offset, "
-        << size << " bytes of size)";
-
       ShaderVariableDescription variable {std::string(name),
         static_cast<uint32_t>(size), static_cast<uint32_t>(offset)};
       ubo[i] = std::move(variable);

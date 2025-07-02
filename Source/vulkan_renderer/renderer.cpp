@@ -40,6 +40,7 @@ namespace dg
     recreateSwapChain(false);
     createUniformBuffer();
 
+    groupDescriptorSets();
     createDescriptorSetLayout();
     createDescriptorPool();
     createDescriptorSets();
@@ -148,6 +149,34 @@ namespace dg
         bindingDescriptions,
         attributeDescriptions
         );
+  }
+
+  // ugly way to to it but I'm too lazy to change the DescriptorSetManager
+  void Renderer::groupDescriptorSets()
+  {
+    DescriptorSlot emptySlot;
+    for (const auto& slot : shaderDescription.descriptorSlots)
+    {
+      if (slot.set + 1 > m_sets.size()) // Set not in m_sets
+      {
+        m_sets.resize(slot.set + 1);
+      }
+
+      if (slot.binding + 1 > m_sets[slot.set].size()) // Same but with binding
+      {
+        m_sets[slot.set].resize(slot.binding + 1, emptySlot);
+      }
+
+      m_sets[slot.set][slot.binding] = std::cref(slot); 
+    }
+
+    for (const auto& vec : m_sets)
+    {
+      for (const auto& binding : vec)
+      {
+        LOGD << binding.get().set << ' ' << binding.get().binding;
+      }
+    }
   }
 
   void Renderer::createDescriptorSetLayout()
