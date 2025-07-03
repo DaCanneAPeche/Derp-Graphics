@@ -66,13 +66,18 @@ namespace dg
 		
 		void recreateSwapChain(bool pipelinesCreation = true);
     void updateTextures(AssetManager& assetManager);
+    void updateDescriptorSets() { m_descriptorSetManager.update(); }
+
 		Window window;
     std::vector<PipelineInfo> pipelinesInfo;
     RenderPass renderPass;
     std::shared_ptr<dg::SwapChain> swapChain;
     ShaderDescription shaderDescription;
+    std::unordered_map<std::string, DescriptorWriter> descriptors = {};
 
     static const int MAX_TEXTURE_NUMBER = 1000;
+    std::unique_ptr<SpecialisedBuffer<UniformBufferObject>> m_uniformBuffer;
+    vk::Sampler m_imageSampler;
 
 	private:
 
@@ -90,7 +95,6 @@ namespace dg
 		void loadModels();
 		[[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
     void groupDescriptorSets();
-    void createDescriptorSetLayoutAndPool();
     void createDescriptorSets();
     void createImageSampler();
     void setupImGui();
@@ -102,21 +106,8 @@ namespace dg
     DescriptorPool m_descriptorPool;
 		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
-    std::unique_ptr<SpecialisedBuffer<UniformBufferObject>> m_uniformBuffer;
-    vk::Sampler m_imageSampler;
     VulkanToolBox& m_toolBox;
     DescriptorSetManager m_descriptorSetManager;
     std::vector<std::vector<std::reference_wrapper<const DescriptorSlot>>> m_sets;
-
-    struct {
-      DescriptorSetLayoutIndex textures = 0;
-      DescriptorSetLayoutIndex ubo = 1;
-    } m_descriptorLayouts;
-
-    struct {
-      DescriptorSetIndex textures = 0;
-      DescriptorSetIndex ubo = 1;
-    } m_descriptorSets;
-
 	};
 } /* dg */ 

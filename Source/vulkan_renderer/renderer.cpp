@@ -41,7 +41,6 @@ namespace dg
     createUniformBuffer();
 
     groupDescriptorSets();
-    createDescriptorSetLayoutAndPool();
     createDescriptorSets();
 
     createPipelineLayout();
@@ -170,7 +169,7 @@ namespace dg
     }
   }
 
-  void Renderer::createDescriptorSetLayoutAndPool()
+  void Renderer::createDescriptorSets()
   {
     // For imgui
     m_descriptorPool.addToPool(vk::DescriptorType::eCombinedImageSampler, 1);
@@ -186,36 +185,21 @@ namespace dg
         const DescriptorSlot& slot = slotRef.get();
         setLayout.addBinding(slot.type, vk::ShaderStageFlagBits::eAll, slot.arrayCount);
         m_descriptorPool.addToPool(slot.type, slot.arrayCount);
+        descriptors[slot.name] = DescriptorWriter {slot.set, slot.binding, &m_descriptorSetManager};
       }
-      setLayout.create();
+      DescriptorSetLayoutIndex layoutIndex = setLayout.create();
+      m_descriptorSetManager.addDescriptor(layoutIndex);
     }
 
     m_descriptorPool.create(m_toolBox, vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet);
-  }
-
-  void Renderer::createDescriptorSets()
-  {
-    // TODO : one descriptor by frame or something like that
-    m_descriptorSets.textures = m_descriptorSetManager.addDescriptor(m_descriptorLayouts.textures);
-    m_descriptorSets.ubo = m_descriptorSetManager.addDescriptor(m_descriptorLayouts.ubo);
-
     m_descriptorSetManager.allocate(m_descriptorPool.descriptorPool);
-
-    vk::DescriptorImageInfo samplerInfo(m_imageSampler, {},
-        vk::ImageLayout::eShaderReadOnlyOptimal);
-    m_descriptorSetManager.writeToDescriptor(m_descriptorSets.textures, 0, samplerInfo, {});
-
-    vk::DescriptorBufferInfo uboInfo = m_uniformBuffer->descriptorInfo();
-    m_descriptorSetManager.writeToDescriptor(m_descriptorSets.ubo, 0, {}, uboInfo);
-
-    m_descriptorSetManager.update();
   }
 
   void Renderer::updateTextures(AssetManager& assetManager)
   {
     auto texturesInfo = assetManager.textureInfos();
-    m_descriptorSetManager.writeToDescriptor(m_descriptorSets.textures, 1, texturesInfo, {});
-    m_descriptorSetManager.update();
+    descriptors["textures"].writeToImage(texturesInfo);
+    updateDescriptorSets();
   }
 
   void Renderer::createPipelines()
@@ -319,6 +303,8 @@ namespace dg
 
   Frame Renderer::startFrame()
   {
+    m_descriptorSetManager.update();
+
     uint32_t imageIndex;
     vk::Result result = swapChain->acquireNextImage(imageIndex);
     if (result == vk::Result::eErrorOutOfDateKHR)

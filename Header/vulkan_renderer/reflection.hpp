@@ -57,54 +57,54 @@ namespace dg
 
   // UBO management
 
-  class ShaderVariableManager;
+  /* class ShaderVariableManager; */
 
-  struct BufferWriteDescription
-  {
-    vk::DeviceSize offset, size;
-    void* data;
-  };
+  /* struct BufferWriteDescription */
+  /* { */
+  /*   vk::DeviceSize offset, size; */
+  /*   void* data; */
+  /* }; */
 
-  /*
-   * A class reperesenting a UBO variable. 
-   * */
-  class ShaderVariable
-  {
-    public:
-      uint32_t size = 0;
-      uint32_t index = 0;
-      std::any value = 0;
+  /* /* */
+  /*  * A class reperesenting a UBO variable. */ 
+  /*  * *1/ */
+  /* class ShaderVariable */
+  /* { */
+  /*   public: */
+  /*     uint32_t size = 0; */
+  /*     uint32_t index = 0; */
+  /*     std::any value = 0; */
 
-      // Should be replaced by a operator= of some form ?
-      void setValue(const std::any& newValue);
+  /*     // Should be replaced by a operator= of some form ? */
+  /*     void setValue(const std::any& newValue); */
 
-    private:
-      ShaderVariableManager* m_pManager = nullptr;
-  };
+  /*   private: */
+  /*     ShaderVariableManager* m_pManager = nullptr; */
+  /* }; */
 
-  /* 
-   * A class built over an uniform buffer object to manage the variables given
-   * to the shader. Should be built around shader reflection.
-   * */
-  class ShaderVariableManager
-  {
-    public:
+  /* /1* */ 
+  /*  * A class built over an uniform buffer object to manage the variables given */
+  /*  * to the shader. Should be built around shader reflection. */
+  /*  * *1/ */
+  /* class ShaderVariableManager */
+  /* { */
+  /*   public: */
 
-      ShaderVariableManager(VulkanToolBox& vulkanToolBox);
+  /*     ShaderVariableManager(VulkanToolBox& vulkanToolBox); */
 
-      void updateVariable(size_t index, uint32_t size, void* data);
-      void processWrites();
+  /*     void updateVariable(size_t index, uint32_t size, void* data); */
+  /*     void processWrites(); */
 
-      ShaderVariable& operator[](const std::string& name)
-      {
-        return m_variables[name];
-      }
+  /*     ShaderVariable& operator[](const std::string& name) */
+  /*     { */
+  /*       return m_variables[name]; */
+  /*     } */
 
-    private:
-      std::unique_ptr<Buffer> m_uniformBuffer;
-      std::map<std::string, ShaderVariable> m_variables;
-      std::vector<BufferWriteDescription> m_bufferWrites;
-      VulkanToolBox& m_toolBox;
-  };
+  /*   private: */
+  /*     std::unique_ptr<Buffer> m_uniformBuffer; */
+  /*     std::map<std::string, ShaderVariable> m_variables; */
+  /*     std::vector<BufferWriteDescription> m_bufferWrites; */
+  /*     VulkanToolBox& m_toolBox; */
+  /* }; */
 
 }

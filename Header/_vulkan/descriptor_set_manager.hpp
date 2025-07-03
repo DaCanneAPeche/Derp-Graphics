@@ -56,4 +56,24 @@ namespace dg
       std::vector<size_t> m_layoutIndexPerDescriptorSet;
       dg::VulkanToolBox& m_toolBox;
   };
+
+  struct DescriptorWriter
+  {
+    uint32_t set, binding;
+    DescriptorSetManager* pManager = nullptr;
+
+    void writeToImage(const vk::ArrayProxyNoTemporaries<const vk::DescriptorImageInfo>& imageInfo,
+        uint32_t firstElement = 0)
+    {
+      assert(pManager != nullptr && "pManager was not assigned");
+      pManager->writeToDescriptor(set, binding, imageInfo, {}, firstElement);
+    }
+
+    void writeToBuffer(const vk::ArrayProxyNoTemporaries<const vk::DescriptorBufferInfo>& bufferInfo,
+        uint32_t firstElement = 0)
+    {
+      assert(pManager != nullptr && "pManager was not assigned");
+      pManager->writeToDescriptor(set, binding, {}, bufferInfo, firstElement);
+    }
+  };
 }

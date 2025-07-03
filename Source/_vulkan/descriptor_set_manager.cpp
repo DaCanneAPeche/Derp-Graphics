@@ -52,6 +52,8 @@ namespace dg
 
   void DescriptorSetManager::update()
   {
+    if (m_writes.size() == 0) return;
+
     m_toolBox.device.updateDescriptorSets(m_writes, {});
     m_writes.clear();
   }

@@ -183,6 +183,20 @@ class Game : public dg::Application
 
     }
 
+    void start() override
+    {
+
+      vk::DescriptorImageInfo samplerInfo(renderer.m_imageSampler, {},
+          vk::ImageLayout::eShaderReadOnlyOptimal);
+      vk::DescriptorBufferInfo uboInfo = renderer.m_uniformBuffer->descriptorInfo();
+      renderer.descriptors["textureSampler"].writeToImage(samplerInfo);
+      // m_descriptorSetManager.writeToDescriptor(m_descriptorSets.textures, 0, samplerInfo, {});
+
+      renderer.descriptors["ubo"].writeToBuffer(uboInfo);
+      //m_descriptorSetManager.writeToDescriptor(m_descriptorSets.ubo, 0, {}, uboInfo);
+      renderer.updateDescriptorSets();
+    }
+
     std::shared_ptr<dg::PipelineConfigInfo> getOutlineConfig()
     {
       std::shared_ptr<dg::PipelineConfigInfo> configInfo =
