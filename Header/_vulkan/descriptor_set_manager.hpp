@@ -60,6 +60,7 @@ namespace dg
   struct DescriptorWriter
   {
     uint32_t set, binding;
+    size_t uboIndex;
     DescriptorSetManager* pManager = nullptr;
 
     void writeToImage(const vk::ArrayProxyNoTemporaries<const vk::DescriptorImageInfo>& imageInfo,

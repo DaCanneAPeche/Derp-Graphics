@@ -35,10 +35,8 @@ namespace dg
   void Renderer::init()
   {
     createImageSampler();
-    loadModels();
 
     recreateSwapChain(false);
-    createUniformBuffer();
 
     groupDescriptorSets();
     createDescriptorSets();
@@ -48,16 +46,10 @@ namespace dg
     recreateSwapChain();
 
     setupImGui();
-
-    window.resizeCallback = [this](GLFWwindow*, int, int)
-    {
-      updateUniformBuffer();
-    };
   }
 
   void Renderer::clean()
   {
-    m_uniformBuffer = nullptr;
     m_descriptorSetManager.clean();
 
     for (auto& pipeline : m_pipelines)
@@ -94,19 +86,6 @@ namespace dg
         vk::False);
 
     m_imageSampler = m_toolBox.device.createSampler(samplerInfo);
-  }
-
-  void Renderer::loadModels()
-  {
-  }
-
-  void Renderer::createUniformBuffer()
-  {
-    m_uniformBuffer = std::make_unique<SpecialisedBuffer<UniformBufferObject>>(m_toolBox,
-        1, vk::BufferUsageFlagBits::eUniformBuffer,
-        vma::AllocationCreateFlagBits::eHostAccessSequentialWrite);
-
-    updateUniformBuffer();
   }
 
   void Renderer::createPipelineLayout()
@@ -185,7 +164,8 @@ namespace dg
         const DescriptorSlot& slot = slotRef.get();
         setLayout.addBinding(slot.type, vk::ShaderStageFlagBits::eAll, slot.arrayCount);
         m_descriptorPool.addToPool(slot.type, slot.arrayCount);
-        descriptors[slot.name] = DescriptorWriter {slot.set, slot.binding, &m_descriptorSetManager};
+        descriptors[slot.name] = DescriptorWriter {slot.set, slot.binding,
+          slot.uboIndex, &m_descriptorSetManager};
       }
       DescriptorSetLayoutIndex layoutIndex = setLayout.create();
       m_descriptorSetManager.addDescriptor(layoutIndex);
@@ -281,24 +261,6 @@ namespace dg
     m_commandBuffers.clear();
 
     LOG_INFO << "Command buffers freed";
-  }
-
-  void Renderer::updateUniformBuffer()
-  {
-    // TODO : Handle synchronization 
-    LOG_WARNING << "Synchronization is not taken care of !";
-
-    vk::Extent2D extent = window.getVkExtent();
-
-    Transform2d transform;
-    transform.ratio = float(extent.height) / float(extent.width);
-    glm::mat2 transformMatrix = transform.getMatrix();
-    UniformBufferObject ubo {
-      glm::vec2(transformMatrix[0][0], transformMatrix[1][0]),
-      glm::vec2(transformMatrix[0][1], transformMatrix[1][1])
-    };
-
-    m_uniformBuffer->write(ubo);
   }
 
   Frame Renderer::startFrame()

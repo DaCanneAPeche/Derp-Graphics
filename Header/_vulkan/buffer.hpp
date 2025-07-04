@@ -28,6 +28,11 @@ namespace dg
 
       void write(void* data, vk::DeviceSize offset = 0, vk::DeviceSize size = vk::WholeSize);
 
+      vk::DescriptorBufferInfo descriptorInfo() const
+      {
+        return vk::DescriptorBufferInfo(buffer, 0, m_instanceSize);
+      }
+
       vk::Buffer buffer;
       vma::Allocation allocation;
       vk::DeviceSize size;
@@ -74,23 +79,13 @@ namespace dg
         m_toolBox.allocator.copyMemoryToAllocation(data.data(), allocation, 0,
             m_instanceSize * data.size());
       }
-      
-      vk::DescriptorBufferInfo descriptorInfo() const
-      {
-        return vk::DescriptorBufferInfo(buffer, 0, m_instanceSize);
-      }
-      
+       
       void writeToIndex(T& data, int index)
       {
         m_toolBox.allocator.copyMemoryToAllocation(&data, allocation,
             m_instanceSize * index, m_instanceSize);
       }
       
-      vk::DescriptorBufferInfo descriptorInfoForIndex(int index) const
-      {
-        return descriptorInfo(m_alignementSize, m_alignementSize * index);
-      }
-
     private:
 
   };

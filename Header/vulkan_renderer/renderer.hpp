@@ -1,5 +1,6 @@
 #pragma once
 
+#include "vulkan_renderer/reflection.hpp"
 #include "vulkan_renderer/window.hpp"
 #include "vulkan_renderer/pipeline.hpp"
 #include "vulkan_renderer/swapchain.hpp"
@@ -10,7 +11,6 @@
 #include "vulkan_renderer/uniform_buffer_object.hpp"
 #include "_vulkan/descriptor_set_manager.hpp"
 #include "vulkan_renderer/render_pass.hpp"
-#include "vulkan_renderer/reflection.hpp"
 
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
@@ -76,7 +76,6 @@ namespace dg
     std::unordered_map<std::string, DescriptorWriter> descriptors = {};
 
     static const int MAX_TEXTURE_NUMBER = 1000;
-    std::unique_ptr<SpecialisedBuffer<UniformBufferObject>> m_uniformBuffer;
     vk::Sampler m_imageSampler;
 
 	private:
@@ -92,15 +91,12 @@ namespace dg
 				);
 		void createCommandBuffers();
 		void freeCommandBuffers();
-		void loadModels();
 		[[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
     void groupDescriptorSets();
     void createDescriptorSets();
     void createImageSampler();
     void setupImGui();
     void renderImGui(int imageIndex);
-    void createUniformBuffer();
-    void updateUniformBuffer();
 
 		vk::PipelineLayout m_pipelineLayout;
     DescriptorPool m_descriptorPool;

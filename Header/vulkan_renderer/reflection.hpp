@@ -2,16 +2,12 @@
 
 #include <iostream>
 #include <unordered_map>
-#include <any>
-#include <map>
 #include <memory>
 
 #include "vulkan/vulkan.hpp"
 #include "slang.h"
 #include "rfl.hpp"
-#include "_vulkan/buffer.hpp"
 #include "plog/Log.h"
-#include "_vulkan/vulkan_tool_box.hpp"
 
 namespace dg
 {
@@ -54,57 +50,5 @@ namespace dg
       return uniformBuffers.size() - 1;
     }
   };
-
-  // UBO management
-
-  /* class ShaderVariableManager; */
-
-  /* struct BufferWriteDescription */
-  /* { */
-  /*   vk::DeviceSize offset, size; */
-  /*   void* data; */
-  /* }; */
-
-  /* /* */
-  /*  * A class reperesenting a UBO variable. */ 
-  /*  * *1/ */
-  /* class ShaderVariable */
-  /* { */
-  /*   public: */
-  /*     uint32_t size = 0; */
-  /*     uint32_t index = 0; */
-  /*     std::any value = 0; */
-
-  /*     // Should be replaced by a operator= of some form ? */
-  /*     void setValue(const std::any& newValue); */
-
-  /*   private: */
-  /*     ShaderVariableManager* m_pManager = nullptr; */
-  /* }; */
-
-  /* /1* */ 
-  /*  * A class built over an uniform buffer object to manage the variables given */
-  /*  * to the shader. Should be built around shader reflection. */
-  /*  * *1/ */
-  /* class ShaderVariableManager */
-  /* { */
-  /*   public: */
-
-  /*     ShaderVariableManager(VulkanToolBox& vulkanToolBox); */
-
-  /*     void updateVariable(size_t index, uint32_t size, void* data); */
-  /*     void processWrites(); */
-
-  /*     ShaderVariable& operator[](const std::string& name) */
-  /*     { */
-  /*       return m_variables[name]; */
-  /*     } */
-
-  /*   private: */
-  /*     std::unique_ptr<Buffer> m_uniformBuffer; */
-  /*     std::map<std::string, ShaderVariable> m_variables; */
-  /*     std::vector<BufferWriteDescription> m_bufferWrites; */
-  /*     VulkanToolBox& m_toolBox; */
-  /* }; */
 
 }

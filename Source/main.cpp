@@ -3,6 +3,7 @@
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES 
 #include <iostream>
 #include "vulkan_renderer/renderer.hpp"
+#include "vulkan_renderer/shader_variable_manager.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
 #include "core/application.hpp"
 #include "core/inputs.hpp"
@@ -10,7 +11,6 @@
 #include "components/position.hpp"
 #include "core/system.hpp"
 #include "vulkan_renderer/shader_module.hpp"
-#include "vulkan_renderer/reflection.hpp"
 #include "_vulkan/slang_compiler.hpp"
 
 #include <glm/gtc/constants.hpp>
@@ -114,6 +114,7 @@ class Game : public dg::Application
 {
   public:
     bool showOnlyOutlines = false;
+    dg::ShaderVariableManager ubo {vulkanToolBox, renderer};
 
     Game(const dg::WindowInfo& windowInfo, const dg::ApplicationInfo& appInfo)
       : dg::Application(windowInfo, appInfo)
@@ -185,16 +186,31 @@ class Game : public dg::Application
 
     void start() override
     {
-
       vk::DescriptorImageInfo samplerInfo(renderer.m_imageSampler, {},
           vk::ImageLayout::eShaderReadOnlyOptimal);
-      vk::DescriptorBufferInfo uboInfo = renderer.m_uniformBuffer->descriptorInfo();
       renderer.descriptors["textureSampler"].writeToImage(samplerInfo);
-      // m_descriptorSetManager.writeToDescriptor(m_descriptorSets.textures, 0, samplerInfo, {});
 
+      ubo.init("ubo");
+      vk::DescriptorBufferInfo uboInfo = ubo.uniformBuffer->descriptorInfo();
       renderer.descriptors["ubo"].writeToBuffer(uboInfo);
-      //m_descriptorSetManager.writeToDescriptor(m_descriptorSets.ubo, 0, {}, uboInfo);
+
       renderer.updateDescriptorSets();
+
+      renderer.window.resizeCallback = [this](GLFWwindow*, int, int)
+      {
+        vk::Extent2D extent = renderer.window.getVkExtent();
+
+        dg::Transform2d transform;
+        transform.ratio = float(extent.height) / float(extent.width);
+        glm::mat2 transformMatrix = transform.getMatrix();
+        dg::UniformBufferObject uboValue {
+          glm::vec2(transformMatrix[0][0], transformMatrix[1][0]),
+            glm::vec2(transformMatrix[0][1], transformMatrix[1][1])
+        };
+
+        ubo["screenTransform"].setValue(uboValue);
+        ubo.processWrites();
+      };
     }
 
     std::shared_ptr<dg::PipelineConfigInfo> getOutlineConfig()
