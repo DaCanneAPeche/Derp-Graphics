@@ -289,9 +289,8 @@ class MainScene : public dg::Scene
           app->vulkanToolBox);
       sprite.transform.rotation = glm::pi<float>()/4;
       sprite.transform.translation = { 0.3, 0.5 };
-      sprite.textureId = game->assets.leclerc.loadAndGetIndex();
-      // sprite.transform.ratio = assetManager->getTexture(sprite.textureId).getRatio();
-      sprite.transform.ratio = 1;
+      sprite.textureId = game->assets.rick.loadAndGetIndex();
+      sprite.transform.ratio = game->assets.rick.imageRatio;
 
       signalHandler.on(dg::config::Signals::KEY_PRESS, [this](dg::Key key,
             dg::KeyboardMods mods)
