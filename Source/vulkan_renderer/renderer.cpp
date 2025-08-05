@@ -177,9 +177,9 @@ namespace dg
 
   void Renderer::updateTextures(AssetManager& assetManager)
   {
-    auto texturesInfo = assetManager.textureInfos();
+    /*auto texturesInfo = assetManager.textureInfos();
     descriptors["textures"].writeToImage(texturesInfo);
-    updateDescriptorSets();
+    updateDescriptorSets();*/
   }
 
   void Renderer::createPipelines()

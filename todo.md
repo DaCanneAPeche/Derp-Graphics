@@ -15,6 +15,7 @@
 - [x] rewrite the fucking swap chain
 - [x] Understand what the hell is a renderpass and maybe make an abstraciton around
 - [x] Renderer refactoring
+- [ ] Keep the image/buffer descriptor infos in memory in the descriptor writers until the end of the frame
 - [ ] Render graph
 - [ ] Template update for descriptor and better ressource mananger
 - [ ] Buffer syncronization
