@@ -1,34 +1,13 @@
-#define VMA_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES 
-#include <iostream>
-#include "vulkan_renderer/renderer.hpp"
-#include "vulkan_renderer/shader_variable_manager.hpp"
-#include "_vulkan/vulkan_tool_box.hpp"
+#pragma once
+
 #include "core/application.hpp"
-#include "core/inputs.hpp"
+#include "vulkan_renderer/shader_variable_manager.hpp"
+#include "_vulkan/slang_compiler.hpp"
 #include "components/sprite.hpp"
 #include "components/position.hpp"
 #include "core/system.hpp"
-#include "vulkan_renderer/shader_module.hpp"
-#include "_vulkan/slang_compiler.hpp"
 
-#include <glm/gtc/constants.hpp>
-#include <rfl.hpp>
-#include <rfl/json.hpp>
-
-using namespace entt::literals;
-
-struct Assets : public dg::AssetManager
-{
-  using dg::AssetManager::AssetManager;
-
-  dg::TextureAsset leclerc = texture("./assets/textures/leclerc.jpg");
-  dg::TextureAsset rick = texture("./assets/textures/nothing_suspicious.jpeg");
-  dg::TextureAsset atlas = texture("./assets/textures/text_atlas_test.png");
-};
-
-class MainScene;
+#include "assets.hpp"
 
 class Game : public dg::Application
 {
@@ -58,8 +37,6 @@ class Game : public dg::Application
 
       spriteShader.reflect(renderer.shaderDescription);
       // renderer.shaderDescription.print();
-
-      addScene<MainScene>(dg::config::Scenes::MAIN);
 
       vk::AttachmentReference colorAttachmentReference = renderer.renderPass.addAttachment(
           vulkanToolBox.getSwapChainSurfaceFormat().format,
@@ -249,108 +226,3 @@ class Game : public dg::Application
       ImGui::End();
     }
 };
-
-class MainScene : public dg::Scene
-{
-  private:
-    entt::entity rick;
-    Game* game = nullptr;
-
-  public:
-    std::unordered_map<uint32_t, std::string> getAssets() override
-    {
-      return {
-        {0, "./assets/textures/leclerc.jpg"},
-        {1, "./assets/textures/nothing_suspicious.jpeg"},
-        {2, "./assets/textures/text_atlas_test.png"}
-      };
-    }
-
-    void start() override
-    {
-      game = static_cast<Game*>(app);
-
-      // entt::meta<comp::Position>().func<&comp::Position::inspect>("Inspector"_hs);
-      rick = app->registry.create();
-      auto& pos = app->registry.emplace<comp::Position>(rick);
-      pos.x = 10;
-      comp::Sprite& sprite = app->registry.emplace<comp::Sprite>(rick);
-
-      std::vector<dg::Vertex> vertices 
-      {
-        {{-0.5f, -0.5f}, {0.0f, 0.0f}},
-          {{0.5f, -0.5f}, {1.0f, 0.0f}},
-          {{0.5f, 0.5f}, {1.0f, 1.0f}},
-          {{-0.5f, 0.5f}, {0.0f, 1.0f}}
-      };
-
-      std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
-      sprite.model = std::make_unique<dg::Model>(vertices, indices,
-          app->vulkanToolBox);
-      sprite.transform.rotation = glm::pi<float>()/4;
-      sprite.transform.translation = { 0.3, 0.5 };
-      sprite.textureId = game->assets.rick.loadAndGetIndex();
-      sprite.transform.ratio = game->assets.rick.imageRatio;
-
-      signalHandler.on(dg::config::Signals::KEY_PRESS, [this](dg::Key key,
-            dg::KeyboardMods mods)
-      {
-        auto& sprite = app->registry.get<comp::Sprite>(rick);
-
-        if (key == dg::Key::w)
-          sprite.transform.translation.y -= 0.1;
-        else if (key == dg::Key::s)
-          sprite.transform.translation.y += 0.1;
-        else if (key == dg::Key::a)
-          sprite.transform.translation.x -= 0.1;
-        else if (key == dg::Key::d)
-          sprite.transform.translation.x += 0.1;
-        else if (key == dg::Key::up)
-          sprite.textureId++;
-        else if (key == dg::Key::down)
-          sprite.textureId--;
-
-      });
-
-      signalHandler.on(dg::config::Signals::MOUSE_PRESS, [this](dg::MouseButton button,
-            dg::KeyboardMods mods)
-      {
-        if (button != dg::MouseButton::left) return;
-
-        auto& sprite = app->registry.get<comp::Sprite>(rick);
-        sprite.transform.rotation += glm::pi<float>()/4;
-      });
-
-      bindInput(dg::Key::space, dg::config::Signals::RICK_ROTATE,
-          dg::KeyboardMods::shift, dg::KeyboardMods::control);
-
-      signalHandler.on(dg::config::Signals::RICK_ROTATE, [this](){
-        auto& sprite = app->registry.get<comp::Sprite>(rick);
-        sprite.transform.rotation += glm::pi<float>()/4;
-      });
-
-      bindInput(dg::Key::m, dg::config::Signals::RICK_MOVE);
-
-      signalHandler.on(dg::config::Signals::RICK_MOVE, [](){
-        LOGD << "MOVE";  
-      });
-
-    }
-
-    void update() override
-    {
-      if (isActionTakingPlace(dg::config::Signals::RICK_MOVE))
-        app->registry.get<comp::Sprite>(rick).transform.translation.x += 1 * app->deltaTime;
-    }
-};
-
-
-int main(void)
-{
-  dg::WindowInfo windowInfo {1000, 1000, "Hello, world !"};
-  dg::ApplicationInfo appInfo {"Hello, world program !", {1, 0, 0}};
-
-  Game game(windowInfo, appInfo);
-  game.init();
-  game.run();
-}

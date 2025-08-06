@@ -8,7 +8,7 @@ add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
 target("Derp_Graphics")
 
     set_kind("binary")
-    add_files("Source/**.cpp")
+    add_files("Source/**.cpp", "platform/**.cpp")
     add_includedirs("Header")
     set_languages("c++20")
     set_symbols("debug")

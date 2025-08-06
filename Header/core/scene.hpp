@@ -16,7 +16,6 @@ namespace dg
       virtual void update() {};
       virtual void lateUpdate() {};
       virtual void end() {};
-      virtual std::unordered_map<uint32_t, std::string> getAssets() {return {};};
 
       Application* app = nullptr; 
       SignalHandler signalHandler;

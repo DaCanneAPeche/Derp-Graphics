@@ -1,6 +1,7 @@
 #include "core/application.hpp"
 #include "core/inputs.hpp"
 #include "core/system.hpp"
+#include "core/scene_registration.hpp"
 
 namespace dg
 {
@@ -29,10 +30,10 @@ namespace dg
     renderer.clean();
   }
 
-  void Application::changeScene(config::Scenes sceneId)
+  void Application::changeScene(uint32_t sceneId)
   {
     if (currentScene != nullptr) currentScene->end();
-    currentScene = m_scenes[static_cast<uint32_t>(sceneId)]();
+    currentScene = _scenes::sceneFabricators[sceneId]();
     currentScene->init(this);
     for (auto& system : _systems::allSystems) system->pScene = currentScene.get();
     currentScene->start();
@@ -50,7 +51,7 @@ namespace dg
 
     initSystems();
     renderer.recreateSwapChain();
-    changeScene(static_cast<config::Scenes>(0));
+    changeScene(0);
     wasInitialized = true;
   }
 

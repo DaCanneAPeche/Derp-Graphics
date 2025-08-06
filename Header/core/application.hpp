@@ -39,23 +39,7 @@ namespace dg
       float deltaTime;
 
     protected:
-      template <class T>
-      void addScene(config::Scenes sceneId)
-      {
-        static_assert(std::is_base_of<Scene, T>(), "Scene not a child of dg::Scene");
-        uint32_t id = static_cast<uint32_t>(sceneId);
-
-        if (m_scenes.size() <= id + 1)
-          m_scenes.resize(id + 1);
-
-        m_scenes[id] =
-        []() -> std::unique_ptr<Scene>
-        {
-          return std::make_unique<T>();
-        };
-      }
-
-      void changeScene(config::Scenes sceneId);
+      void changeScene(uint32_t sceneId);
 
       std::unique_ptr<Scene> currentScene;
       ApplicationInfo m_appInfo;
@@ -70,7 +54,6 @@ namespace dg
       void setupSignalHandler();
       void initSystems();
 
-      std::vector<std::function<std::unique_ptr<Scene>()>> m_scenes;
       Timer m_timer;
       bool wasInitialized = false;
   };
