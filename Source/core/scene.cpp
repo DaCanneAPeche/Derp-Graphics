@@ -8,9 +8,6 @@ namespace dg
   void Scene::init(Application *application)
   {
     app = application;
-    /* assetManager = std::make_unique<AssetManager>(getAssets(), app->vulkanToolBox); */
-    /* assetManager->loadAll(); */
-    /* app->renderer.updateTextures(*assetManager); */
   }
 
   void Scene::bindInput(std::vector<Key>& keys, dg::config::Signals signal,

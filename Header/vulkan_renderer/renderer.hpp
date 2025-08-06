@@ -65,7 +65,6 @@ namespace dg
     }
 		
 		void recreateSwapChain(bool pipelinesCreation = true);
-    void updateTextures(AssetManager& assetManager);
     void updateDescriptorSets() { m_descriptorSetManager.update(); }
 
 		Window window;

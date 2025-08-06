@@ -175,13 +175,6 @@ namespace dg
     m_descriptorSetManager.allocate(m_descriptorPool.descriptorPool);
   }
 
-  void Renderer::updateTextures(AssetManager& assetManager)
-  {
-    /*auto texturesInfo = assetManager.textureInfos();
-    descriptors["textures"].writeToImage(texturesInfo);
-    updateDescriptorSets();*/
-  }
-
   void Renderer::createPipelines()
   {
 
