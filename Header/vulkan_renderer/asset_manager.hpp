@@ -12,11 +12,13 @@ namespace dg
 {
 
   class AssetManager;
+  class AssetPack;
 
   struct Asset
   {
     std::string path;
-    AssetManager* pManager; 
+    std::weak_ptr<AssetManager> manager; 
+    AssetPack* pPack = nullptr;
   };
 
   struct TextureAsset : public Asset
@@ -25,6 +27,7 @@ namespace dg
     uint32_t index;
     float imageRatio = 1;
 
+    ~TextureAsset();
     uint32_t loadAndGetIndex();
   };
 
@@ -53,11 +56,25 @@ namespace dg
       void batchTextureUpdates() {}; // TODO : Implement
 
       // Move the textures on the VRAM to save memory, probably not very useful
-      void removeGapsOnTheGPU() {}; // TODO : Implement
+      // void removeGapsOnTheGPU() {}; // TODO : Implement
 
     private:
       VulkanToolBox& m_toolBox;
       std::vector<std::unique_ptr<Texture>> m_textures;
+  };
+
+  class AssetPack
+  {
+    public:
+      static std::shared_ptr<AssetManager> s_assetManager;
+
+      static void initAssetManager(VulkanToolBox& vulkanToolBox)
+      {
+        if (s_assetManager == nullptr)
+          s_assetManager = std::make_shared<AssetManager>(vulkanToolBox);
+      }
+
+    private:
 
     protected:
       TextureAsset texture(const std::string& assetName);

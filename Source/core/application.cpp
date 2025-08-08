@@ -51,7 +51,6 @@ namespace dg
 
     initSystems();
     renderer.recreateSwapChain();
-    changeScene(0);
     wasInitialized = true;
   }
 
@@ -60,6 +59,7 @@ namespace dg
     assert(wasInitialized == true && "You need to call app.init() before app.run()");
 
     start();
+    changeScene(0);
     while (!renderer.shouldWindowClose())
     {
       m_timer.start();
