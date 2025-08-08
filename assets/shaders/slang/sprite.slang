@@ -22,11 +22,12 @@ SamplerState textureSampler;
 [[vk::binding(1, 0)]]
 Texture2D textures[1000];
 
+[[vk::binding(0, 1)]]
+ConstantBuffer<UniformBufferObject> ubo;
+
 struct UniformBufferObject {
   float2x2 screenTransform;
 }
-[[vk::binding(0, 1)]]
-ConstantBuffer<UniformBufferObject> ubo;
 
 [shader("vertex")]
 VOut vertexMain(Vertex input)

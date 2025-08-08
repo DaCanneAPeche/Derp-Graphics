@@ -91,7 +91,6 @@ namespace dg
 		void createCommandBuffers();
 		void freeCommandBuffers();
 		[[nodiscard]] std::vector<const char*> getRequestedExtensions() const;
-    void groupDescriptorSets();
     void createDescriptorSets();
     void createImageSampler();
     void setupImGui();
@@ -103,6 +102,5 @@ namespace dg
 		std::vector<vk::CommandBuffer> m_commandBuffers;
     VulkanToolBox& m_toolBox;
     DescriptorSetManager m_descriptorSetManager;
-    std::vector<std::vector<std::reference_wrapper<const DescriptorSlot>>> m_sets;
 	};
 } /* dg */ 

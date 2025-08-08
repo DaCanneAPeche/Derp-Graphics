@@ -38,7 +38,6 @@ namespace dg
 
     recreateSwapChain(false);
 
-    groupDescriptorSets();
     createDescriptorSets();
 
     createPipelineLayout();
@@ -128,40 +127,19 @@ namespace dg
         );
   }
 
-  // ugly way to to it but I'm too lazy to change the DescriptorSetManager
-  void Renderer::groupDescriptorSets()
-  {
-    DescriptorSlot emptySlot;
-    for (const auto& slot : shaderDescription.descriptorSlots)
-    {
-      if (slot.set + 1 > m_sets.size()) // Set not in m_sets
-      {
-        m_sets.resize(slot.set + 1);
-      }
-
-      if (slot.binding + 1 > m_sets[slot.set].size()) // Same but with binding
-      {
-        m_sets[slot.set].resize(slot.binding + 1, emptySlot);
-      }
-
-      m_sets[slot.set][slot.binding] = std::cref(slot); 
-    }
-  }
-
   void Renderer::createDescriptorSets()
   {
     // For imgui
     m_descriptorPool.addToPool(vk::DescriptorType::eCombinedImageSampler, 1);
     m_descriptorPool.numberOfSets += 1;
 
-    for (const auto& set : m_sets)
+    for (const auto& set : shaderDescription.descriptorSets)
     {
       DescriptorSetLayout& setLayout = m_descriptorSetManager.addLayout();
       m_descriptorPool.numberOfSets += 1;
 
-      for (const auto& slotRef : set)
+      for (const auto& slot : set)
       {
-        const DescriptorSlot& slot = slotRef.get();
         setLayout.addBinding(slot.type, vk::ShaderStageFlagBits::eAll, slot.arrayCount);
         m_descriptorPool.addToPool(slot.type, slot.arrayCount);
         descriptors[slot.name] = DescriptorWriter {slot.set, slot.binding,

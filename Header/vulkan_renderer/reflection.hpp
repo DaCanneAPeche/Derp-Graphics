@@ -33,7 +33,7 @@ namespace dg
 
   struct ShaderDescription
   {
-    std::vector<DescriptorSlot> descriptorSlots;
+    std::vector<std::vector<DescriptorSlot>> descriptorSets;
     std::vector<UniformBuffer> uniformBuffers;
 
     void print();

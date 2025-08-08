@@ -4,40 +4,51 @@ namespace dg
 {
   void ShaderDescription::print()
   {
-    std::cout << "Descriptor slots : " << descriptorSlots.size() << std::endl;
-    for (const auto& slot : descriptorSlots)
+    std::cout << "Descriptor sets : " << descriptorSets.size() << std::endl;
+    for (const auto& set : descriptorSets)
     {
-      std::cout << slot.name << '('
-        << "Set = " << slot.set << " ; Binding = " << slot.binding
-        << " ; Type = " << rfl::enum_to_string(slot.type);
-
-      if (slot.arrayCount > 1) std::cout << " ; Array size = " << slot.arrayCount;
-      if (slot.type == vk::DescriptorType::eUniformBuffer)
+      for (const auto& slot : set)
       {
-        std::cout << " ; UBO structure index = " << slot.uboIndex;
-      }
+        std::cout << slot.name << '('
+          << "Set = " << slot.set << " ; Binding = " << slot.binding
+          << " ; Type = " << rfl::enum_to_string(slot.type);
 
-      std::cout << ')' << std::endl;
+        if (slot.arrayCount > 1) std::cout << " ; Array size = " << slot.arrayCount;
+        if (slot.type == vk::DescriptorType::eUniformBuffer)
+        {
+          std::cout << " ; UBO structure index = " << slot.uboIndex;
+        }
+
+        std::cout << ')' << std::endl;
+      }
     }
 
-      std::cout << std::endl;
+    std::cout << std::endl;
 
-      std::cout << "UBO structures : " << uniformBuffers.size() << std::endl;
-      for (const auto& ubo : uniformBuffers)
+    std::cout << "UBO structures : " << uniformBuffers.size() << std::endl;
+    for (const auto& ubo : uniformBuffers)
+    {
+      std::cout << '-';
+      for (const auto& field : ubo)
       {
-        std::cout << '-';
-        for (const auto& field : ubo)
-        {
-          std::cout << ' ' << field.name << " (size = " << field.size
-            << " ; offset = " << field.relativeOffset << ")" << std::endl;
-        }
+        std::cout << ' ' << field.name << " (size = " << field.size
+          << " ; offset = " << field.relativeOffset << ")" << std::endl;
       }
+    }
   }
 
   void ShaderDescription::addDescriptorSlot(const std::string& name, uint32_t set,
       uint32_t binding, vk::DescriptorType type, uint32_t arrayCount, size_t uboIndex)
   {
-    descriptorSlots.push_back({ name, set, binding, type, arrayCount, uboIndex });
+    // Automaticly group descriptors by set
+    DescriptorSlot emptySlot;
+    if (set + 1 > descriptorSets.size()) // Set not in descritorSlots
+      descriptorSets.resize(set + 1);
+
+    if (binding + 1 > descriptorSets[set].size()) // Same but with binding
+      descriptorSets[set].resize(binding + 1, emptySlot);
+
+    descriptorSets[set][binding] = {name, set, binding, type, arrayCount, uboIndex};
   }
 
   void ShaderDescription::addDescriptorSlotFromSlang(const std::string& name, uint32_t set,

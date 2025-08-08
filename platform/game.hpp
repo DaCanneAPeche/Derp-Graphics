@@ -36,7 +36,7 @@ class Game : public dg::Application
       };
 
       spriteShader.reflect(renderer.shaderDescription);
-      // renderer.shaderDescription.print();
+      renderer.shaderDescription.print();
 
       vk::AttachmentReference colorAttachmentReference = renderer.renderPass.addAttachment(
           vulkanToolBox.getSwapChainSurfaceFormat().format,
