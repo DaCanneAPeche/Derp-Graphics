@@ -4,15 +4,9 @@
 
 #include "game.hpp"
 
-#include "core/config_info.hpp"
-#include "rfl/toml.hpp"
-#include "rfl.hpp"
-
 int main(void)
 {
-  rfl::Result<dg::ConfigInfo> config = rfl::toml::load<dg::ConfigInfo>("assets/derp-config.toml");
-
-  Game game(config.value());
+  Game game(dg::ConfigInfo::fromTOML("assets/derp-config.toml"));
   game.init();
   game.run();
 }

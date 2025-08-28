@@ -56,7 +56,7 @@ class MainScene : public dg::Scene
       });
 
       signalHandler.on(dg::config::Signals::MOUSE_PRESS, [this](dg::MouseButton button,
-            dg::KeyboardMods mods)
+            dg::KeyboardMods mods, glm::vec<2, double> mousePosition)
       {
         if (button != dg::MouseButton::left) return;
 
