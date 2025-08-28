@@ -30,6 +30,7 @@ namespace dg
         glfwSetKeyCallback(m_window, _keyInputCallback);
         glfwSetCursorPosCallback(m_window, _mouseMoveCallback);
         glfwSetMouseButtonCallback(m_window, _mouseButtonCallback);
+        glfwSetScrollCallback(m_window, _mouseScrollCallback);
         
         PLOG_INFO << "Window created";
     }
@@ -58,7 +59,7 @@ namespace dg
 
     void Window::_frameBufferResizeCallback(GLFWwindow* pGLFWWindow, int width, int height)
     {
-        Window* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(pGLFWWindow));
+        Window* window = getWindowPointer(pGLFWWindow);
         window->isResized = true;
         window->info.width = width;
         window->info.height = height;
@@ -68,20 +69,22 @@ namespace dg
 
     void Window::_keyInputCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods)
     {
-      static_cast<Window*>(glfwGetWindowUserPointer(pWindow))
-        ->keyInputCallback(pWindow, key, scancode, action, mods);
+        getWindowPointer(pWindow)->keyInputCallback(pWindow, key, scancode, action, mods);
     }
 
     void Window::_mouseMoveCallback(GLFWwindow* pWindow, double xPos, double yPos)
     {
-      static_cast<Window*>(glfwGetWindowUserPointer(pWindow))
-        ->mouseMoveCallback(pWindow, xPos, yPos);
+        getWindowPointer(pWindow)->mouseMoveCallback(pWindow, xPos, yPos);
     }
 
     void Window::_mouseButtonCallback(GLFWwindow* pWindow, int button, int action, int mods)
     {
-      static_cast<Window*>(glfwGetWindowUserPointer(pWindow))
-        ->mouseButtonCallback(pWindow, button, action, mods);
+      getWindowPointer(pWindow)->mouseButtonCallback(pWindow, button, action, mods);
+    }
+
+    void Window::_mouseScrollCallback(GLFWwindow* pWindow, double xAmount, double yAmount)
+    {
+        getWindowPointer(pWindow)->mouseScrollCallback(pWindow, xAmount, yAmount);
     }
 
 } /* dg */ 

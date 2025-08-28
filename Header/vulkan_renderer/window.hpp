@@ -41,7 +41,8 @@ namespace dg
     std::function<void(GLFWwindow*, int, int, int, int)> keyInputCallback;
     std::function<void(GLFWwindow*, double, double)> mouseMoveCallback;
     std::function<void(GLFWwindow*, int, int, int)> mouseButtonCallback;
-    std::function<void(GLFWwindow*, int, int)> resizeCallback;
+    std::function<void(GLFWwindow*, int, int)> resizeCallback = [](GLFWwindow*, int, int){};
+    std::function<void(GLFWwindow*, double, double)> mouseScrollCallback;
 
 	private:
 
@@ -49,7 +50,13 @@ namespace dg
     static void _keyInputCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods);
     static void _mouseMoveCallback(GLFWwindow* pWindow, double xPos, double yPos);
     static void _mouseButtonCallback(GLFWwindow* pWindow, int button, int action, int mods);
+    static void _mouseScrollCallback(GLFWwindow* pWindow, double xAmount, double yAmount);
 		void init();
+
+    static Window* getWindowPointer(GLFWwindow* pWindow)
+    {
+      return static_cast<Window*>(glfwGetWindowUserPointer(pWindow));
+    }
 
 		GLFWwindow* m_window;
 	};

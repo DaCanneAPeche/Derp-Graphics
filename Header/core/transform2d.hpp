@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include "plog/Log.h"
 
 namespace dg
 {
@@ -18,6 +19,7 @@ namespace dg
 			glm::mat2 rotationMatrix {{cos, sin}, {-sin, cos}};
 
 			glm::mat2 scaleMatrix = {{scaling.x * ratio, 0.0f}, {0.0f, scaling.y}};
+      //LOGD << ratio;
 			return rotationMatrix * scaleMatrix;
 		}
 	};

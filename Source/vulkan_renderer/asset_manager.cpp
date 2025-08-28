@@ -4,7 +4,7 @@
 namespace dg
 {
 
-  TextureAsset::~TextureAsset()
+  void TextureAsset::unload()
   {
     if (!loadedOnGpu) return;
 

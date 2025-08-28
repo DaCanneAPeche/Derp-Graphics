@@ -148,7 +148,7 @@ namespace dg
         CheckIfFunctionsAreOverriden<System<Components...>, decltype(*this)>
           areFuncOverriden;
 
-        if (areFuncOverriden.onCreation)
+        // if (areFuncOverriden.onCreation)
           pRegistry->on_construct<T>()
             .template connect<&System<Components...>::_onCreation>(*this);
 

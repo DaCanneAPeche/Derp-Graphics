@@ -18,7 +18,7 @@ namespace dg
 				m_toolBox.device.destroyImageView(imageView);
 			}
 
-      float getRatio() { return width / height; }
+      float getRatio() { return static_cast<float>(width) / static_cast<float>(height); }
 
 			vk::ImageView imageView;
 			vk::ImageLayout imageLayout;

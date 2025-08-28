@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 #include <vector>
+#include "_vulkan/debug_messenger.hpp"
 
 namespace dg
 {

@@ -15,6 +15,7 @@
 
 // std
 #include <cstring>
+#include <iostream>
 
 static void imgui_check_vk_result(VkResult err)
 {
@@ -311,6 +312,11 @@ namespace dg
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+#ifdef DG_DISABLE_IMGUI_INI_FILE
+    std::cout << "imid\n\n\n";
+    io.ConfigFlags |= ImGuiConfigFlags_NoSavedSettings;
+#endif
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();

@@ -16,6 +16,7 @@ namespace dg
       MOUSE_MOVE,
       MOUSE_PRESS,
       MOUSE_RELEASE,
+      MOUSE_SCROLL,
 
       RICK_ROTATE,
       RICK_MOVE,

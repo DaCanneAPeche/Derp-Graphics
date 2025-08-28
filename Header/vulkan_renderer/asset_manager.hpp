@@ -27,8 +27,9 @@ namespace dg
     uint32_t index;
     float imageRatio = 1;
 
-    ~TextureAsset();
+    ~TextureAsset() { unload(); }
     uint32_t loadAndGetIndex();
+    void unload();
   };
 
   struct TextureDescriptorUpdate
@@ -63,21 +64,17 @@ namespace dg
       std::vector<std::unique_ptr<Texture>> m_textures;
   };
 
-  class AssetPack
+  struct AssetPack
   {
-    public:
-      static std::shared_ptr<AssetManager> s_assetManager;
+    static std::shared_ptr<AssetManager> s_assetManager;
 
-      static void initAssetManager(VulkanToolBox& vulkanToolBox)
-      {
-        if (s_assetManager == nullptr)
-          s_assetManager = std::make_shared<AssetManager>(vulkanToolBox);
-      }
+    static void initAssetManager(VulkanToolBox& vulkanToolBox)
+    {
+      if (s_assetManager == nullptr)
+        s_assetManager = std::make_shared<AssetManager>(vulkanToolBox);
+    }
 
-    private:
-
-    protected:
-      TextureAsset texture(const std::string& assetName);
+    TextureAsset texture(const std::string& assetName);
   };
 
 }

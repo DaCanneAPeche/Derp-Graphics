@@ -1,4 +1,5 @@
 #include "vulkan_renderer/texture.hpp"
+#include "plog/Log.h"
 
 namespace dg {
 

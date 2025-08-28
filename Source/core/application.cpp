@@ -19,7 +19,12 @@ namespace dg
     static plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
     static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender("log.txt",
         1000000, 5);
-    plog::init(plog::verbose, &consoleAppender).addAppender(&rollingFileAppender);
+
+    auto& logger = plog::init(plog::verbose, &consoleAppender);
+
+#ifndef NDEBUG
+    logger.addAppender(&rollingFileAppender);
+#endif
 
     PLOG_INFO << "Program started : " << appInfo.name;
     vulkanToolBox.init(m_appInfo, renderer.window);
@@ -27,6 +32,9 @@ namespace dg
 
   Application::~Application()
   {
+    if (currentScene != nullptr) currentScene->end();
+    currentScene = nullptr;
+
     renderer.clean();
   }
 
@@ -134,8 +142,21 @@ namespace dg
         {GLFW_RELEASE, config::Signals::MOUSE_RELEASE}
       };
 
+      glm::vec<2, double> mousePosition;
+      glfwGetCursorPos(window, &mousePosition.x, &mousePosition.y);
+
       currentScene->signalHandler.send(actionMap[action],
-          static_cast<MouseButton>(button), static_cast<KeyboardMods>(mods));
+          static_cast<MouseButton>(button), static_cast<KeyboardMods>(mods),
+          mousePosition);
+    };
+
+    renderer.window.mouseScrollCallback = [this](GLFWwindow* window,
+        double xAmount, double yAmount)
+    {
+      if (doesImGuiRequestInputs()) return;
+
+      glm::vec<2, double> amount = {xAmount, yAmount};
+      currentScene->signalHandler.send(config::Signals::MOUSE_SCROLL, amount);
     };
 
   }

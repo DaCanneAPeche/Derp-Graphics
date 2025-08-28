@@ -1,7 +1,7 @@
-#include "_vulkan/vulkan_tool_box.hpp"
+#include "_vulkan/debug_messenger.hpp"
 #include "_vulkan/instance.hpp"
 #include "_vulkan/device_builder.hpp"
-#include "_vulkan/debug_messenger.hpp"
+#include "_vulkan/vulkan_tool_box.hpp"
 
 namespace dg
 {

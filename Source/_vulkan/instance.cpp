@@ -12,6 +12,12 @@ namespace dg
         requestedExtensions
         );
 
+    auto debugCreateInfo = getDebugMessengerCreateInfo();
+    if (validationLayers.size() > 0)
+    {
+      createInfo.pNext = &debugCreateInfo;
+    }
+
     return vk::createInstance(createInfo);
   }
 }
