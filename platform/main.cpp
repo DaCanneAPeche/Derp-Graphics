@@ -4,12 +4,15 @@
 
 #include "game.hpp"
 
+#include "core/config_info.hpp"
+#include "rfl/toml.hpp"
+#include "rfl.hpp"
+
 int main(void)
 {
-  dg::WindowInfo windowInfo {1000, 1000, "Hello, world !"};
-  dg::ApplicationInfo appInfo {"Hello, world program !", {1, 0, 0}};
+  rfl::Result<dg::ConfigInfo> config = rfl::toml::load<dg::ConfigInfo>("assets/derp-config.toml");
 
-  Game game(windowInfo, appInfo);
+  Game game(config.value());
   game.init();
   game.run();
 }

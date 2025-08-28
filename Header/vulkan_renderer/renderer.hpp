@@ -29,7 +29,7 @@ namespace dg
 	class Renderer
 	{
 	public:
-		Renderer(const WindowInfo& windowInfo, VulkanToolBox& vulkanToolBox);
+		Renderer(const ConfigInfo& configInfo, VulkanToolBox& vulkanToolBox);
 		~Renderer() {};
 
 		Renderer(const Renderer &) = delete;

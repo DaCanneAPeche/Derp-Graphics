@@ -6,6 +6,7 @@
 #include "components/sprite.hpp"
 #include "components/position.hpp"
 #include "core/system.hpp"
+#include "core/config_info.hpp"
 
 #include "assets.hpp"
 
@@ -16,8 +17,7 @@ class Game : public dg::Application
     bool showOnlyOutlines = false;
     dg::ShaderVariableManager ubo {vulkanToolBox, renderer};
 
-    Game(const dg::WindowInfo& windowInfo, const dg::ApplicationInfo& appInfo)
-      : dg::Application(windowInfo, appInfo)
+    Game(const dg::ConfigInfo& configInfo) : dg::Application(configInfo)
     {
       dg::SlangCompiler spriteShader("./assets/shaders/slang/sprite.slang");
 

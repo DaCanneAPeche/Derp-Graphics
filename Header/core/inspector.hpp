@@ -14,7 +14,6 @@ namespace dg
   template <class T>
   struct Inspector
   {
-
     Inspector()
     {
       entt::meta<T>().template func<&Inspector<T>::inspectFields>("Inspector"_hs);

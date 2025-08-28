@@ -6,13 +6,12 @@
 namespace dg
 {
 
-  void VulkanToolBox::init(const ApplicationInfo& applicationInfo,
-      Window& window)
+  void VulkanToolBox::init(const ConfigInfo& configInfo, Window& window)
   {
     vk::ApplicationInfo appInfo(
-        applicationInfo.name.c_str(),
-        VK_MAKE_VERSION(applicationInfo.version[0], 
-          applicationInfo.version[1], applicationInfo.version[2]),
+        configInfo.application.name.c_str(),
+        VK_MAKE_VERSION(configInfo.application.version[0], 
+          configInfo.application.version[1], configInfo.application.version[2]),
         "Derp Graphics",
         VK_MAKE_VERSION(1, 0, 0),
         vk::ApiVersion13

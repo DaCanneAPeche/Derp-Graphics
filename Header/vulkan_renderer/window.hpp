@@ -4,6 +4,7 @@
 #include "GLFW/glfw3.h"
 #include "glm/glm.hpp"
 #include "vulkan/vulkan.hpp"
+#include "core/config_info.hpp"
 
 // std
 #include <string>
@@ -12,19 +13,18 @@
 namespace dg
 {
 
-	struct WindowInfo {
-
+	struct WindowInfo
+  {
 		int width;
 		int height;
 		std::string name;
-
 	};
 		
 	class Window
 	{
 	public:
-		Window (const WindowInfo& windowInfo);
-		~Window ();
+		Window(const ConfigInfo& configInfo);
+		~Window();
 
 		Window(const Window&) = delete;
 		Window &operator=(const Window&) = delete;

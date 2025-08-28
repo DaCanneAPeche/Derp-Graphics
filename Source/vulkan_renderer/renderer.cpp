@@ -29,8 +29,8 @@ static void imgui_check_vk_result(VkResult err)
 
 namespace dg
 {
-  Renderer::Renderer(const WindowInfo& windowInfo, VulkanToolBox& vulkanToolBox)
-    : window(windowInfo), m_toolBox(vulkanToolBox), renderPass(vulkanToolBox),
+  Renderer::Renderer(const ConfigInfo& configInfo, VulkanToolBox& vulkanToolBox)
+    : window(configInfo), m_toolBox(vulkanToolBox), renderPass(vulkanToolBox),
     m_descriptorSetManager(vulkanToolBox) { }
 
   void Renderer::init()

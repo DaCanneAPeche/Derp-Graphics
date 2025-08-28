@@ -12,9 +12,7 @@ namespace dg
     return io.WantCaptureMouse || io.WantCaptureKeyboard;
   }
 
-  Application::Application(const WindowInfo& windowInfo,
-      const ApplicationInfo& appInfo) : renderer(windowInfo, vulkanToolBox),
-      m_appInfo(appInfo)
+  Application::Application(const ConfigInfo& configInfo) : renderer(configInfo, vulkanToolBox)
   {
     static plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
     static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender("log.txt",
@@ -26,8 +24,8 @@ namespace dg
     logger.addAppender(&rollingFileAppender);
 #endif
 
-    PLOG_INFO << "Program started : " << appInfo.name;
-    vulkanToolBox.init(m_appInfo, renderer.window);
+    PLOG_INFO << "Program started : " << configInfo.application.name;
+    vulkanToolBox.init(configInfo, renderer.window);
   }
 
   Application::~Application()

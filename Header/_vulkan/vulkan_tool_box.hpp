@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.hpp>
 #include <GLFW/glfw3.h>
 
-#include "core/application_info.hpp"
+#include "core/config_info.hpp"
 #include "vulkan_renderer/window.hpp"
 #include "_vulkan/structs.hpp"
 
@@ -15,7 +15,7 @@ namespace dg
   class VulkanToolBox
   {
     public:
-      void init(const ApplicationInfo& applicationInfo, Window& window);
+      void init(const ConfigInfo& configInfo, Window& window);
       ~VulkanToolBox();
 
       vk::Instance instance;

@@ -9,7 +9,7 @@
 
 #include "config/scenes.hpp"
 #include "core/scene.hpp"
-#include "core/application_info.hpp"
+#include "core/config_info.hpp"
 #include "core/timer.hpp"
 #include "vulkan_renderer/renderer.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
@@ -26,8 +26,7 @@ namespace dg
   class Application
   {
     public:
-      Application(const dg::WindowInfo& windowInfo,
-          const dg::ApplicationInfo& appInfo);
+      Application(const ConfigInfo& configInfo);
       ~Application();
 
       void init(); // An init function meant to be called after the child constructor
@@ -42,7 +41,6 @@ namespace dg
       void changeScene(uint32_t sceneId);
 
       std::unique_ptr<Scene> currentScene;
-      ApplicationInfo m_appInfo;
 
       virtual void start() {}; // Called after the renderer is initialized
       virtual void update() {};

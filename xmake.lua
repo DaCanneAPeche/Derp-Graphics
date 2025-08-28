@@ -1,7 +1,8 @@
 add_rules("mode.debug", "mode.release")
 add_requires("glm", "glfw", "vulkan-memory-allocator-hpp v3.1.0", "vulkan-hpp v1.3.283",
-    "vulkan-memory-allocator v3.1.0", "stb", "plog", "entt", "reflect-cpp", "imgui",
-    "spirv-cross", "slang")
+    "vulkan-memory-allocator v3.1.0", "stb", "plog", "entt", "imgui",
+    "spirv-cross", "slang", "toml++")
+add_requires("reflect-cpp", {configs = {toml = true}})
 add_requires("imgui docking", {configs = {glfw = true, vulkan = true}})
 
 add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
@@ -15,7 +16,9 @@ target("Derp_Graphics")
 
     add_packages("glm", "glfw", "vulkan-memory-allocator-hpp", "vulkan-hpp",
         "vulkan-memory-allocator", "stb", "plog", "entt", "reflect-cpp", "imgui",
-        "spirv-cross", "slang")
+        "spirv-cross", "slang", "toml++")
+
+    add_cxxflags("-DREFLECTCPP_TOML=ON")
 
     after_build(function (target)
        
