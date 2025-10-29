@@ -9,6 +9,7 @@
 #include "core/config_info.hpp"
 
 #include "assets.hpp"
+#include "pipelines.hpp"
 
 class Game : public dg::Application
 {
@@ -21,19 +22,11 @@ class Game : public dg::Application
     {
       dg::SlangCompiler spriteShader("./assets/shaders/slang/sprite.slang");
 
-      renderer.pipelinesInfo = {
-        dg::PipelineInfo {
-            dg::Pl::sprites,
-            spriteShader.get("vertexMain"),
-            spriteShader.get("fragmentMain")
-        },
-        dg::PipelineInfo {
-            dg::Pl::outline,
-            spriteShader.get("vertexMain"),
-            spriteShader.get("fragmentMain"),
-            getOutlineConfig()
-        },
-      };
+      renderer.registerPipelineInfo(Pipelines::Sprites, spriteShader.get("vertexMain"),
+          spriteShader.get("fragmentMain"));
+
+      renderer.registerPipelineInfo(Pipelines::Outline, spriteShader.get("vertexMain"),
+          spriteShader.get("fragmentMain"), getOutlineConfig());
 
       spriteShader.reflect(renderer.shaderDescription);
       renderer.shaderDescription.print();
@@ -135,9 +128,9 @@ class Game : public dg::Application
       assets.s_assetManager->textureDescriptorUpdates.clear();
 
       if (showOnlyOutlines)
-        frame.bindPipeline(dg::Pl::outline);
+        frame.bindPipeline(Pipelines::Outline);
       else
-        frame.bindPipeline(dg::Pl::sprites);
+        frame.bindPipeline(Pipelines::Sprites);
 
       auto renderView = registry.view<comp::Sprite>();
 

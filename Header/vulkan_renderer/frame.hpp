@@ -21,7 +21,8 @@ namespace dg
       renderer.pushConstant(commandBuffer, data);
     }
 
-    void bindPipeline(Pl pipelineId)
+    template <CastableTo<uint32_t> PipelineIdType>
+    void bindPipeline(PipelineIdType pipelineId)
     {
       renderer.bindPipeline(commandBuffer, pipelineId);
     }

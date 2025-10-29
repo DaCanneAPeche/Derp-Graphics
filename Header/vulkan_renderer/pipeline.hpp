@@ -2,20 +2,13 @@
 
 #include "vulkan/vulkan.hpp"
 #include "_vulkan/vulkan_tool_box.hpp"
-#include <memory>
 #include "vulkan_renderer/shader_module.hpp"
+#include "utils/castable_to.hpp"
+
+#include <memory>
 
 namespace dg
 {
-
-	// Pipelines, not a enum class to avoid static cast everywhere
-  enum class Pl : uint32_t
-	{
-    sprites = 0,
-    outline,
-
-    Count
-	};
 
 	struct PipelineConfigInfo
 	{
@@ -35,7 +28,7 @@ namespace dg
 
   struct PipelineInfo
   {
-    Pl id;
+    uint32_t id = 0;
     ShaderModule vertexShader;
     ShaderModule fragmentShader;
 

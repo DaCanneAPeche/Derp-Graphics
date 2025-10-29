@@ -162,6 +162,9 @@ namespace dg
 
     for (auto& pipelineInfo : pipelinesInfo)
     {
+      if (m_pipelines.size() < pipelineInfo.id + 1) 
+        m_pipelines.resize(pipelineInfo.id + 1);
+
       m_pipelines[static_cast<uint32_t>(pipelineInfo.id)] = createPipeline(
           pipelineInfo.vertexShader,
           pipelineInfo.fragmentShader,

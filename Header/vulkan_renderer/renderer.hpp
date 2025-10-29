@@ -11,6 +11,7 @@
 #include "vulkan_renderer/uniform_buffer_object.hpp"
 #include "_vulkan/descriptor_set_manager.hpp"
 #include "vulkan_renderer/render_pass.hpp"
+#include "utils/castable_to.hpp"
 
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
@@ -53,7 +54,8 @@ namespace dg
           0, sizeof(T), &pushData);
     }
 
-    void bindPipeline(vk::CommandBuffer& commandBuffer, Pl pipelineId)
+    template <CastableTo<uint32_t> PipelineIdType>
+    void bindPipeline(vk::CommandBuffer& commandBuffer, PipelineIdType pipelineId)
     {
       m_pipelines[static_cast<uint32_t>(pipelineId)]->bind(commandBuffer); 
 
@@ -62,6 +64,15 @@ namespace dg
           m_pipelineLayout,
           0, m_descriptorSetManager.descriptorSets, {}
           );
+    }
+
+    template <CastableTo<uint32_t> PipelineIdType>
+    void registerPipelineInfo(PipelineIdType id, const ShaderModule& vertexShader,
+        const ShaderModule& fragmentShader,
+        std::shared_ptr<PipelineConfigInfo> config = nullptr)
+    {
+      pipelinesInfo.push_back(PipelineInfo {static_cast<uint32_t>(id),
+          vertexShader, fragmentShader, config});
     }
 		
 		void recreateSwapChain(bool pipelinesCreation = true);
@@ -98,7 +109,7 @@ namespace dg
 
 		vk::PipelineLayout m_pipelineLayout;
     DescriptorPool m_descriptorPool;
-		std::array<std::unique_ptr<Pipeline>, static_cast<uint32_t>(Pl::Count)> m_pipelines;
+		std::vector<std::unique_ptr<Pipeline>> m_pipelines;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
     VulkanToolBox& m_toolBox;
     DescriptorSetManager m_descriptorSetManager;

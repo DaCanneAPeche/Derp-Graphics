@@ -7,7 +7,6 @@
 
 #include "entt/entt.hpp"
 
-#include "config/scenes.hpp"
 #include "core/scene.hpp"
 #include "core/config_info.hpp"
 #include "core/timer.hpp"

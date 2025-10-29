@@ -1,5 +1,6 @@
 #include "game.hpp"
 #include "core/scene_registration.hpp"
+#include "scenes.hpp"
 
 class MainScene : public dg::Scene
 {
@@ -16,7 +17,7 @@ class MainScene : public dg::Scene
       // entt::meta<comp::Position>().func<&comp::Position::inspect>("Inspector"_hs);
       rick = app->registry.create();
       auto& pos = app->registry.emplace<comp::Position>(rick);
-      pos.x = 10;
+      pos.x = 15;
       comp::Sprite& sprite = app->registry.emplace<comp::Sprite>(rick);
 
       std::vector<dg::Vertex> vertices 
@@ -87,4 +88,4 @@ class MainScene : public dg::Scene
     }
 };
 
-static dg::RegisterScene<MainScene> _(0);
+static dg::RegisterScene<MainScene> _(Scenes::Main);

@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "core/scene.hpp"
+#include "utils/castable_to.hpp"
 
 namespace dg
 {
@@ -12,10 +13,9 @@ namespace dg
   {
     inline std::vector<std::function<std::unique_ptr<Scene>()>> sceneFabricators;
 
-    template <class SceneType>
-    void addScene(uint32_t sceneId)
+    template <std::derived_from<Scene> SceneType, CastableTo<uint32_t> IdType>
+    void addScene(IdType sceneId)
     {
-      static_assert(std::is_base_of<Scene, SceneType>(), "Scene not a child of dg::Scene");
       uint32_t id = static_cast<uint32_t>(sceneId);
 
       if (sceneFabricators.size() <= id + 1) sceneFabricators.resize(id + 1);
@@ -28,10 +28,11 @@ namespace dg
     }
   }
 
-  template <class SceneType>
+  template <std::derived_from<Scene> SceneType>
   struct RegisterScene
   {
-    RegisterScene(uint32_t sceneId)
+    template <CastableTo<uint32_t> IdType>
+    RegisterScene(IdType sceneId)
     {
         _scenes::addScene<SceneType>(sceneId);
     }
