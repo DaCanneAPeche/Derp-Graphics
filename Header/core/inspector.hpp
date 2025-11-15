@@ -16,7 +16,8 @@ namespace dg
   {
     Inspector()
     {
-      entt::meta<T>().template func<&Inspector<T>::inspectFields>("Inspector"_hs);
+      entt::meta_factory<T> factory {};
+      factory.template func<&Inspector<T>::inspectFields>("Inspector"_hs);
     }
 
     static void inspectFields(void* _pInspected)
