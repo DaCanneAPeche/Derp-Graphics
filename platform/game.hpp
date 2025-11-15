@@ -7,6 +7,7 @@
 #include "components/position.hpp"
 #include "core/system.hpp"
 #include "core/config_info.hpp"
+#include "vulkan_renderer/render_pass_builder.hpp"
 
 #include "assets.hpp"
 #include "pipelines.hpp"
@@ -31,43 +32,7 @@ class Game : public dg::Application
       spriteShader.reflect(renderer.shaderDescription);
       renderer.shaderDescription.print();
 
-      vk::AttachmentReference colorAttachmentReference = renderer.renderPass.addAttachment(
-          vulkanToolBox.getSwapChainSurfaceFormat().format,
-          vk::SampleCountFlagBits::e1,
-          vk::AttachmentLoadOp::eClear,
-          vk::AttachmentStoreOp::eStore,
-          vk::AttachmentLoadOp::eDontCare,
-          vk::AttachmentStoreOp::eDontCare,
-          vk::ImageLayout::eUndefined,
-          vk::ImageLayout::ePresentSrcKHR
-          ).get(vk::ImageLayout::eColorAttachmentOptimal);
-
-      vk::AttachmentReference depthAttachmentReference = renderer.renderPass.addAttachment(
-          vulkanToolBox.findDepthFormat(),
-          vk::SampleCountFlagBits::e1,
-          vk::AttachmentLoadOp::eClear,
-          vk::AttachmentStoreOp::eDontCare,
-          vk::AttachmentLoadOp::eDontCare,
-          vk::AttachmentStoreOp::eDontCare,
-          vk::ImageLayout::eUndefined,
-          vk::ImageLayout::eDepthStencilAttachmentOptimal
-          ).get(vk::ImageLayout::eDepthStencilAttachmentOptimal);
-
-      renderer.renderPass.addSubpass(vk::SubpassDescription(
-            {}, vk::PipelineBindPoint::eGraphics, {}, colorAttachmentReference, {},
-            &depthAttachmentReference, {}
-            ));
-
-      renderer.renderPass.addDependency(vk::SubpassDependency(
-            vk::SubpassExternal, 0,
-            vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
-            vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eEarlyFragmentTests,
-            {},
-            vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eDepthStencilAttachmentWrite,
-            {}
-            ));
-
-      renderer.renderPass.create();
+      dg::RenderPassBuilder::BuildDefaultRenderpass(renderer.renderPass);
     }
 
     ~Game()

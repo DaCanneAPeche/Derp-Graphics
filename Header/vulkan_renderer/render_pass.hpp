@@ -21,13 +21,14 @@ namespace dg
   {
 
     public:
-      RenderPass(VulkanToolBox& vulkanToolBox) : m_toolBox(vulkanToolBox) {}
+      RenderPass(VulkanToolBox& vulkanToolBox) : toolBox(vulkanToolBox) {}
       ~RenderPass()
       {
-        m_toolBox.device.destroy(renderPass);
+        toolBox.device.destroy(renderPass);
       }
 
       vk::RenderPass renderPass;
+      VulkanToolBox& toolBox;
 
       AttachmentReference addAttachment(vk::Format format, vk::SampleCountFlagBits samples,
           vk::AttachmentLoadOp loadOp, vk::AttachmentStoreOp storeOp,
@@ -49,7 +50,6 @@ namespace dg
 
     private:
 
-      VulkanToolBox& m_toolBox;
       std::vector<vk::AttachmentDescription> m_attachments = {};
       std::vector<vk::SubpassDescription> m_subpasses = {};
       std::vector<vk::SubpassDependency> m_dependencies = {};

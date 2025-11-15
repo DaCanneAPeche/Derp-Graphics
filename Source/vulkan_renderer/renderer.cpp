@@ -334,11 +334,11 @@ namespace dg
     initInfo.Queue = m_toolBox.graphicsQueue;
     initInfo.PipelineCache = VK_NULL_HANDLE;
     initInfo.DescriptorPool = m_descriptorPool.descriptorPool;
-    initInfo.RenderPass = renderPass.renderPass;
-    initInfo.Subpass = 0;
+    initInfo.PipelineInfoMain.RenderPass = renderPass.renderPass;
+    initInfo.PipelineInfoMain.Subpass = 0;
     initInfo.MinImageCount = 2;
     initInfo.ImageCount = swapChain->imageCount;
-    initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+    initInfo.PipelineInfoMain.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     // initInfo.Allocator = g_Allocator;
     initInfo.CheckVkResultFn = imgui_check_vk_result;
     ImGui_ImplVulkan_Init(&initInfo);
