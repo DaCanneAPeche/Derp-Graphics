@@ -27,6 +27,11 @@ namespace comp
 
     dg::Inspector<Sprite> inspector;
 
+    std::function<void()> test = []()
+    {
+      LOGD << "Test";
+    };
+
     void draw(dg::Frame& frame)
     {
       dg::PushConstant push {

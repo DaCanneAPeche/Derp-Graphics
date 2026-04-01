@@ -43,4 +43,10 @@ namespace dg
       ImGui::SliderFloat2("Scale", reinterpret_cast<float*>(&var.scaling), -10, 10);
     }
 
+  template <>
+    inline void inspect<>(std::string_view name, std::function<void()>& func)
+    {
+      if (ImGui::Button(std::string(name).c_str())) func();
+    }
+
 }

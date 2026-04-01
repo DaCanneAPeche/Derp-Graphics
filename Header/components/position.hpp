@@ -9,6 +9,6 @@ namespace comp
     float x = 0, y = 0;
     int z = 10;
 
-    dg::Inspector<Position> inspector;
+    //dg::Inspector<Position> inspector;
   };
 }

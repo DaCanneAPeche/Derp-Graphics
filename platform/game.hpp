@@ -148,10 +148,9 @@ class Game : public dg::Application
       {
         for (auto entity : registry.view<entt::entity>())
         {
-          char label[8 + sizeof(int)];
-          sprintf(label, "Entity %i", static_cast<int>(entity));
+          std::string label = "Entity " + std::to_string(static_cast<int>(entity));
 
-          if (ImGui::TreeNode(label))
+          if (ImGui::TreeNode(label.c_str()))
           {
             for(auto [id, storage] : registry.storage())
             {
