@@ -29,5 +29,10 @@ target("Derp_Graphics")
             os.run(cmd)
         end
 
+        if not os.exists("$(buildir)/$(plat)/$(arch)/$(mode)/assets") then
+          os.ln("../../../../assets", "$(buildir)/$(plat)/$(arch)/$(mode)/assets")
+        end
+
+
     end)
 
