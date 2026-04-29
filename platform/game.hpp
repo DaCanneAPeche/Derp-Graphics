@@ -15,7 +15,6 @@
 class Game : public dg::Application
 {
   public:
-    Assets assets;
     bool showOnlyOutlines = false;
     dg::ShaderVariableManager ubo {vulkanToolBox, renderer};
 
@@ -88,9 +87,9 @@ class Game : public dg::Application
 
     void render(dg::Frame& frame) override
     {
-      assets.s_assetManager->processTextureLoadings(renderer.descriptors["textures"]);
+      dg::AssetPack::getAssetManager()->processTextureLoadings(renderer.descriptors["textures"]);
       renderer.updateDescriptorSets();
-      assets.s_assetManager->textureDescriptorUpdates.clear();
+      dg::AssetPack::getAssetManager()->textureDescriptorUpdates.clear();
 
       if (showOnlyOutlines)
         frame.bindPipeline(Pipelines::Outline);

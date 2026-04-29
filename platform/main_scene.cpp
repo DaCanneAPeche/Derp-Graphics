@@ -2,11 +2,14 @@
 #include "core/scene_registration.hpp"
 #include "scenes.hpp"
 
+#include <iostream>
+
 class MainScene : public dg::Scene
 {
   private:
     entt::entity rick;
     Game* game = nullptr;
+    Assets assets;
 
   public:
 
@@ -33,8 +36,8 @@ class MainScene : public dg::Scene
           app->vulkanToolBox);
       sprite.transform.rotation = glm::pi<float>()/4;
       sprite.transform.translation = { 0.3, 0.5 };
-      sprite.textureId = game->assets.rick.loadAndGetIndex();
-      sprite.transform.ratio = game->assets.rick.imageRatio;
+      sprite.textureId = assets.rick.loadAndGetIndex();
+      sprite.transform.ratio = assets.rick.imageRatio;
 
       signalHandler.on(dg::config::Signals::KEY_PRESS, [this](dg::Key key,
             dg::KeyboardMods mods)
@@ -86,6 +89,7 @@ class MainScene : public dg::Scene
       if (isActionTakingPlace(dg::config::Signals::RICK_MOVE))
         app->registry.get<comp::Sprite>(rick).transform.translation.x += 1 * app->deltaTime;
     }
+
 };
 
 static dg::RegisterScene<MainScene> _(Scenes::Main);

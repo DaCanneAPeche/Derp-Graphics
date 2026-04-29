@@ -12,6 +12,8 @@ namespace dg
   class Scene
   {
     public:
+      virtual ~Scene() = default;
+
       virtual void start() {};
       virtual void update() {};
       virtual void lateUpdate() {};

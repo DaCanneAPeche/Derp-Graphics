@@ -8,6 +8,8 @@
 #include "vulkan_renderer/texture.hpp"
 #include "_vulkan/descriptor_set_manager.hpp"
 
+#include <plog/Log.h>
+
 namespace dg
 {
 
@@ -54,7 +56,7 @@ namespace dg
       void unloadTexture(TextureAsset& asset);
       void processTextureLoadings(DescriptorWriter& descriptorWriter);
 
-      void batchTextureUpdates() {}; // TODO : Implement
+      /* void batchTextureUpdates() {}; // TODO : Implement */
 
       // Move the textures on the VRAM to save memory, probably not very useful
       // void removeGapsOnTheGPU() {}; // TODO : Implement
@@ -68,12 +70,23 @@ namespace dg
   {
     static std::shared_ptr<AssetManager> s_assetManager;
 
+    static std::shared_ptr<AssetManager> getAssetManager()
+    {
+      if (s_assetManager == nullptr)
+      {
+        throw std::runtime_error("AssetPack's assetManager wasn't instanzialised before use");
+      }
+
+      return s_assetManager; 
+    }
+
     static void initAssetManager(VulkanToolBox& vulkanToolBox)
     {
       if (s_assetManager == nullptr)
         s_assetManager = std::make_shared<AssetManager>(vulkanToolBox);
     }
 
+    std::vector<TextureAsset*> textureAssets;
     TextureAsset texture(const std::string& assetName);
   };
 
