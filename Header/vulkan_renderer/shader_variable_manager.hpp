@@ -14,7 +14,7 @@ namespace dg
 
   /* 
    * A class built over an uniform buffer object to manage the variables given
-   * to the shader. Should be built around shader reflection.
+   * to the shader.
    * */
   class ShaderVariableManager
   {

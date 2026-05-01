@@ -88,6 +88,7 @@ class Game : public dg::Application
     void render(dg::Frame& frame) override
     {
       dg::AssetPack::getAssetManager()->processTextureLoadings(renderer.descriptors["textures"]);
+
       renderer.updateDescriptorSets();
       dg::AssetPack::getAssetManager()->textureDescriptorUpdates.clear();
 
@@ -106,6 +107,7 @@ class Game : public dg::Application
 
     }
 
+    // TODO : have blocks already  constructed that I can add to the imgui window
     void imguiRender() override
     {
       ImGui::Begin("Debug");

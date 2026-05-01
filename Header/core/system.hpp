@@ -13,22 +13,6 @@
 namespace dg
 {
 
-  // TODO: change it so it is manually called from the system
-  // Can work with this deduction but updating g++ is annoying
-  template <class Base, class Derived>
-    struct CheckIfFunctionsAreOverriden
-    {
-      using DerivedType = std::remove_reference_t<Derived>;
-
-      bool onCreation = !std::is_same_v<decltype(&DerivedType::onCreation),
-           decltype(&Base::onCreation)>;
-      bool onReplace = !std::is_same_v<decltype(&DerivedType::onReplace),
-           decltype(&Base::onReplace)>;
-      bool onDestruct = !std::is_same_v<decltype(&DerivedType::onDestruct),
-           decltype(&Base::onDestruct)>;
-      // bool update = &Parent::update == &Derived::update;
-    };
-
   struct ISystem
   {
     // Calls update function for all entity concerned
@@ -103,24 +87,14 @@ namespace dg
 
         else if constexpr(sizeof...(Components) == 1)
         {
-          // TODO: that does not work
-          CheckIfFunctionsAreOverriden<System<Components...>, decltype(*this)>
-            areFuncOverriden;
+          pRegistry->on_construct<FirstComponent>()
+            .template connect<&System<Components...>::_singleComponentOnCreation>(*this);
 
-          // LOGD << areFuncOverriden.onCreation;
-          // LOGD << areFuncOverriden.onReplace;
+          pRegistry->on_construct<FirstComponent>()
+            .template connect<&System<Components...>::_singleComponentOnReplace>(*this);
 
-          if (areFuncOverriden.onCreation)
-            pRegistry->on_construct<FirstComponent>()
-              .template connect<&System<Components...>::_singleComponentOnCreation>(*this);
-
-          if (areFuncOverriden.onReplace)
-            pRegistry->on_construct<FirstComponent>()
-              .template connect<&System<Components...>::_singleComponentOnReplace>(*this);
-
-          if (areFuncOverriden.onDestruct)
-            pRegistry->on_construct<FirstComponent>()
-              .template connect<&System<Components...>::_singleComponentOnDestruct>(*this);
+          pRegistry->on_construct<FirstComponent>()
+            .template connect<&System<Components...>::_singleComponentOnDestruct>(*this);
         }
 
         else (initSignals<Components>(), ...);
@@ -135,8 +109,6 @@ namespace dg
     protected:
 
     private:
-      // template <class Self> => When g++ will be supported on debian
-      // void setName(this Self&& self)
       void setName()
       {
         name = entt::type_name<std::remove_reference_t<decltype(*this)>()>().value();
@@ -145,20 +117,14 @@ namespace dg
       template <class T>
       void initSignals()
       {
-        CheckIfFunctionsAreOverriden<System<Components...>, decltype(*this)>
-          areFuncOverriden;
+        pRegistry->on_construct<T>()
+          .template connect<&System<Components...>::_onCreation>(*this);
 
-        // if (areFuncOverriden.onCreation)
-          pRegistry->on_construct<T>()
-            .template connect<&System<Components...>::_onCreation>(*this);
+        pRegistry->on_construct<T>()
+          .template connect<&System<Components...>::_onReplace>(*this);
 
-        if (areFuncOverriden.onReplace)
-          pRegistry->on_construct<T>()
-            .template connect<&System<Components...>::_onReplace>(*this);
-
-        if (areFuncOverriden.onDestruct)
-          pRegistry->on_construct<T>()
-            .template connect<&System<Components...>::_onDestruct>(*this);
+        pRegistry->on_construct<T>()
+          .template connect<&System<Components...>::_onDestruct>(*this);
       }
 
       void _onCreation(entt::registry&, entt::entity entity)
