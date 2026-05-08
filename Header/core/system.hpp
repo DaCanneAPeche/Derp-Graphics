@@ -13,6 +13,33 @@
 namespace dg
 {
 
+  struct AreFunctionsOverriden
+  {
+    bool onCreation = false;
+    bool onReplace = false;
+    bool onDestruct = false;
+  };
+
+  template <class Base, class Derived>
+  struct CheckIfFunctionsAreOverriden
+  {
+    using DerivedType = std::remove_reference_t<Derived>;
+
+    AreFunctionsOverriden check()
+    {
+      AreFunctionsOverriden areFunctionsOverriden;
+
+      areFunctionsOverriden.onCreation = !std::is_same_v<decltype(&DerivedType::onCreation),
+        decltype(&Base::onCreation)>;
+      areFunctionsOverriden.onReplace = !std::is_same_v<decltype(&DerivedType::onReplace),
+        decltype(&Base::onReplace)>;
+      areFunctionsOverriden.onDestruct = !std::is_same_v<decltype(&DerivedType::onDestruct),
+        decltype(&Base::onDestruct)>;
+
+      return areFunctionsOverriden;
+    }
+  };
+
   struct ISystem
   {
     // Calls update function for all entity concerned
@@ -22,7 +49,14 @@ namespace dg
     entt::registry* pRegistry = nullptr;
     Scene* pScene = nullptr;
     bool active = true;
-    std::string_view name = "Unknown";
+    std::string name = "Unknown";
+    AreFunctionsOverriden areFunctionsOverriden;
+    
+    template <class T>
+    void setName()
+    {
+      name = entt::type_name<T>();
+    }
   };
 
   template <class ...Components>
@@ -77,8 +111,6 @@ namespace dg
 
       void init() override
       {
-        setName();
-
         assert(pRegistry != nullptr && "pRegistry was not assigned");
         if constexpr(sizeof...(Components) == 0)
         {
@@ -87,14 +119,17 @@ namespace dg
 
         else if constexpr(sizeof...(Components) == 1)
         {
-          pRegistry->on_construct<FirstComponent>()
-            .template connect<&System<Components...>::_singleComponentOnCreation>(*this);
+          if (areFunctionsOverriden.onCreation)
+            pRegistry->on_construct<FirstComponent>()
+              .template connect<&System<Components...>::_singleComponentOnCreation>(*this);
 
-          pRegistry->on_construct<FirstComponent>()
-            .template connect<&System<Components...>::_singleComponentOnReplace>(*this);
+          if (areFunctionsOverriden.onReplace)
+            pRegistry->on_construct<FirstComponent>()
+              .template connect<&System<Components...>::_singleComponentOnReplace>(*this);
 
-          pRegistry->on_construct<FirstComponent>()
-            .template connect<&System<Components...>::_singleComponentOnDestruct>(*this);
+          if (areFunctionsOverriden.onDestruct)
+            pRegistry->on_construct<FirstComponent>()
+              .template connect<&System<Components...>::_singleComponentOnDestruct>(*this);
         }
 
         else (initSignals<Components>(), ...);
@@ -109,22 +144,21 @@ namespace dg
     protected:
 
     private:
-      void setName()
-      {
-        name = entt::type_name<std::remove_reference_t<decltype(*this)>()>().value();
-      }
 
       template <class T>
       void initSignals()
       {
-        pRegistry->on_construct<T>()
-          .template connect<&System<Components...>::_onCreation>(*this);
+        if (areFunctionsOverriden.onCreation)
+          pRegistry->on_construct<T>()
+            .template connect<&System<Components...>::_onCreation>(*this);
 
-        pRegistry->on_construct<T>()
-          .template connect<&System<Components...>::_onReplace>(*this);
+        if (areFunctionsOverriden.onReplace)
+          pRegistry->on_construct<T>()
+            .template connect<&System<Components...>::_onReplace>(*this);
 
-        pRegistry->on_construct<T>()
-          .template connect<&System<Components...>::_onDestruct>(*this);
+        if (areFunctionsOverriden.onDestruct)
+          pRegistry->on_construct<T>()
+            .template connect<&System<Components...>::_onDestruct>(*this);
       }
 
       void _onCreation(entt::registry&, entt::entity entity)
@@ -179,10 +213,15 @@ namespace dg
       inline std::vector<std::shared_ptr<ISystem>> allSystems;
       // static std::unordered_map<int, std::weak_ptr<System>> s_idMap;
 
-      template <class T>
+      template <class System, class Parent>
       int addSystem()
       {
-        std::shared_ptr<ISystem> newSystem = std::make_shared<T>();
+        std::shared_ptr<ISystem> newSystem = std::make_shared<System>();
+        newSystem->setName<System>();
+
+        CheckIfFunctionsAreOverriden<Parent, System> checker;
+        newSystem->areFunctionsOverriden = checker.check();
+
         _systems::allSystems.push_back(newSystem);
 
         return 0; // It needs to have a return in order to be called outside a function
@@ -190,12 +229,12 @@ namespace dg
 
   } // _systems 
 
-  template <class System>
+  template <class System, class Parent>
   struct RegisterSystem
   {
     RegisterSystem()
     {
-      _systems::addSystem<System>();
+      _systems::addSystem<System, Parent>();
     }
   };
 
