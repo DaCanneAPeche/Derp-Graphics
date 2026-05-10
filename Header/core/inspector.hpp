@@ -3,7 +3,6 @@
 #include "entt/entt.hpp"
 #include "imgui.h"
 #include "core/inspect_functions.hpp"
-
 #include "rfl.hpp"
 
 namespace dg

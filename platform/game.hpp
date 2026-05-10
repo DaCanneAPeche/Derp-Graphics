@@ -1,13 +1,17 @@
 #pragma once
 
-#include "core/application.hpp"
-#include "vulkan_renderer/shader_variable_manager.hpp"
-#include "_vulkan/slang_compiler.hpp"
 #include "components/sprite.hpp"
 #include "components/position.hpp"
+
 #include "core/system.hpp"
 #include "core/config_info.hpp"
+#include "core/inspector_modules.hpp"
+#include "core/application.hpp"
+
+#include "_vulkan/slang_compiler.hpp"
+
 #include "vulkan_renderer/render_pass_builder.hpp"
+#include "vulkan_renderer/shader_variable_manager.hpp"
 
 #include "assets.hpp"
 #include "pipelines.hpp"
@@ -106,101 +110,16 @@ class Game : public dg::Application
 
     }
 
-    // TODO : have blocks already  constructed that I can add to the imgui window
     void imguiRender() override
     {
       ImGui::Begin("Debug");
+      
+      ImGui::Checkbox("Wireframe rendering", &showOnlyOutlines);
 
-      if (ImGui::TreeNode("Timing"))
-      {
-        ImGui::Text("Frame duration : %f ms", deltaTime * 1000);
-        ImGui::Text("FPS : %d", static_cast<int>(1 / deltaTime));
-        ImGui::TreePop();
-      }
-
-      if (ImGui::TreeNode("Rendering"))
-      {
-        vk::PhysicalDeviceProperties physicalDeviceProperties =
-          vulkanToolBox.physicalDevice.getProperties();
-
-        ImGui::Checkbox("Wireframe", &showOnlyOutlines);
-
-        unsigned long maxPushConstantSize =
-          physicalDeviceProperties.limits.maxPushConstantsSize;
-        ImGui::Text("Push constant size : %lu bits out of %lu",
-            sizeof(dg::PushConstant), maxPushConstantSize);
-
-        uint32_t rawApiVersion = physicalDeviceProperties.apiVersion;
-        unsigned long apiVersion[4] = {
-          vk::apiVersionVariant(rawApiVersion),
-          vk::apiVersionMajor(rawApiVersion),
-          vk::apiVersionMinor(rawApiVersion),
-          vk::apiVersionPatch(rawApiVersion)
-        };
-
-        ImGui::Text("Hardware max API version : %lu.%lu.%lu.%lu", apiVersion[0],
-            apiVersion[1], apiVersion[2], apiVersion[3]);
-
-        ImGui::TreePop();
-      }
-
-      if (ImGui::TreeNode("Entities"))
-      {
-        for (auto entity : registry.view<entt::entity>())
-        {
-          std::string label = "Entity " + std::to_string(static_cast<int>(entity));
-
-          if (ImGui::TreeNode(label.c_str()))
-          {
-            for(auto [id, storage] : registry.storage())
-            {
-              auto type = entt::resolve(id);
-
-              if (auto func = type.func(entt::hashed_string("Inspector"));
-                  storage.contains(entity) && func) {
-                void* comp = storage.value(entity);
-
-                func.invoke(type.from_void(comp), comp);
-              }
-            }
-            ImGui::TreePop();
-          }
-        }
-
-        ImGui::TreePop();
-      }
-
-      if(ImGui::TreeNode("Systems"))
-      {
-        ImGui::Text("Number of systems : %lu", dg::_systems::allSystems.size());
-
-        for (const auto& system : dg::_systems::allSystems)
-        {
-          if (ImGui::TreeNode(system->inspectorInfo.name.c_str()))
-          {
-            ImGui::Checkbox("Active", &system->active);
-
-            ImGui::Separator();
-
-            ImGui::Text("Components :");
-            for (size_t i = 0 ; i < system->inspectorInfo.components.size() ; i++)
-            {
-              ImGui::Text(system->inspectorInfo.components[i].c_str());
-            }
-
-            ImGui::Separator();
-
-            ImGui::Text("ECS signals :");
-            if (system->areFunctionsOverriden.onCreation) ImGui::Text("- on entity creation");
-            if (system->areFunctionsOverriden.onDestruct) ImGui::Text("- on entity destruction");
-            if (system->areFunctionsOverriden.onReplace) ImGui::Text("- on entity replacement");
-
-            ImGui::TreePop();
-          }
-        }
-
-        ImGui::TreePop();
-      }
+      dg::inspector_modules::time(deltaTime);
+      dg::inspector_modules::vulkanInfos(vulkanToolBox);
+      dg::inspector_modules::entities(registry);
+      dg::inspector_modules::systems();
 
       ImGui::End();
     }
