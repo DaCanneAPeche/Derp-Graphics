@@ -30,6 +30,6 @@ class SpriteSystem : public dg::System<comp::Sprite>
     }
 };
 
-/* static dg::RegisterSystem<SpritePosSystem> _; */
-static dg::RegisterSystem<SpriteSystem, dg::System<comp::Sprite>> _;
+static dg::RegisterSystem<SpritePosSystem, dg::System<comp::Sprite, comp::Position>> _;
+static dg::RegisterSystem<SpriteSystem, dg::System<comp::Sprite>> __;
 

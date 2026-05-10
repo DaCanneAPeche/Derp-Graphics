@@ -88,7 +88,6 @@ class Game : public dg::Application
     void render(dg::Frame& frame) override
     {
       dg::AssetPack::getAssetManager()->processTextureLoadings(renderer.descriptors["textures"]);
-
       renderer.updateDescriptorSets();
       dg::AssetPack::getAssetManager()->textureDescriptorUpdates.clear();
 
@@ -177,7 +176,27 @@ class Game : public dg::Application
 
         for (const auto& system : dg::_systems::allSystems)
         {
-          ImGui::Checkbox(std::string(system->name).c_str(), &system->active);
+          if (ImGui::TreeNode(system->inspectorInfo.name.c_str()))
+          {
+            ImGui::Checkbox("Active", &system->active);
+
+            ImGui::Separator();
+
+            ImGui::Text("Components :");
+            for (size_t i = 0 ; i < system->inspectorInfo.components.size() ; i++)
+            {
+              ImGui::Text(system->inspectorInfo.components[i].c_str());
+            }
+
+            ImGui::Separator();
+
+            ImGui::Text("ECS signals :");
+            if (system->areFunctionsOverriden.onCreation) ImGui::Text("- on entity creation");
+            if (system->areFunctionsOverriden.onDestruct) ImGui::Text("- on entity destruction");
+            if (system->areFunctionsOverriden.onReplace) ImGui::Text("- on entity replacement");
+
+            ImGui::TreePop();
+          }
         }
 
         ImGui::TreePop();

@@ -20,6 +20,24 @@ namespace dg
     bool onDestruct = false;
   };
 
+  struct SystemInspectorInfo
+  {
+    std::string name;
+    std::vector<std::string> components;
+
+    template <class Component>
+    void addComponentName()
+    {
+      components.push_back(std::string(entt::type_name<Component>().value()));
+    }
+
+    template <class System>
+    void setName()
+    {
+      name = std::string(entt::type_name<System>().value());
+    }
+  };
+
   template <class Base, class Derived>
   struct CheckIfFunctionsAreOverriden
   {
@@ -49,14 +67,10 @@ namespace dg
     entt::registry* pRegistry = nullptr;
     Scene* pScene = nullptr;
     bool active = true;
-    std::string name = "Unknown";
+
+    SystemInspectorInfo inspectorInfo;
     AreFunctionsOverriden areFunctionsOverriden;
-    
-    template <class T>
-    void setName()
-    {
-      name = entt::type_name<T>();
-    }
+
   };
 
   template <class ...Components>
@@ -111,6 +125,8 @@ namespace dg
 
       void init() override
       {
+        (inspectorInfo.addComponentName<Components>(), ...);
+
         assert(pRegistry != nullptr && "pRegistry was not assigned");
         if constexpr(sizeof...(Components) == 0)
         {
@@ -217,7 +233,7 @@ namespace dg
       int addSystem()
       {
         std::shared_ptr<ISystem> newSystem = std::make_shared<System>();
-        newSystem->setName<System>();
+        newSystem->inspectorInfo.setName<System>();
 
         CheckIfFunctionsAreOverriden<Parent, System> checker;
         newSystem->areFunctionsOverriden = checker.check();
