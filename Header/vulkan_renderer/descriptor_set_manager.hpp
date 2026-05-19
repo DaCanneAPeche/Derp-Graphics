@@ -1,7 +1,7 @@
 #pragma once
 
-#include "_vulkan/descriptor_set_layout.hpp"
-#include "_vulkan/vulkan_tool_box.hpp"
+#include "vulkan_renderer/descriptor_set_layout.hpp"
+#include "vulkan_renderer/vulkan_tool_box.hpp"
 
 #include <vector>
 #include <unordered_map>

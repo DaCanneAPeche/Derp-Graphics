@@ -1,4 +1,4 @@
-#include "_vulkan/descriptor_set_manager.hpp"
+#include "vulkan_renderer/descriptor_set_manager.hpp"
 #include <plog/Log.h>
 
 namespace dg

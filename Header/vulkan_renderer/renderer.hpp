@@ -6,10 +6,10 @@
 #include "vulkan_renderer/swapchain.hpp"
 #include "vulkan_renderer/model.hpp"
 #include "vulkan_renderer/texture.hpp"
-#include "_vulkan/vulkan_tool_box.hpp"
+#include "vulkan_renderer/vulkan_tool_box.hpp"
 #include "vulkan_renderer/asset_manager.hpp"
 #include "vulkan_renderer/uniform_buffer_object.hpp"
-#include "_vulkan/descriptor_set_manager.hpp"
+#include "vulkan_renderer/descriptor_set_manager.hpp"
 #include "vulkan_renderer/render_pass.hpp"
 #include "utils/castable_to.hpp"
 

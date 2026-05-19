@@ -4,9 +4,9 @@
 #include <stdint.h>
 #include <memory>
 
-#include "_vulkan/vulkan_tool_box.hpp"
+#include "vulkan_renderer/vulkan_tool_box.hpp"
 #include "vulkan_renderer/texture.hpp"
-#include "_vulkan/descriptor_set_manager.hpp"
+#include "vulkan_renderer/descriptor_set_manager.hpp"
 
 #include <plog/Log.h>
 

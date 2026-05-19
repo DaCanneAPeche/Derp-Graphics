@@ -1,9 +1,9 @@
 #pragma once
 #include "stb/stb_image.h"
 #include "vulkan/vulkan.hpp"
-#include "_vulkan/buffer.hpp"
+#include "vulkan_renderer/buffer.hpp"
 #include <string>
-#include "_vulkan/vulkan_tool_box.hpp"
+#include "vulkan_renderer/vulkan_tool_box.hpp"
 
 namespace dg
 {

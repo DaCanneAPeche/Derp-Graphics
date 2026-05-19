@@ -8,7 +8,7 @@
 #include "core/inspector_modules.hpp"
 #include "core/application.hpp"
 
-#include "_vulkan/slang_compiler.hpp"
+#include "vulkan_renderer/slang_compiler.hpp"
 
 #include "vulkan_renderer/render_pass_builder.hpp"
 #include "vulkan_renderer/shader_variable_manager.hpp"

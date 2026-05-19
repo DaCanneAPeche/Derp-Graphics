@@ -2,8 +2,8 @@
 
 #include "vulkan/vulkan.hpp"
 #include "vulkan_renderer/render_pass.hpp"
-#include "_vulkan/vulkan_tool_box.hpp"
-#include "_vulkan/structs.hpp"
+#include "vulkan_renderer/vulkan_tool_box.hpp"
+#include "vulkan_renderer/structs.hpp"
 
 #include "plog/Log.h"
 

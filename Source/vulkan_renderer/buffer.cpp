@@ -1,5 +1,5 @@
-#include "_vulkan/buffer.hpp"
-#include "_vulkan/vulkan_tool_box.hpp"
+#include "vulkan_renderer/buffer.hpp"
+#include "vulkan_renderer/vulkan_tool_box.hpp"
 #include <iostream>
 #include <plog/Log.h>
 

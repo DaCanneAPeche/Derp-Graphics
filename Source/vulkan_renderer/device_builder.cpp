@@ -1,5 +1,5 @@
-#include "_vulkan/device_builder.hpp"
-#include "_vulkan/buffer.hpp"
+#include "vulkan_renderer/device_builder.hpp"
+#include "vulkan_renderer/buffer.hpp"
 
 // std
 #include <stdexcept>

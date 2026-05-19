@@ -1,4 +1,4 @@
-#include "_vulkan/slang_compiler.hpp"
+#include "vulkan_renderer/slang_compiler.hpp"
 
 #include "utils/file.hpp"
 
