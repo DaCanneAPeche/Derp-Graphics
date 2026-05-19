@@ -3,6 +3,7 @@
 #include <string>
 #include "vulkan_renderer/reflection.hpp"
 #include "vulkan_renderer/shader_module.hpp"
+#include "core/file_watcher.hpp"
 
 #include "slang.h"
 #include "slang-com-ptr.h"

@@ -9,7 +9,7 @@
 #include "core/application.hpp"
 
 #include "vulkan_renderer/slang_compiler.hpp"
-
+#include "vulkan_renderer/slang_shader_watcher.hpp"
 #include "vulkan_renderer/render_pass_builder.hpp"
 #include "vulkan_renderer/shader_variable_manager.hpp"
 
@@ -21,9 +21,12 @@ class Game : public dg::Application
   public:
     bool showOnlyOutlines = false;
     dg::ShaderVariableManager ubo {vulkanToolBox, renderer};
+    dg::SlangShaderWatcher shaderWatcher;
 
     Game(const dg::ConfigInfo& configInfo) : dg::Application(configInfo)
     {
+      shaderWatcher.watchFile("./assets/shaders/slang/sprite.slang");
+
       dg::SlangCompiler spriteShader("./assets/shaders/slang/sprite.slang");
 
       renderer.registerPipelineInfo(Pipelines::Sprites, spriteShader.get("vertexMain"),
@@ -72,6 +75,11 @@ class Game : public dg::Application
         ubo["screenTransform"].setValue(uboValue);
         ubo.processWrites();
       };
+    }
+
+    void update() override
+    {
+      if (shaderWatcher.wereShadersModified()) LOGD << "Shaders updated !";
     }
 
     std::shared_ptr<dg::PipelineConfigInfo> getOutlineConfig()
