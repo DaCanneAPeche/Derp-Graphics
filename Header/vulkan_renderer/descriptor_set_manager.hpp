@@ -29,6 +29,7 @@ namespace dg
     public:
 
       DescriptorSetManager(dg::VulkanToolBox& toolBox) : m_toolBox(toolBox) {}
+
       void clean()
       {
         layouts.clear();

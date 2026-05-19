@@ -49,6 +49,12 @@ namespace dg
       uniformBuffers.push_back(ubo);
       return uniformBuffers.size() - 1;
     }
+
+    void clear()
+    {
+      descriptorSets.clear();
+      uniformBuffers.clear();
+    }
   };
 
 }

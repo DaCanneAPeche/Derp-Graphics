@@ -7,9 +7,9 @@
 #include "core/config_info.hpp"
 #include "core/inspector_modules.hpp"
 #include "core/application.hpp"
+#include "core/shader_watcher.hpp"
 
 #include "vulkan_renderer/slang_compiler.hpp"
-#include "vulkan_renderer/slang_shader_watcher.hpp"
 #include "vulkan_renderer/render_pass_builder.hpp"
 #include "vulkan_renderer/shader_variable_manager.hpp"
 
@@ -21,22 +21,27 @@ class Game : public dg::Application
   public:
     bool showOnlyOutlines = false;
     dg::ShaderVariableManager ubo {vulkanToolBox, renderer};
-    dg::SlangShaderWatcher shaderWatcher;
+    dg::ShaderWatcher shaderWatcher;
 
     Game(const dg::ConfigInfo& configInfo) : dg::Application(configInfo)
     {
+      shaderWatcher.initRenderer(renderer);
       shaderWatcher.watchFile("./assets/shaders/slang/sprite.slang");
+      shaderWatcher.callback = [this]()
+      {
+        dg::SlangCompiler spriteShader("./assets/shaders/slang/sprite.slang");
 
-      dg::SlangCompiler spriteShader("./assets/shaders/slang/sprite.slang");
+        renderer.registerPipelineInfo(Pipelines::Sprites, spriteShader.get("vertexMain"),
+            spriteShader.get("fragmentMain"));
 
-      renderer.registerPipelineInfo(Pipelines::Sprites, spriteShader.get("vertexMain"),
-          spriteShader.get("fragmentMain"));
+        renderer.registerPipelineInfo(Pipelines::Outline, spriteShader.get("vertexMain"),
+            spriteShader.get("fragmentMain"), getOutlineConfig());
 
-      renderer.registerPipelineInfo(Pipelines::Outline, spriteShader.get("vertexMain"),
-          spriteShader.get("fragmentMain"), getOutlineConfig());
-
-      spriteShader.reflect(renderer.shaderDescription);
-      renderer.shaderDescription.print();
+        renderer.shaderDescription.clear();
+        spriteShader.reflect(renderer.shaderDescription);
+        renderer.shaderDescription.print();
+      };
+      shaderWatcher.callback();
 
       dg::RenderPassBuilder::BuildDefaultRenderpass(renderer.renderPass);
     }
@@ -79,7 +84,7 @@ class Game : public dg::Application
 
     void update() override
     {
-      if (shaderWatcher.wereShadersModified()) LOGD << "Shaders updated !";
+      shaderWatcher.process();
     }
 
     std::shared_ptr<dg::PipelineConfigInfo> getOutlineConfig()

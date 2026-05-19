@@ -37,7 +37,6 @@ namespace dg
 		Renderer &operator=(const Renderer &) = delete;
 
     void init();
-    void recreatingShaders();
     void clean();
 
     Frame startFrame();
