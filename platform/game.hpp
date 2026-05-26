@@ -92,6 +92,7 @@ class Game : public dg::Application
         ubo["screenTransform"].setValue(uboValue);
         ubo.processWrites();
       };
+
     }
 
     void update() override
@@ -147,5 +148,7 @@ class Game : public dg::Application
       dg::inspector_modules::systems();
 
       ImGui::End();
+
+      dg::inspector_modules::logMessagesConsoleWindow(debugMessagesStorer.messages);
     }
 };

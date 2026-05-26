@@ -5,6 +5,7 @@
 #include "vulkan_renderer/push_constant.hpp"
 #include "entt/entt.hpp"
 #include "core/system.hpp"
+#include "core/debug_messages_storer.hpp"
 
 namespace dg
 {
@@ -14,5 +15,6 @@ namespace dg
     void vulkanInfos(dg::VulkanToolBox& vulkanToolBox);
     void entities(entt::registry& registry);
     void systems();
+    void logMessagesConsoleWindow(std::vector<DebugMessage>& messages);
   }
 }

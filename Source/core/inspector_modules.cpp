@@ -105,5 +105,30 @@ namespace dg
       }
     }
 
+    void logMessagesConsoleWindow(std::vector<DebugMessage>& messages)
+    {
+      ImGui::Begin("Logging console");
+
+      for (const auto& message : messages)
+      {
+        ImVec4 color;
+
+        switch (message.severity)
+        {
+          case plog::Severity::none:    color = {0.631f, 0.631f, 0.631f, 1.0f}; break;
+          case plog::Severity::info:    color = {1.0f,   1.0f,   1.0f,   1.0f}; break;
+          case plog::Severity::debug:   color = {0.231f, 0.859f, 0.608f, 1.0f}; break;
+          case plog::Severity::verbose: color = {0.137f, 0.549f, 0.384f, 1.0f}; break;
+          case plog::Severity::warning: color = {0.949f, 0.933f, 0.082f, 1.0f}; break;
+          case plog::Severity::error:   color = {0.976f, 0.239f, 0.212f, 1.0f}; break;
+          case plog::Severity::fatal:   color = {0.686f, 0.122f, 0.102f, 1.0f}; break;
+        }
+
+        ImGui::TextColored(color, message.text.c_str());
+      }
+
+      ImGui::End();
+    }
+
   }
 }

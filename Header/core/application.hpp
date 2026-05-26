@@ -10,6 +10,7 @@
 #include "core/scene.hpp"
 #include "core/config_info.hpp"
 #include "core/timer.hpp"
+#include "core/debug_messages_storer.hpp"
 #include "vulkan_renderer/renderer.hpp"
 #include "vulkan_renderer/vulkan_tool_box.hpp"
 #include "vulkan_renderer/frame.hpp"
@@ -35,6 +36,7 @@ namespace dg
       dg::Renderer renderer;
       entt::registry registry;
       float deltaTime;
+      dg::DebugMessagesStorer<plog::TxtFormatter> debugMessagesStorer;
 
     protected:
       void changeScene(uint32_t sceneId);

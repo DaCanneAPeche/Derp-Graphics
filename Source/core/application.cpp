@@ -22,6 +22,7 @@ namespace dg
 
 #ifndef NDEBUG
     logger.addAppender(&rollingFileAppender);
+    logger.addAppender(&debugMessagesStorer);
 #endif
 
     PLOG_INFO << "Program started : " << configInfo.application.name;
