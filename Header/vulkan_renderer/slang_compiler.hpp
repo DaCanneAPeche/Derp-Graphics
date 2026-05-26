@@ -16,7 +16,7 @@ namespace dg
   {
     public:
 
-      SlangCompiler(const std::string& filePath);
+      SlangCompiler(const std::string& filePath, bool& errorCompiling);
 
       ShaderModule get(const std::string& entryPoint);
       void reflect(ShaderDescription& description);

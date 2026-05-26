@@ -45,4 +45,5 @@ float4 fragmentMain(VOut input) : SV_Target
     let texture = textures[push.textureIndex];
     let color = texture.Sample(textureSampler, input.uv);
     return color;
+    // return float4(1.0f, 0.0f, 0.0f, 1.0f);
 }

@@ -9,7 +9,7 @@
 namespace dg
 {
 
-  SlangCompiler::SlangCompiler(const std::string& filePath)
+  SlangCompiler::SlangCompiler(const std::string& filePath, bool& errorCompiling)
   {
     Slang::ComPtr<slang::IGlobalSession> globalSession;
     slang::createGlobalSession(globalSession.writeRef());
@@ -43,7 +43,7 @@ namespace dg
     {
       LOGD << (const char*)diagnosticsBlob->getBufferPointer();
     }
-    if (!m_module) throw std::runtime_error("Error compiling slang shader");
+    if (!m_module) errorCompiling = true;
   }
 
   ShaderModule SlangCompiler::get(const std::string& entryPointName)

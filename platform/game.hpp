@@ -29,7 +29,19 @@ class Game : public dg::Application
       shaderWatcher.watchFile("./assets/shaders/slang/sprite.slang");
       shaderWatcher.callback = [this]()
       {
-        dg::SlangCompiler spriteShader("./assets/shaders/slang/sprite.slang");
+        static bool firstCompilation = true;
+        bool errorCompiling = false;
+
+        dg::SlangCompiler spriteShader("./assets/shaders/slang/sprite.slang", errorCompiling);
+
+        if (errorCompiling && firstCompilation)
+          throw std::runtime_error("Error compiling shaders");
+        else if (errorCompiling)
+        {
+          LOG_WARNING << "Error compiling shaders. Keeping former ones.";
+          return;
+        }
+        firstCompilation = false;
 
         renderer.registerPipelineInfo(Pipelines::Sprites, spriteShader.get("vertexMain"),
             spriteShader.get("fragmentMain"));
