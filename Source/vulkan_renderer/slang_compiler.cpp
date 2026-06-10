@@ -123,6 +123,10 @@ namespace dg
         description.addDescriptorSlotFromSlang(name, set, binding, type,
             arraySize, uboIndex);
       }
+      else if (param->getCategory() == slang::ParameterCategory::PushConstantBuffer)
+      {
+        description.pushConstantSize = param->getTypeLayout()->getElementTypeLayout()->getSize();
+      }
     }
 
   }

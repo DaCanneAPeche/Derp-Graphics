@@ -14,7 +14,7 @@ namespace dg
       }
     }
 
-    void vulkanInfos(dg::VulkanToolBox& vulkanToolBox)
+    void vulkanInfos(dg::VulkanToolBox& vulkanToolBox, uint32_t pushConstantSize)
     {
       if (ImGui::TreeNode("Rendering"))
       {
@@ -23,8 +23,8 @@ namespace dg
 
         unsigned long maxPushConstantSize =
           physicalDeviceProperties.limits.maxPushConstantsSize;
-        ImGui::Text("Push constant size : %lu bits out of %lu",
-            sizeof(dg::PushConstant), maxPushConstantSize);
+        ImGui::Text("Push constant size : %u bits out of %lu",
+            pushConstantSize, maxPushConstantSize);
 
         uint32_t rawApiVersion = physicalDeviceProperties.apiVersion;
         unsigned long apiVersion[4] = {

@@ -11,6 +11,8 @@
 #include "vulkan_renderer/uniform_buffer_object.hpp"
 #include "vulkan_renderer/descriptor_set_manager.hpp"
 #include "vulkan_renderer/render_pass.hpp"
+#include "vulkan_renderer/push_constant_manager.hpp"
+
 #include "utils/castable_to.hpp"
 
 #include "imgui.h"
@@ -47,11 +49,11 @@ namespace dg
 		void waitIdle() const { m_toolBox.device.waitIdle(); }
     
     template <class T>
-    void pushConstant(vk::CommandBuffer& commandBuffer, const T& pushData)
+    void pushConstant(vk::CommandBuffer& commandBuffer, const T& pushData, size_t pushConstantRangeIndex)
     {
+      vk::PushConstantRange& range = pushConstantManager.ranges[pushConstantRangeIndex]; 
       commandBuffer.pushConstants(m_pipelineLayout,
-          vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-          0, sizeof(T), &pushData);
+          range.stageFlags, range.offset, range.size, &pushData);
     }
 
     template <CastableTo<uint32_t> PipelineIdType>
@@ -84,6 +86,7 @@ namespace dg
     std::shared_ptr<dg::SwapChain> swapChain;
     ShaderDescription shaderDescription;
     std::unordered_map<std::string, DescriptorWriter> descriptors = {};
+    PushConstantManager pushConstantManager;
 
     static const int MAX_TEXTURE_NUMBER = 1000;
     vk::Sampler m_imageSampler;

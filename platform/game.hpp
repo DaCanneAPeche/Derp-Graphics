@@ -55,6 +55,12 @@ class Game : public dg::Application
       };
       shaderWatcher.callback();
 
+      // Automaticly added thanks to shader reflection
+      // renderer.pushConstantManager.addRange(
+      //     vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
+      //     0, sizeof(dg::PushConstant)
+      //     );
+
       dg::RenderPassBuilder::BuildDefaultRenderpass(renderer.renderPass);
     }
 
@@ -143,7 +149,7 @@ class Game : public dg::Application
       ImGui::Checkbox("Wireframe rendering", &showOnlyOutlines);
 
       dg::inspector_modules::time(deltaTime);
-      dg::inspector_modules::vulkanInfos(vulkanToolBox);
+      dg::inspector_modules::vulkanInfos(vulkanToolBox, renderer.shaderDescription.pushConstantSize);
       dg::inspector_modules::entities(registry);
       dg::inspector_modules::systems();
 

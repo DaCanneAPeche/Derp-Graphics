@@ -1,6 +1,6 @@
 #include "core/system.hpp"
-#include "components/sprite.hpp"
-#include "components/position.hpp"
+#include "../components/sprite.hpp"
+#include "../components/position.hpp"
 #include "core/application.hpp"
 
 class SpritePosSystem : public dg::System<comp::Sprite, comp::Position>

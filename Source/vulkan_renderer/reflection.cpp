@@ -35,6 +35,10 @@ namespace dg
           << " ; offset = " << field.relativeOffset << ")" << std::endl;
       }
     }
+
+    std::cout << std::endl;
+
+    std::cout << "Push constant size : " << pushConstantSize << std::endl;
   }
 
   void ShaderDescription::addDescriptorSlot(const std::string& name, uint32_t set,

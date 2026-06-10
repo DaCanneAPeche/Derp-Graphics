@@ -1,6 +1,5 @@
 #include "vulkan_renderer/renderer.hpp"
 #include "utils/file.hpp"
-#include "vulkan_renderer/push_constant.hpp"
 #include "core/transform2d.hpp"
 #include "core/timer.hpp"
 #include "vulkan_renderer/frame.hpp"
@@ -90,13 +89,9 @@ namespace dg
 
   void Renderer::createPipelineLayout()
   {
-    vk::PushConstantRange pushConstantRange(
-        vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment,
-        0, sizeof(PushConstant)
-        );
-
+    pushConstantManager.fillRangesIfDoNotExistAtAll(shaderDescription.pushConstantSize);
     vk::PipelineLayoutCreateInfo pipelineLayoutInfo({},
-        m_descriptorSetManager.layouts, pushConstantRange);
+        m_descriptorSetManager.layouts, pushConstantManager.ranges);
 
     m_pipelineLayout = m_toolBox.device.createPipelineLayout(pipelineLayoutInfo);
 

@@ -16,9 +16,9 @@ namespace dg
     Renderer& renderer;
     uint32_t imageIndex = 0;
 
-    void pushConstant(const auto& data)
+    void pushConstant(const auto& data, size_t rangeIndex = 0)
     {
-      renderer.pushConstant(commandBuffer, data);
+      renderer.pushConstant(commandBuffer, data, rangeIndex);
     }
 
     template <CastableTo<uint32_t> PipelineIdType>

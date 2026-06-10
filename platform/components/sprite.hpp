@@ -4,7 +4,7 @@
 #include "vulkan_renderer/texture.hpp"
 #include "vulkan_renderer/frame.hpp"
 #include "core/transform2d.hpp"
-#include "vulkan_renderer/push_constant.hpp"
+#include "../push_constant.hpp"
 #include "core/inspector.hpp"
 
 #include <memory>
@@ -34,7 +34,7 @@ namespace comp
 
     void draw(dg::Frame& frame)
     {
-      dg::PushConstant push {
+      PushConstant push {
         .transform = transform.getMatrix(),
           .offset = transform.translation,
           .textureId = textureId

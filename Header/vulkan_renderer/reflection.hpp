@@ -33,6 +33,7 @@ namespace dg
 
   struct ShaderDescription
   {
+    uint32_t pushConstantSize = 0;
     std::vector<std::vector<DescriptorSlot>> descriptorSets;
     std::vector<UniformBuffer> uniformBuffers;
 
