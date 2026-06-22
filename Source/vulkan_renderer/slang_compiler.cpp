@@ -125,7 +125,9 @@ namespace dg
       }
       else if (param->getCategory() == slang::ParameterCategory::PushConstantBuffer)
       {
-        description.pushConstantSize = param->getTypeLayout()->getElementTypeLayout()->getSize();
+        size_t pushConstantSize = param->getTypeLayout()->getElementTypeLayout()->getSize();
+        if (description.pushConstantSize < pushConstantSize)
+          description.pushConstantSize = pushConstantSize;
       }
     }
 
