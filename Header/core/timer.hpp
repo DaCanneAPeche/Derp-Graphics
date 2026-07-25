@@ -16,8 +16,10 @@ namespace dg
     public:
 
       Timer() {};
-      Timer(SignalHandler& signalHandler) { p_signalHandler = &signalHandler; }
-      Timer(SignalHandler* pSignalHandler) { p_signalHandler = pSignalHandler; }
+
+      template <class SignalType>
+      Timer(SignalHandler<SignalType>& signalHandler) { p_signalHandler = &signalHandler; }
+      Timer(ISignalHandler* pSignalHandler) { p_signalHandler = pSignalHandler; }
 
       void start();
       void update();
@@ -26,7 +28,7 @@ namespace dg
       timerUnit getElapsedTime();
 
       template <class... Types>
-      void setTimeout(timerUnit timeout, config::Signals signal,
+      void setTimeout(timerUnit timeout, CastableTo<uint32_t> auto signal,
           Types... args)
       {
         if (p_signalHandler == nullptr)
@@ -46,7 +48,7 @@ namespace dg
       config::Signals m_callbackSignal {0};
       timerUnit m_timeout {0};
       std::function<void()> m_callback; // Used to send signal
-      SignalHandler* p_signalHandler = nullptr;
+      ISignalHandler* p_signalHandler = nullptr;
       bool m_hasStarted;
 
   };

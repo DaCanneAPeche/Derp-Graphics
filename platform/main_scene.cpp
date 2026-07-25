@@ -39,7 +39,7 @@ class MainScene : public dg::Scene
       sprite.textureId = assets.rick.loadAndGetIndex();
       sprite.transform.ratio = assets.rick.imageRatio;
 
-      signalHandler.on(dg::config::Signals::KEY_PRESS, [this](dg::Key key,
+      eventHandler.on(dg::Events::KeyPress, [this](dg::Key key,
             dg::KeyboardMods mods)
       {
         auto& sprite = app->registry.get<comp::Sprite>(rick);
@@ -59,7 +59,7 @@ class MainScene : public dg::Scene
 
       });
 
-      signalHandler.on(dg::config::Signals::MOUSE_PRESS, [this](dg::MouseButton button,
+      eventHandler.on(dg::Events::MousePress, [this](dg::MouseButton button,
             dg::KeyboardMods mods, glm::vec<2, double> mousePosition)
       {
         if (button != dg::MouseButton::left) return;
@@ -68,26 +68,26 @@ class MainScene : public dg::Scene
         sprite.transform.rotation += glm::pi<float>()/4;
       });
 
-      bindInput(dg::Key::space, dg::config::Signals::RICK_ROTATE,
-          dg::KeyboardMods::shift, dg::KeyboardMods::control);
+      // bindInput(dg::Key::space, dg::config::Signals::RICK_ROTATE,
+      //     dg::KeyboardMods::shift, dg::KeyboardMods::control);
 
-      signalHandler.on(dg::config::Signals::RICK_ROTATE, [this](){
-        auto& sprite = app->registry.get<comp::Sprite>(rick);
-        sprite.transform.rotation += glm::pi<float>()/4;
-      });
+      // eventHandler.on(dg::config::Signals::RICK_ROTATE, [this](){
+      //   auto& sprite = app->registry.get<comp::Sprite>(rick);
+      //   sprite.transform.rotation += glm::pi<float>()/4;
+      // });
 
-      bindInput(dg::Key::m, dg::config::Signals::RICK_MOVE);
+      // bindInput(dg::Key::m, dg::config::Signals::RICK_MOVE);
 
-      signalHandler.on(dg::config::Signals::RICK_MOVE, [](){
-        LOGD << "MOVE";  
-      });
+      // eventHandler.on(dg::config::Signals::RICK_MOVE, [](){
+        // LOGD << "MOVE";  
+      // });
 
     }
 
     void update() override
     {
-      if (isActionTakingPlace(dg::config::Signals::RICK_MOVE))
-        app->registry.get<comp::Sprite>(rick).transform.translation.x += 1 * app->deltaTime;
+      // if (isActionTakingPlace(dg::config::Signals::RICK_MOVE))
+        // app->registry.get<comp::Sprite>(rick).transform.translation.x += 1 * app->deltaTime;
     }
 
 };

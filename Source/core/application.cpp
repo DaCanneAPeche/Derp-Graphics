@@ -107,17 +107,17 @@ namespace dg
     {
       if (doesImGuiRequestInputs()) return;
 
-      std::unordered_map<int, config::Signals> actionMap = 
+      std::unordered_map<int, Events> actionMap = 
       {
-        {GLFW_PRESS, config::Signals::KEY_PRESS},
-        {GLFW_REPEAT, config::Signals::KEY_REPEAT},
-        {GLFW_RELEASE, config::Signals::KEY_RELEASE}
+        {GLFW_PRESS, Events::KeyPress},
+        {GLFW_REPEAT, Events::KeyRepeat},
+        {GLFW_RELEASE, Events::KeyRelease}
       };
 
       Key _key = Key::unknown;
       if (key != GLFW_KEY_UNKNOWN) _key = static_cast<Key>(key);
 
-      currentScene->signalHandler.send(actionMap[action], _key,
+      currentScene->eventHandler.send(actionMap[action], _key,
           static_cast<KeyboardMods>(mods));
     };
 
@@ -127,7 +127,7 @@ namespace dg
       if (doesImGuiRequestInputs()) return;
 
       glm::vec<2, double> mousePosition = {xPos, yPos};
-      currentScene->signalHandler.send(config::Signals::MOUSE_MOVE, mousePosition);
+      currentScene->eventHandler.send(Events::MouseMove, mousePosition);
     };
 
     renderer.window.mouseButtonCallback = [this](GLFWwindow* window, int button,
@@ -135,16 +135,16 @@ namespace dg
     {
       if (doesImGuiRequestInputs()) return;
 
-      std::unordered_map<int, config::Signals> actionMap = 
+      std::unordered_map<int, Events> actionMap = 
       {
-        {GLFW_PRESS, config::Signals::MOUSE_PRESS},
-        {GLFW_RELEASE, config::Signals::MOUSE_RELEASE}
+        {GLFW_PRESS, Events::MousePress},
+        {GLFW_RELEASE, Events::MouseRelease}
       };
 
       glm::vec<2, double> mousePosition;
       glfwGetCursorPos(window, &mousePosition.x, &mousePosition.y);
 
-      currentScene->signalHandler.send(actionMap[action],
+      currentScene->eventHandler.send(actionMap[action],
           static_cast<MouseButton>(button), static_cast<KeyboardMods>(mods),
           mousePosition);
     };
@@ -155,7 +155,7 @@ namespace dg
       if (doesImGuiRequestInputs()) return;
 
       glm::vec<2, double> amount = {xAmount, yAmount};
-      currentScene->signalHandler.send(config::Signals::MOUSE_SCROLL, amount);
+      currentScene->eventHandler.send(Events::MouseScroll, amount);
     };
 
   }

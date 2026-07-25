@@ -20,25 +20,25 @@ namespace dg
       virtual void end() {};
 
       Application* app = nullptr; 
-      SignalHandler signalHandler;
+      EventHandler eventHandler;
       std::unique_ptr<AssetManager> assetManager = nullptr;
 
       void init(Application* application);
 
-      void bindInput(std::vector<Key>& keys, dg::config::Signals signal,
+      void bindInput(std::vector<Key>& keys, uint32_t signal,
           KeyboardMods necessaryMods = KeyboardMods::none,
           KeyboardMods forbiddenMods = KeyboardMods::none);
 
-      void bindInput(Key key, dg::config::Signals signal,
+      void bindInput(Key key, uint32_t signal,
           KeyboardMods necessaryMods = KeyboardMods::none,
           KeyboardMods forbiddenMods = KeyboardMods::none);
 
-      bool isActionTakingPlace(dg::config::Signals signal)
+      bool isActionTakingPlace(uint32_t signal)
       {
         return inputMap[signal];
       }
 
-      std::unordered_map<config::Signals, bool> inputMap = {};
+      std::unordered_map<uint32_t, bool> inputMap = {};
 
     protected:
 

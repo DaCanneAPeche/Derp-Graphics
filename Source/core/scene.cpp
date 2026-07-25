@@ -10,23 +10,23 @@ namespace dg
     app = application;
   }
 
-  void Scene::bindInput(std::vector<Key>& keys, dg::config::Signals signal,
+  void Scene::bindInput(std::vector<Key>& keys, uint32_t signal,
       KeyboardMods necessaryMods, KeyboardMods forbiddenMods)
   {
     assert((necessaryMods & forbiddenMods) == KeyboardMods::none &&
         "Necessary and forbidden mods cannot overlap !");
 
-    signalHandler.on(dg::config::Signals::KEY_PRESS, [keys,
+    eventHandler.on(Events::KeyPress, [keys,
         signal, necessaryMods, forbiddenMods, this](Key key, KeyboardMods mods)
         {
           if (!isInputRespected(keys, mods, key, necessaryMods, forbiddenMods))
             return;
 
-          signalHandler.send(signal);
+          eventHandler.send(signal);
           inputMap[signal] = true;
         });
 
-    signalHandler.on(dg::config::Signals::KEY_RELEASE, [keys,
+    eventHandler.on(Events::KeyRelease, [keys,
         signal, necessaryMods, forbiddenMods, this](Key key, KeyboardMods mods)
         {
           if (isInputRespected(keys, mods, key, necessaryMods, forbiddenMods))
@@ -34,7 +34,7 @@ namespace dg
         });
   }
 
-  void Scene::bindInput(Key key, dg::config::Signals signal,
+  void Scene::bindInput(Key key, uint32_t signal,
       KeyboardMods necessaryMods, KeyboardMods forbiddenMods)
   {
     std::vector<Key> keys = {key};

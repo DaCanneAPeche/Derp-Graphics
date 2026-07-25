@@ -4,113 +4,120 @@
 #include <functional>
 #include <any>
 
-#include "config/signals.hpp"
 #include <plog/Log.h>
+
+#include "core/events.hpp"
+#include "utils/castable_to.hpp"
 
 namespace dg
 {
-  class SignalHandler
+  struct LifeCycle
+  {
+    bool alive = false;
+  };
+
+  template <class... CallbackArgsTypes>
+  struct SignalCallback
+  {
+    std::function<void(CallbackArgsTypes...)> func;
+    size_t lifeCycleIndex;
+  };
+
+  using SignalType = uint32_t;
+  class SignalManager
   {
     public:
-      void on(uint32_t signal, auto callback)
+
+      static SignalManager* get()
       {
-        m_signalMap[signal].push_back(std::function(callback));
+        if (!s_instance) s_instance = new SignalManager();
+
+        return s_instance;
       }
 
-      template <class... Types>
-      void send(uint32_t signal, Types... args)
+      static void on(CastableTo<SignalType> auto signal, auto callback, size_t lifeCycleIndex)
       {
-        if (!m_signalMap.contains(signal))
+        get()->IOn(signal, callback, lifeCycleIndex);
+      }
+
+      template <class... CallbackArgsTypes>
+      static void send(CastableTo<SignalType> auto signal, CallbackArgsTypes... arguments)
+      {
+        get()->ISend(signal, arguments...);
+      }
+
+      static void shutdown()
+      {
+        delete s_instance;
+        s_instance = nullptr;
+      }
+
+      static bool isLifeCycleAlive(size_t lifeCycleIndex)
+      {
+        return get()->IIsLifeCycleAlive(lifeCycleIndex);
+      }
+
+      static size_t createLifeCycle()
+      {
+        return get()->ICreateLifeCycle();
+      }
+
+      static LifeCycle& getLifeCycle(size_t lifeCycleIndex)
+      {
+        return get()->IGetLifeCycle(lifeCycleIndex);
+      }
+      
+      // Not true by default because really annoying with key ups and things
+      static inline bool warnOnUselessSends = false;
+
+      SignalManager(const SignalManager&) = delete;
+      SignalManager& operator=(const SignalManager&) = delete;
+  
+    private:
+      SignalManager() {}
+
+      void IOn(CastableTo<SignalType> auto signal, auto callback, size_t lifeCycleIndex)
+      {
+        m_signalMap[static_cast<SignalType>(signal)].push_back({std::function(callback), lifeCycleIndex});
+      }
+
+      template <class... CallbackArgsTypes>
+      void ISend(CastableTo<SignalType> auto signal, CallbackArgsTypes... arguments)
+      {
+        if (!m_signalMap.contains(static_cast<SignalType>(signal)))
         {
           LOG_WARNING_IF(warnOnUselessSends)
-            << "Signal sent without existing callbacks : " << signal;
+            << "Signal sent without existing callbacks : " << static_cast<SignalType>(signal);
           return;
         }
 
-        for (const std::any& callback : m_signalMap[signal])
+        for (const std::any& _callback : m_signalMap[static_cast<SignalType>(signal)])
         {
-          auto func = std::any_cast<std::function<void(Types...)>>(callback);
-          func(args...);
+          auto callback = std::any_cast<SignalCallback<CallbackArgsTypes...>>(_callback);
+          if (IIsLifeCycleAlive(callback.lifeCycle)) callback.func(arguments...);
         }
       }
 
-      void on(config::Signals signal, auto callback)
+      bool IIsLifeCycleAlive(size_t lifeCycleIndex)
       {
-        on(static_cast<uint32_t>(signal), callback);
+        return m_lifeCycles[lifeCycleIndex].alive;
       }
 
-      template <class... Types>
-      void send(config::Signals signal, Types... args)
+      size_t ICreateLifeCycle()
       {
-        send(static_cast<uint32_t>(signal), args...);
+        m_lifeCycles.emplace_back(true);
+        return m_lifeCycles.size() - 1;
       }
 
-      // Not true by default because really annoying with key ups and things
-      bool warnOnUselessSends = false;
+      LifeCycle& IGetLifeCycle(size_t lifeCycleIndex)
+      {
+        return m_lifeCycles[lifeCycleIndex];
+      }
 
-    private:
-      std::unordered_map<uint32_t, std::vector<std::any>> m_signalMap;
+      std::unordered_map<SignalType, std::vector<std::any>> m_signalMap;
+      std::vector<LifeCycle> m_lifeCycles = {LifeCycle {true}};
+
+      static inline SignalManager* s_instance = nullptr;
   };
 
-  /*
-   * As a singleton
-  class SignalHandler
-  {
-    public:
-
-      static void clear()
-      {
-        getInstance().IClear();
-      }
-
-      static void on(uint32_t signal, auto callback)
-      {
-        getInstance().IOn(signal, callback);
-      }
-
-      template <class... Types>
-      static void send(uint32_t signal, Types... args)
-      {
-        getInstance().ISend(signal, args...);
-      }
-
-      static SignalHandler& getInstance()
-      {
-        static SignalHandler instance;
-        return instance;
-      }
-
-    private:
-
-      void IClear()
-      {
-        m_signalMap.clear();
-      }
-
-      void IOn(uint32_t signal, auto callback)
-      {
-        m_signalMap[signal].push_back(std::function(callback));
-      }
-
-      template <class... Types>
-      void ISend(uint32_t signal, Types... args)
-      {
-        if (!m_signalMap.contains(signal))
-        {
-          LOG_WARNING << "Signal sent without existing callbacks : " << signal;
-          return;
-        }
-
-        for (const std::any& callback : m_signalMap[signal])
-        {
-          auto func = std::any_cast<std::function<void(Types...)>>(callback);
-          func(args...);
-        }
-
-      }
-
-      // Signal -> vector of function callbacks
-      std::unordered_map<uint32_t, std::vector<std::any>> m_signalMap;
-  };
-  */
 }
